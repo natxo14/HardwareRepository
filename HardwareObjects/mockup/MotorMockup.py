@@ -108,6 +108,7 @@ class MotorMockup(AbstractMotor):
         if self.__move_task is not None:
             self.__move_task.kill()
 
+
     def get_value(self):
         """Read the actuator position.
         Returns:
@@ -125,3 +126,10 @@ class MotorMockup(AbstractMotor):
                              If timeout == 0: return at once and do not wait;
         """
         gevent.spawn(self._move, value)
+        self._nominal_value = value
+
+    def set_state(self, state):
+        """Set the motor state
+            no set_state function in parent class        
+        """
+        self._state = state

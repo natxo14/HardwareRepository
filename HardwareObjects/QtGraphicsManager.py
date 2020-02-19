@@ -170,7 +170,6 @@ class QtGraphicsManager(AbstractSampleView):
             self
         )
         self.graphics_measure_distance_item.hide()
-
         self.graphics_measure_angle_item = GraphicsLib.GraphicsItemMeasureAngle(self)
         self.graphics_measure_angle_item.hide()
         self.graphics_measure_area_item = GraphicsLib.GraphicsItemMeasureArea(self)
@@ -918,6 +917,7 @@ class QtGraphicsManager(AbstractSampleView):
                 self.graphics_grid_draw_item.set_end_position(
                     scene_point.x(), scene_point.y()
                 )
+
         elif self.in_measure_distance_state:
             self.graphics_measure_distance_item.set_coord(self.mouse_position)
         elif self.in_measure_angle_state:
@@ -943,6 +943,7 @@ class QtGraphicsManager(AbstractSampleView):
                 abs(select_start_x - scene_point.x()) > 5
                 and abs(select_start_y - scene_point.y()) > 5
             ):
+
                 painter_path = QtImport.QPainterPath()
                 painter_path.addRect(
                     min(select_start_x, scene_point.x()),
