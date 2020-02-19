@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device class="BlissMotor">
+<<<<<<< HEAD
   <actuator_name>omega</actuator_name>
+=======
+  <motor_name>omega</motor_name>
+>>>>>>> 7f8f87fc... First HardwareRepository for id13
   <GUIStep>20</GUIStep>
 </device>

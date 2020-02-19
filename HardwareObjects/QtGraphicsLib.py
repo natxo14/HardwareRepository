@@ -249,7 +249,6 @@ class GraphicsItemBeam(GraphicsItem):
         """
         self.custom_pen.setColor(QtImport.Qt.green)
         painter.setPen(self.custom_pen)
-<<<<<<< Updated upstream
 
         # print(
         #     f"""drawRect x : {self.beam_position[0] * self.scene().image_scale - self.beam_size_pix[0] / 2 * self.scene().image_scale } 
@@ -259,9 +258,7 @@ class GraphicsItemBeam(GraphicsItem):
         #      self.beam_size_pix[0] : {self.beam_size_pix[0]}
         #      self.beam_size_pix[1] : {self.beam_size_pix[1]} """
         # )
-=======
->>>>>>> Stashed changes
-        
+
         if self.beam_is_rectangle:
             painter.drawRect(
                 self.beam_position[0] * self.scene().image_scale
