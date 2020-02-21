@@ -119,7 +119,7 @@ class TangoLimaVideoDevice(AbstractVideoDevice):
 
         if img_data[0] == "VIDEO_IMAGE":
             raw_fmt = img_data[1][: self.header_size]
-            raw_buffer = np.fromstring(img_data[1][self.header_size :], np.uint16)
+            raw_buffer = np.frombuffer(img_data[1][self.header_size :], np.uint16)
             _, ver, img_mode, frame_number, width, height, _, _, _, _ = struct.unpack(
                 self.header_fmt, img_data[1][: self.header_size]
             )
