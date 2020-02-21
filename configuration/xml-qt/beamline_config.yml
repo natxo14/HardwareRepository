@@ -39,6 +39,8 @@ _objects:
     - plate_manipulator: plate-manipulator.xml
     - diffractometer: diffractometer-mockup.xml
     - sample_view: sample-view.xml
+    #- diffractometer: mini-diff-mockup.xml
+    #- microscope: graphics.xml
     - lims: lims-client-mockup.xml
     - queue_manager: queue.xml
     - queue_model: queue-model.xml
