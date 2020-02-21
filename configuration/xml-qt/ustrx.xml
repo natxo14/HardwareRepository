@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device class="BlissMotor">
   <motor_name>ustrx</motor_name>
+<<<<<<< HEAD
   <GUIstep>0.05</GUIstep>
+=======
+  <GUIStep>20</GUIStep>
+>>>>>>> 85231528... Added files to configure id13 beamline
 </device>
