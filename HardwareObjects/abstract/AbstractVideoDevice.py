@@ -234,19 +234,19 @@ class AbstractVideoDevice(Device):
         return self.cam_type
 
     def y8_2_rgb(self, raw_buffer):
-        image = np.fromstring(raw_buffer, dtype=np.uint8)
+        image = np.frombuffer(raw_buffer, dtype=np.uint8)
         raw_dims = self.get_raw_image_size()
         image.resize(raw_dims[1], raw_dims[0], 1)
         return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
     def y16_2_rgb(self, raw_buffer):
-        image = np.fromstring(raw_buffer, dtype=np.uint8)
+        image = np.frombuffer(raw_buffer, dtype=np.uint8)
         raw_dims = self.get_raw_image_size()
         np.resize(image, (raw_dims[1], raw_dims[0], 2))
         return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
     def yuv_2_rgb(self, raw_buffer):
-        image = np.fromstring(raw_buffer, dtype=np.uint8)
+        image = np.frombuffer(raw_buffer, dtype=np.uint8)
         raw_dims = self.get_raw_image_size()
         image.resize(raw_dims[1], raw_dims[0], 2)
         return cv2.cvtColor(image, cv2.COLOR_YUV2RGB_UYVY)

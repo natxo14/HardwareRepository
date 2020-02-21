@@ -110,7 +110,7 @@ class QtTangoLimaVideo(AbstractVideoDevice):
             _, ver, img_mode, frame_number, width, height, _, _, _, _ = struct.unpack(
                 header_fmt, img_data[1][: struct.calcsize(header_fmt)]
             )
-            raw_buffer = np.fromstring(img_data[1][32:], np.uint16)
+            raw_buffer = np.frombuffer(img_data[1][32:], np.uint16)
         return raw_buffer, width, height
 
     def get_gain(self):
