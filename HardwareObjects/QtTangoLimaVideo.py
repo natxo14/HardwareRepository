@@ -86,7 +86,7 @@ class QtTangoLimaVideo(AbstractVideoDevice):
 
     def set_cam_encoding(self, cam_encoding):
         if cam_encoding == "yuv422p":
-            self.device.video_mode = "YUV422"
+            self.device.video_mode = "YUV422PACKED"
         elif cam_encoding == "y8":
             self.device.video_mode = "Y8"
 
