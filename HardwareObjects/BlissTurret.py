@@ -42,8 +42,11 @@ class BlissTurret(Device):
     def get_turret_mnemonic(self):
         return self.turret_name
 
+<<<<<<< HEAD
     def update_values(self):
         self.emit("positionChanged", (self.get_position(),))
         self.emit("modeChanged", (self.get_mode(),))
 
 
+=======
+>>>>>>> f624c696... Volpi and Turret HObjects added
