@@ -24,4 +24,7 @@ class BlissVolpi(Device):
 
     def get_intensity(self):
         """get volpi intensity value."""
-        return self.self.volpi.intensity    
+        return self.self.volpi.intensity
+    
+    def update_values(self):
+        self.emit("intensityChanged", (self.get_intensity(),))
