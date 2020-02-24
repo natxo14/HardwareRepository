@@ -20,6 +20,7 @@ class BlissVolpi(Device):
 
     def set_intensity(self, intensity):
         """set volpi to new value."""
+<<<<<<< HEAD
         self.volpi.intensity = intensity
 
     def get_intensity(self):
@@ -31,3 +32,10 @@ class BlissVolpi(Device):
 
     def intensity_changed(self, new_intensity):
         self.emit("intensityChanged", (new_intensity,))
+=======
+        self.self.volpi.intensity = intensity
+
+    def get_intensity(self):
+        """get volpi intensity value."""
+        return self.self.volpi.intensity    
+>>>>>>> f624c696... Volpi and Turret HObjects added
