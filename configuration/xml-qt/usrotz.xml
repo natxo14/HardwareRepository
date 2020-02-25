@@ -2,8 +2,12 @@
 <device class="BlissMotor">
   <motor_name>usrotz</motor_name>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <GUIstep>0.5</GUIstep>
 =======
   <GUIStep>20</GUIStep>
 >>>>>>> 85231528... Added files to configure id13 beamline
+=======
+  <GUIstep>0.5</GUIstep>
+>>>>>>> e8548673... Work on turret and volpi HObjects plus xml files
 </device>
