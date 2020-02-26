@@ -12,8 +12,6 @@ class BlissVolpi(Device):
 
         cfg = static.get_config()
         self.volpi = cfg.get(self.volpi_name)
-        print(f"########@BlissVolpi init : {self.volpi_name}" )
-        print(f"########@BlissVolpi init : {self.volpi}" )
         self.connect(self.volpi, "intensity", self.intensity_changed)
     
     def connectNotify(self, signal):
@@ -22,7 +20,6 @@ class BlissVolpi(Device):
 
     def set_intensity(self, intensity):
         """set volpi to new value."""
-        print(f"@BlissVolpi set intensity : {intensity}" )
         self.volpi.intensity = intensity
 
     def get_intensity(self):
