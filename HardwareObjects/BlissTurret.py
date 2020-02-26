@@ -11,8 +11,6 @@ class BlissTurret(Device):
 
         cfg = static.get_config()
         self.turret = cfg.get(self.turret_name)
-        print(f"########@BlissTurret init : {self.turret_name}" )
-        print(f"########@BlissTurret init : {self.turret}" )
         self.connect(self.turret, "position", self.position_changed)
         self.connect(self.turret, "mode", self.mode_changed)
     
