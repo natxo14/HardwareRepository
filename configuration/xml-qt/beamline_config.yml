@@ -40,7 +40,7 @@ _objects:
     - plate_manipulator: plate-manipulator.xml
     - diffractometer: diffractometer-mockup.xml
     # - diffractometer: mini-diff-mockup.xml
-    - microscope: graphics2.xml
+    # - microscope: graphics2.xml
     - lims: lims-client-mockup.xml
     - queue_manager: queue.xml
     - queue_model: queue-model.xml
