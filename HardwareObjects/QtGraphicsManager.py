@@ -170,6 +170,7 @@ class QtGraphicsManager(AbstractSampleView):
             self
         )
         self.graphics_measure_distance_item.hide()
+
         self.graphics_measure_angle_item = GraphicsLib.GraphicsItemMeasureAngle(self)
         self.graphics_measure_angle_item.hide()
         self.graphics_measure_area_item = GraphicsLib.GraphicsItemMeasureArea(self)
@@ -213,10 +214,9 @@ class QtGraphicsManager(AbstractSampleView):
         self.graphics_view.wheelSignal.connect(self.mouse_wheel_scrolled)
 
         self.diffractometer_hwobj = self.getObjectByRole("diffractometer")
-        print(f"QtGraphicsManager self.diffractometer_hwobj : {self.diffractometer_hwobj}")
+
         if self.diffractometer_hwobj is not None:
             pixels_per_mm = self.diffractometer_hwobj.get_pixels_per_mm()
-            print(f"QtGraphicsManager call diffractometer_pixels_per_mm_changed pixels_per_mm : {pixels_per_mm}")
             self.diffractometer_pixels_per_mm_changed(pixels_per_mm)
             GraphicsLib.GraphicsItemGrid.set_grid_direction(
                 self.diffractometer_hwobj.get_grid_direction()
@@ -273,9 +273,7 @@ class QtGraphicsManager(AbstractSampleView):
             )
 
         if HWR.beamline.beam is not None:
-            print(f"qtgraphicsmanager : HWR.beamline.beam is not None")
             self.beam_info_dict = HWR.beamline.beam.get_beam_info()
-            print(f"qtgraphicsmanager : beam_info_dict {self.beam_info_dict}")
             self.beam_position = HWR.beamline.beam.get_beam_position()
             self.connect(
                 HWR.beamline.beam, "beamPosChanged", self.beam_position_changed
@@ -566,7 +564,6 @@ class QtGraphicsManager(AbstractSampleView):
         :param beam_info: information about the beam shape
         :type beam_info: dict with beam info parameters
         """
-        print(f"beam_info_changed : {beam_info}")
         if beam_info:
             self.beam_info_dict = beam_info
             for graphics_item in self.graphics_view.graphics_scene.items():
@@ -739,12 +736,10 @@ class QtGraphicsManager(AbstractSampleView):
         :param pixels_per_mm: two floats for scaling
         :type pixels_per_mm: list with two floats
         """
-        print(f"QtGraphicsManager INSIDE diffractometer_pixels_per_mm_changed pixels_per_mm : {pixels_per_mm} / self.pixels_per_mm {self.pixels_per_mm} / type {type(pixels_per_mm)}")
-            
+
         if type(pixels_per_mm) in (list, tuple):
             if pixels_per_mm != self.pixels_per_mm:
                 self.pixels_per_mm = pixels_per_mm
-                print(f"temp : self.pixels_per_mm {self.pixels_per_mm}")
                 for item in self.graphics_view.graphics_scene.items():
                     if isinstance(item, GraphicsLib.GraphicsItem):
                         item.set_pixels_per_mm(self.pixels_per_mm)
@@ -923,7 +918,6 @@ class QtGraphicsManager(AbstractSampleView):
                 self.graphics_grid_draw_item.set_end_position(
                     scene_point.x(), scene_point.y()
                 )
-
         elif self.in_measure_distance_state:
             self.graphics_measure_distance_item.set_coord(self.mouse_position)
         elif self.in_measure_angle_state:
@@ -949,7 +943,6 @@ class QtGraphicsManager(AbstractSampleView):
                 abs(select_start_x - scene_point.x()) > 5
                 and abs(select_start_y - scene_point.y()) > 5
             ):
-
                 painter_path = QtImport.QPainterPath()
                 painter_path.addRect(
                     min(select_start_x, scene_point.x()),
