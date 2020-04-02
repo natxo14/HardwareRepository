@@ -194,7 +194,6 @@ class GraphicsItem(QtImport.QGraphicsItem):
                           (size_x, size_y, shape)
         :type beam_info: dict
         """
-        print(f"self : {self} set_beam_info : beam_info : {beam_info}")
         self.beam_is_rectangle = beam_info.get("shape") == "rectangular"
         self.beam_size_mm[0] = beam_info.get("size_x", 0)
         self.beam_size_mm[1] = beam_info.get("size_y", 0)
@@ -211,7 +210,6 @@ class GraphicsItem(QtImport.QGraphicsItem):
     def set_pixels_per_mm(self, pixels_per_mm):
         """Sets pixels per mm and updates item
         """
-        print(f"self : {self} set_pixels_per_mm : self.beam_size_mm : {self.beam_size_mm} pixels_per_mm : {pixels_per_mm}")
         if not (math.isnan(pixels_per_mm[0]) or math.isnan(pixels_per_mm[1])):
             self.pixels_per_mm = pixels_per_mm
             self.beam_size_pix[0] = int(self.beam_size_mm[0] * self.pixels_per_mm[0])
@@ -247,7 +245,7 @@ class GraphicsItemBeam(GraphicsItem):
         """Main beam painter method
            Draws ellipse or rectangle with a cross in the middle
         """
-        self.custom_pen.setColor(QtImport.Qt.green)
+        self.custom_pen.setColor(QtImport.Qt.blue)
         painter.setPen(self.custom_pen)
 
         if self.beam_is_rectangle:
