@@ -78,6 +78,7 @@ class BlissMotor(AbstractMotor):
     def __init__(self, name):
         AbstractMotor.__init__(self, name)
         self.motor_obj = None
+        self.motor_states = BlissMotorStates
 
     def init(self):
         """Initialise the motor"""
