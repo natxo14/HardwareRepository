@@ -36,6 +36,7 @@ class BeamInfoMockup(AbstractBeam):
 
     def init(self):
         super(BeamInfoMockup, self).init()
+        self.beam_position = [318, 238]
         self.aperture_hwobj = self.getObjectByRole("aperture")
         if self.aperture_hwobj is not None:
             self.connect(
@@ -146,7 +147,6 @@ class BeamInfoMockup(AbstractBeam):
         Description: called if aperture, slits or focusing has been changed
         Returns: dictionary, {size_x: 0.1, size_y: 0.1, shape: "rectangular"}
         """
-        print("evaluate_beam_info")
         size_x = min(
             self.beam_size_aperture[0],
             self.beam_size_slits[0],
@@ -160,7 +160,6 @@ class BeamInfoMockup(AbstractBeam):
 
         self.beam_info_dict["size_x"] = size_x
         self.beam_info_dict["size_y"] = size_y
-        print(f"evaluate_beam_info self.beam_info_dict {self.beam_info_dict}")
         if tuple(self.beam_size_aperture) < tuple(self.beam_size_slits):
             self.beam_info_dict["shape"] = "ellipse"
         else:
