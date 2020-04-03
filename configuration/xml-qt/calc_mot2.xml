@@ -2,6 +2,5 @@
 <device class="BlissMotor">
   <actuator_name>m1</actuator_name>
   <motor_name>m1</motor_name>
-  <actuator_name>m1</actuator_name>
   <GUIStep>20</GUIStep>
 </device>
