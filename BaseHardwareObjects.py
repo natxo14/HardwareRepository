@@ -307,15 +307,6 @@ class HardwareObjectNode(object):
         objects = []
         role = str(role).lower()
 
-        # from PyQt5.QtCore import pyqtRemoveInputHook
-        # pyqtRemoveInputHook()
-        # import pdb
-        # pdb.set_trace() 
-        # print(f"""get object by role 
-        #           object : {obj} 
-        #           obj._objectsByRole : {obj._objectsByRole} 
-        #           role : {role}""")
-
         while True:
             if role in obj._objectsByRole:
                 return obj._objectsByRole[role]
