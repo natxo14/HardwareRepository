@@ -85,14 +85,6 @@ class DiffractometerMockup(GenericDiffractometer):
 
         self.equipment_ready()
 
-        # TODO FFS get this cleared up - one function, one name
-        self.getPositions = self.get_positions
-
-        # from PyQt5.QtCore import pyqtRemoveInputHook
-        # pyqtRemoveInputHook()
-        # import pdb
-        # pdb.set_trace()
-        
         self.connect(
             self.motor_hwobj_dict["phi"], "valueChanged", self.phi_motor_moved
         )
