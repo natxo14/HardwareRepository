@@ -477,6 +477,7 @@ class HardwareObjectMixin(CommandContainer):
         Args:
             state (enum 'HardwareObjectState'): state
         """
+        print(f"HWOB Mixin 1 update_state {state} vs {self.STATES.READY}")
         if state is None:
             state = self.get_state()
 
@@ -493,7 +494,9 @@ class HardwareObjectMixin(CommandContainer):
         if state != self._state:
             self._state = state
             self.emit("stateChanged", (self._state,))
-
+        
+        print(f"HWOB Mixin 4 update_state final state {self._state}")
+                
     def update_specific_state(self, state=None):
         """Update self._specific_state, and emit specificStateChanged if appropriate
 
@@ -527,8 +530,11 @@ class HardwareObjectMixin(CommandContainer):
         Should be expanded in subclasse with more updatable attributes
         (e.g. value, limits)
         """
+        print(f"HWOB Mixin update_values 1")
         self.update_state()
+        print(f"HWOB Mixin update_values 2")
         self.update_specific_state()
+        print(f"HWOB Mixin update_values 3")
 
     # Moved from HardwareObjectNode
     def clear_gevent(self):
