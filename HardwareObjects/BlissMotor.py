@@ -57,6 +57,9 @@ class BlissMotorStates(enum.Enum):
     OFF = 6
     DISABLED = 7
     UNKNOWN = 8
+    NOTINITIALIZED = 9
+    LOWLIMIT = 10
+    HIGHLIMIT = 11
 
 
 class BlissMotor(AbstractMotor):
@@ -73,6 +76,9 @@ class BlissMotor(AbstractMotor):
         "OFF": HardwareObjectState.OFF,
         "DISABLED": HardwareObjectState.OFF,
         "UNKNOWN": HardwareObjectState.UNKNOWN,
+        "NOTINITIALIZED": HardwareObjectState.OFF,
+        "LOWLIMIT": HardwareObjectState.READY,
+        "HIGHLIMIT": HardwareObjectState.READY,
     }
 
     def __init__(self, name):
@@ -87,28 +93,69 @@ class BlissMotor(AbstractMotor):
         self.motor_obj = cfg.get(self.actuator_name)
         self.connect(self.motor_obj, "position", self.update_value)
         self.connect(self.motor_obj, "state", self.update_state)
-        self.connect(self.motor_obj, "move_done", self.update_state)
+        self.connect(self.motor_obj, "move_done", self.update_state2)
+
+
+        print(f"BlissMotor : init state : {self.motor_obj.state}")
+        self.update_state(self.motor_obj.state)
 
     def update_state(self, state=None):
         """Check if the state has changed. Emits signal stateChanged.
         Args:
             state (enum 'HardwareObjectState'): state
         """
+        print(f"BlissMotor : update_state ; BLISS STATE CHANGED : {state}")
         if isinstance(state, bool):
             # It seems like the current version of BLISS gives us a boolean
             # at first and last event, True for ready and False for moving
             state = "READY" if state else "MOVING"
+            print(f"BlissMotor : isinstance(state,bool) : {state}")
         else:
+            if state is None:
+                state = self.get_state()
+                print(f"BlissMotor : if state is None : {state}")
             try:
                 state = state.current_states_names[0]
             except (AttributeError, KeyError):
                 state = "UNKNOWN"
-
+        print(f"BlissMotor : bliss motor update_state 2: {state}")
+        
         try:
             self._specific_state = BlissMotorStates.__members__[state]
         except:
             self._specific_state = BlissMotorStates.__members__["UNKNOWN"]
 
+        tmp = self.SPECIFIC_TO_HWR_STATE.get(state, HardwareObjectState.UNKNOWN)
+        print(f"BlissMotor : bliss motor update_state 3: {state}  {tmp}")
+        AbstractMotor.update_state(
+            self, self.SPECIFIC_TO_HWR_STATE.get(state, HardwareObjectState.UNKNOWN)
+        )
+
+    def update_state2(self, state=None):
+        """Check if the state has changed. Emits signal stateChanged.
+        Args:
+            state (enum 'HardwareObjectState'): state
+        """
+        print(f"BlissMotor : update_state2 ; BLISS MOVE DONE : {state}")
+        if isinstance(state, bool):
+            # It seems like the current version of BLISS gives us a boolean
+            # at first and last event, True for ready and False for moving
+            state = "READY" if state else "MOVING"
+            print(f"BlissMotor : isinstance(state,bool) : {state}")
+        else:
+            try:
+                state = state.current_states_names[0]
+            except (AttributeError, KeyError):
+                state = "UNKNOWN"
+        print(f"BlissMotor : bliss motor update_state2 2: {state}")
+        
+        try:
+            self._specific_state = BlissMotorStates.__members__[state]
+        except:
+            self._specific_state = BlissMotorStates.__members__["UNKNOWN"]
+
+        tmp = self.SPECIFIC_TO_HWR_STATE.get(state, HardwareObjectState.UNKNOWN)
+        print(f"BlissMotor : bliss motor update_state2 3: {state}  {tmp}")
         AbstractMotor.update_state(
             self, self.SPECIFIC_TO_HWR_STATE.get(state, HardwareObjectState.UNKNOWN)
         )

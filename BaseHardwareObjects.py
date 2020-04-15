@@ -454,10 +454,13 @@ class HardwareObjectMixin(CommandContainer):
         Args:
             state (enum 'HardwareObjectState'): state
         """
+        print(f"HWOB Mixin 1 update_state {state} vs {self.STATES.READY}")
         if state is None:
             state = self.get_state()
+            print(f"HWOB Mixin 2 update_state {state}")
         if state != self._state:
             if state == self.STATES.READY:
+                print(f"HWOB Mixin 3 update_state state == self.STATES.READY")
                 self._ready_event.set()
             elif not isinstance(state, self.STATES):
                 raise ValueError("Attempt to update to illegal state: %s" % state)
@@ -466,7 +469,9 @@ class HardwareObjectMixin(CommandContainer):
 
             self._state = state
             self.emit("stateChanged", (self._state,))
-
+        
+        print(f"HWOB Mixin 4 update_state final state {self._state}")
+                
     def update_specific_state(self, state=None):
         """Check if the specific state has changed. Emits signal stateChanged.
         Args:
@@ -493,8 +498,11 @@ class HardwareObjectMixin(CommandContainer):
 
            Normaly this method would emit all values
         """
+        print(f"HWOB Mixin update_values 1")
         self.update_state()
+        print(f"HWOB Mixin update_values 2")
         self.update_specific_state()
+        print(f"HWOB Mixin update_values 3")
 
     # Moved from HardwareObjectNode
     def clear_gevent(self):
