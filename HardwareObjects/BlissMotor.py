@@ -56,6 +56,7 @@ class BlissMotorStates(enum.Enum):
     HOME = 5
     OFF = 6
     DISABLED = 7
+    UNKNOWN = 8
 
 class BlissMotor(AbstractMotor):
     """Bliss Motor implementation"""
@@ -70,6 +71,7 @@ class BlissMotor(AbstractMotor):
         "HOME": HardwareObjectState.READY,
         "OFF": HardwareObjectState.OFF,
         "DISABLED": HardwareObjectState.OFF,
+        "UNKNOWN": HardwareObjectState.UNKNOWN,
     }
 
     def __init__(self, name):
@@ -85,11 +87,9 @@ class BlissMotor(AbstractMotor):
         self.connect(self.motor_obj, "state", self.update_state)
         self.connect(self.motor_obj, "move_done", self.update_state)
 
-
-        print(f"BlissMotor : init state : {self.motor_obj.state}")
-        #self.update_state(self.motor_obj.state)
-        self.update_state(self.get_state())
-
+        # init state to match motor's one
+        self.update_state(self.motor_obj.state)
+        
     def update_state(self, state=None):
         """Check if the state has changed. Emits signal stateChanged.
         Args:
@@ -101,19 +101,20 @@ class BlissMotor(AbstractMotor):
             state = "READY" if state else "MOVING"
         else:
             if state is None:
+                # this returns a HardwareObjectState
                 state = self.get_state()
             
-            if state not in HardwareObjectState:
-                try:
-                    state = state.current_states_names[0]
-                except (AttributeError, KeyError):
-                    state = "UNKNOWN"
-            else:
+            if state in HardwareObjectState:
                 # if 'state' is already a HardwareObjectState no need to convert it.
                 self._specific_state = state
                 AbstractMotor.update_state(self, state)  
                 return
-
+            else:
+                # state comming from bliss (with current_states_names attribute)
+                try:
+                    state = state.current_states_names[0]
+                except (AttributeError, KeyError):
+                    state = "UNKNOWN"
         try:
             self._specific_state = BlissMotorStates.__members__[state]
         except:
