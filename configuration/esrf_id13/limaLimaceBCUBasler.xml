@@ -1,0 +1,9 @@
+<device class="QtTangoLimaVideo">
+   <type>basler</type>
+   <encoding>y16</encoding>
+   <tangoname>//lid00limace:20000/id00/limaccds/bcu_basler_std</tangoname>
+   <!-- gain>0.5</gain -->
+   <exposure>0.01</exposure>
+   <mirror>(False, False)</mirror>
+   <interval>30</interval>
+</device>
