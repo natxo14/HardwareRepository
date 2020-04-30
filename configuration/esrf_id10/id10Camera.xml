@@ -1,9 +1,12 @@
 <device class="QtTangoLimaVideo">
-   <type>basler</type>
-   <encoding>yuv422p</encoding>
-   <tangoname>//id13:20000/id13/limaccds/uvlm1</tangoname>
-   <!-- gain>0.5</gain -->
-   <exposure>0.01</exposure>
-   <mirror>(False, False)</mirror>
-   <interval>30</interval>
+  <!--type>prosilica</type -->
+  <type>bayer</type>
+  <encoding>bayer_rg16</encoding>
+  <tangoname>id10/LimaCCDs/cdi_camera</tangoname>
+  <interval>300</interval>
+  <!-- gain>0.5</gain -->
+  <!--exposure></exposure -->
+  <mirror>(False, False)</mirror>
+  <image_hor_flip>False</image_hor_flip>
+  <image_ver_flip>True</image_ver_flip>
 </device>
