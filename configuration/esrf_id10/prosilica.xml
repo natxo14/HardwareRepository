@@ -1,7 +1,0 @@
-<device class="TangoLimaVideo">
-  <username>Prosilica</username>
-  <tangoname>id10/LimaCCDs/cdi_camera</tangoname>
-  <interval>300</interval>
-  <image_hor_flip>False</image_hor_flip>
-  <image_ver_flip>True</image_ver_flip>
-</device>
