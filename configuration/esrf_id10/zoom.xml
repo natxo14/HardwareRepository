@@ -1,5 +1,6 @@
-<device class = "SpecMotor">
-  <username>zoom</username>
-  <specname>zoom</specname>
-  <specversion>ting:cdi</specversion>
+<?xml version="1.0" encoding="utf-8"?>
+<device class="BlissMotor">
+  <actuator_name>zoom</actuator_name>
+  <GUIstep>0.05</GUIstep>
 </device>
+

@@ -1,5 +1,6 @@
-<device class = "SpecMotor">
-  <username>thx</username>
-  <specname>thx</specname>
-  <specversion>ting:cdi</specversion>
+<?xml version="1.0" encoding="utf-8"?>
+<device class="BlissMotor">
+  <actuator_name>thx</actuator_name>
+  <GUIstep>0.05</GUIstep>
 </device>
+
