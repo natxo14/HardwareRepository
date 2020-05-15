@@ -1,6 +1,6 @@
-<device class = "SpecMotor">
-  <username>cy</username>
-  <specname>cy</specname>
-  <unit>1e-3</unit>
-  <specversion>ting:cdi</specversion>
+<?xml version="1.0" encoding="utf-8"?>
+<device class="BlissMotor">
+  <actuator_name>cy</actuator_name>
+  <GUIstep>0.05</GUIstep>
 </device>
+

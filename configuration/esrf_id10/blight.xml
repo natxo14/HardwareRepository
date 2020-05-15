@@ -1,5 +1,5 @@
-<device class = "SpecMotor">
-  <username>blight</username>
-  <specname>blight</specname>
-  <specversion>ting:cdi</specversion>
+<?xml version="1.0" encoding="utf-8"?>
+<device class="BlissMotor">
+  <actuator_name>blight</actuator_name>
+  <GUIstep>0.05</GUIstep>
 </device>
