@@ -1,0 +1,6 @@
+<device class = "SpecMotor">
+  <username>cy</username>
+  <specname>cy</specname>
+  <unit>1e-3</unit>
+  <specversion>ting:cdi</specversion>
+</device>

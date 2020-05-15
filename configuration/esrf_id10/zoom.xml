@@ -1,0 +1,5 @@
+<device class = "SpecMotor">
+  <username>zoom</username>
+  <specname>zoom</specname>
+  <specversion>ting:cdi</specversion>
+</device>

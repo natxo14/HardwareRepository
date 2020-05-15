@@ -1,0 +1,5 @@
+<device class = "SpecMotor">
+  <username>gz</username>
+  <specname>gz</specname>
+  <specversion>ting:cdi</specversion>
+</device>
