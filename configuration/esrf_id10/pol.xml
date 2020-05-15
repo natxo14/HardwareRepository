@@ -1,0 +1,5 @@
+<device class = "SpecMotor">
+  <username>pol</username>
+  <specname>pol</specname>
+  <specversion>ting:cdi</specversion>
+</device>
