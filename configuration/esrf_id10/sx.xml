@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device class="BlissMotor">
-  <actuator_name>sx</actuator_name>
+  <actuator_name>sx_cdi</actuator_name>
   <GUIstep>0.05</GUIstep>
 </device>
 
