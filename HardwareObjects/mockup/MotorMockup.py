@@ -101,6 +101,7 @@ class MotorMockup(AbstractMotor):
         self.update_state(self.STATES.READY)
 
 
+
     def get_value(self):
         """Read the actuator position.
         Returns:
