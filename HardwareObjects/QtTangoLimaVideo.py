@@ -116,6 +116,7 @@ class QtTangoLimaVideo(AbstractVideoDevice):
                 header_fmt, img_data[1][: struct.calcsize(header_fmt)]
             )
             raw_buffer = np.fromstring(img_data[1][32:], np.uint16)
+        print(f"TangoLima get_image w {width} - h {height}")
         return raw_buffer, width, height
 
     def get_gain(self):

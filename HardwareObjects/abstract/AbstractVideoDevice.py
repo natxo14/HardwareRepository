@@ -252,11 +252,11 @@ class AbstractVideoDevice(Device):
         return cv2.cvtColor(image, cv2.COLOR_YUV2RGB_UYVY)
 
     def bayer_rg16_2_rgb(self, raw_buffer):
-        image = np.fromstring(raw_buffer, dtype=np.uint8)
+        image = np.fromstring(raw_buffer, dtype=np.uint16)
         raw_dims = self.get_raw_image_size()
         print(f"#################$$$$$$$$$$$$$$$$$$$bayer_rg16_2_rgb {raw_dims}")
-        image.resize(raw_dims[1], raw_dims[0], 1)
-        return cv2.cvtColor(image, cv2.COLOR_BayerRG2RGB)
+        image.resize(raw_dims[1], raw_dims[0])
+        return cv2.cvtColor(image, cv2.COLOR_BayerRG2BGR)
 
     def save_snapshot(self, filename, image_type="PNG"):
         if USEQT:
