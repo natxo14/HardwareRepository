@@ -196,6 +196,7 @@ class AbstractVideoDevice(Device):
                 qimage = QImage(
                     raw_buffer, width, height, width * 3, QImage.Format_RGB888
                 )
+            
             else:
                 qimage = QImage(raw_buffer, width, height, QImage.Format_RGB888)
 
@@ -252,11 +253,14 @@ class AbstractVideoDevice(Device):
         return cv2.cvtColor(image, cv2.COLOR_YUV2RGB_UYVY)
 
     def bayer_rg16_2_rgb(self, raw_buffer):
-        image = np.fromstring(raw_buffer, dtype=np.uint8)
+        image = np.fromstring(raw_buffer, dtype=np.uint16)
         raw_dims = self.get_raw_image_size()
-        print(f"#################$$$$$$$$$$$$$$$$$$$bayer_rg16_2_rgb {raw_dims}")
-        image.resize(raw_dims[1], raw_dims[0], 1)
-        return cv2.cvtColor(image, cv2.COLOR_BayerRG2RGB)
+        image.resize(raw_dims[1], raw_dims[0])
+        out_buffer =  cv2.cvtColor(image, cv2.COLOR_BayerRG2BGR)
+        if out_buffer.ndim == 3 and out_buffer.itemsize > 1:
+            # decoding bayer16 gives 12 bit values => scale to 8 bit
+            out_buffer = np.right_shift(out_buffer, 4).astype(np.uint8)
+        return out_buffer
 
     def save_snapshot(self, filename, image_type="PNG"):
         if USEQT:
@@ -378,8 +382,8 @@ class AbstractVideoDevice(Device):
             self.decoder = self.y16_2_rgb
         elif cam_encoding.lower() == "bayer_rg16":
             self.decoder = self.bayer_rg16_2_rgb
-        print(f"AbsVideoDev set cam enconding {self.decoder} - {cam_encoding}")
-
+        self.cam_encoding = cam_encoding
+        
     def get_image_dimensions(self):
         raw_width, raw_height = self.get_raw_image_size()
         width = raw_width * self.scale
