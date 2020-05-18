@@ -84,9 +84,6 @@ class QtTangoLimaVideo(AbstractVideoDevice):
 
         AbstractVideoDevice.init(self)
 
-        #self.cam_enconding = self.device.read_attribute("video_mode")
-        #print(f"#### QtTangoLima : cam enconding {self.cam_encoding}")
-
     def set_cam_encoding(self, cam_encoding):
         if cam_encoding == "yuv422p":
             self.device.video_mode = "YUV422"
@@ -94,7 +91,6 @@ class QtTangoLimaVideo(AbstractVideoDevice):
             self.device.video_mode = "Y8"
         elif cam_encoding.lower() == "bayer_rg16":
             self.device.video_mode = "BAYER_RG16"
-        print(f"#### QtTangoLima : cam enconding {self.cam_encoding} {self.device.video_mode}")
         AbstractVideoDevice.set_cam_encoding(self, cam_encoding)
 
     """ Overloading of AbstractVideoDevice methods """
@@ -116,7 +112,6 @@ class QtTangoLimaVideo(AbstractVideoDevice):
                 header_fmt, img_data[1][: struct.calcsize(header_fmt)]
             )
             raw_buffer = np.fromstring(img_data[1][32:], np.uint16)
-        print(f"TangoLima get_image w {width} - h {height}")
         return raw_buffer, width, height
 
     def get_gain(self):
