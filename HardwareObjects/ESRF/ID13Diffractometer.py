@@ -25,19 +25,33 @@ from HardwareRepository.HardwareObjects.GenericDiffractometer import (
     GenericDiffractometer
 )
 from HardwareRepository.HardwareObjects import sample_centring
+from HardwareRepository.BaseHardwareObjects import HardwareObject
+from HardwareRepository import HardwareRepository as HWR
+
+__credits__ = ["MXCuBE collaboration"]
+__version__ = "2.2."
+__status__ = "Draft"
 
 class ID13Diffractometer(GenericDiffractometer):
 
-    CENTRING_MOTORS_NAME = [
-        "phi",
-        "phiz",
-        "phiy",
-        "sampx",
-        "sampy",
-        "kappa",
-        "kappa_phi",
-        "beam_x",
-        "beam_y",
-        "zoom",
-    ]
+    # CENTRING_MOTORS_NAME = [
+    #     "phi",
+    #     "phiz",
+    #     "phiy",
+    #     "sampx",
+    #     "sampy",
+    #     "kappa",
+    #     "kappa_phi",
+    #     "beam_x",
+    #     "beam_y",
+    #     "zoom",
+    # ]
     
+    def __init__(self, *args):
+        GenericDiffractometer.__init__(self, *args)
+
+        # Hardware objects ----------------------------------------------------
+        self.zoom_motor_hwobj = None
+        self.omega_reference_motor = None
+        self.centring_hwobj = None
+        self.minikappa_correction_hwobj = None 

@@ -842,6 +842,7 @@ class GenericDiffractometer(HardwareObject):
         """
         Descript. :
         """
+        print(f"GenDiff start_move_to_beam")
         try:
             self.emit_progress_message("Move to beam...")
             self.centring_time = time.time()

@@ -1652,6 +1652,7 @@ class QtGraphicsManager(AbstractSampleView):
                 - infoMsg: as str
         """
         self.emit("centringInProgress", True)
+        print(f"QtGraphMng start_centring")
         if tree_click:
             self.hide_all_items()
             self.set_cursor_busy(True)
