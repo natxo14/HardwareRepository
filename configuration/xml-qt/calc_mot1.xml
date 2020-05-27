@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device class="BlissMotor">
-  <actuator_name>omega</actuator_name>
-  <motor_name>omega</motor_name>
-  <GUIStep>20</GUIStep>
+  <actuator_name>m0</actuator_name>
+  <GUIstep>0.5</GUIstep>
 </device>
