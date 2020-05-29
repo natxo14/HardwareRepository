@@ -28,14 +28,14 @@ _objects:
     # - transmission: attenuators-mockup.xml
     # - transmission: transmission-mockup.xml
     - energy: energy-mockup.xml
-    - beam: beam-info.xml
-    - flux: flux-mockup.xml
-    - detector: detector-mockup.xml
-    - resolution: resolution-mockup.xml
-    - hutch_interlock: door-interlock-mockup.xml
-    - safety_shutter: safety-shutter-mockup.xml
-    - fast_shutter: fast-shutter-mockup.xml
-    - sample_changer: sample-changer-mockup.xml
+    # - beam: beam-info.xml
+    # - flux: flux-mockup.xml
+    # - detector: detector-mockup.xml
+    # - resolution: resolution-mockup.xml
+    # - hutch_interlock: door-interlock-mockup.xml
+    # - safety_shutter: safety-shutter-mockup.xml
+    # - fast_shutter: fast-shutter-mockup.xml
+    # - sample_changer: sample-changer-mockup.xml
     # NBNB TODO remove plate_manipulater and treat as another smaple changer
     - plate_manipulator: plate-manipulator.xml
     - diffractometer: diffractometer-mockup.xml
