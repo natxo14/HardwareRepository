@@ -273,6 +273,7 @@ class QtGraphicsManager(AbstractSampleView):
             )
 
         if HWR.beamline.beam is not None:
+            HWR.beamline.beam.evaluate_beam_info()
             self.beam_info_dict = HWR.beamline.beam.get_beam_info_dict()
             self.beam_position = HWR.beamline.beam.get_beam_position_on_screen()
             self.connect(
@@ -1617,7 +1618,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_move_beam_mark_state = False
         self.graphics_move_beam_mark_item.hide()
         self.graphics_view.graphics_scene.update()
-        HWR.beamline.beam.set_beam_position(
+        HWR.beamline.beam.set_beam_position_on_screen(
             self.graphics_move_beam_mark_item.end_coord[0],
             self.graphics_move_beam_mark_item.end_coord[1],
         )
@@ -1652,6 +1653,7 @@ class QtGraphicsManager(AbstractSampleView):
                 - infoMsg: as str
         """
         self.emit("centringInProgress", True)
+        print(f"QtGraphMng start_centring")
         if tree_click:
             self.hide_all_items()
             self.set_cursor_busy(True)
