@@ -29,6 +29,7 @@ _objects:
     # - transmission: transmission-mockup.xml
     - energy: energy-mockup.xml
     - beam: beam-info.xml
+    - sample_view : sample-view.xml
     # - flux: flux-mockup.xml
     # - detector: detector-mockup.xml
     # - resolution: resolution-mockup.xml
