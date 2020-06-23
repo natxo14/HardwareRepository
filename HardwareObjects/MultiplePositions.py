@@ -156,8 +156,9 @@ class MultiplePositions(Equipment):
             self.mode = "absolute"
 
         motors = self["motors"]
+        print(f"@@@@@@@@@@@@@@@@@@@@@@motors {motors}")
         self.roles = motors.getRoles()
-
+        print(f"@@@@@@@@@@@@@@@@@@@@@@self.roles {self.roles}")
         self.deltas = {}
         try:
             # WARNING self.deltas is a LINK to the INTERNAL properties dictionary
@@ -171,20 +172,26 @@ class MultiplePositions(Equipment):
         self.positionsIndex = []
         try:
             positions = self["positions"]
+            print(f"positions {positions}")
         except BaseException:
             logging.getLogger().error("No positions.")
         else:
             for position in positions:
                 name = position.getProperty("name")
+                print(f"name {name}")
                 if name is not None:
                     self.positionsIndex.append(name)
                     self.positions[name] = {}
 
                     motpos = position.getProperties()
                     motroles = list(motpos.keys())
+                    print(f"motpos {motpos}")
+                    print(f"motroles {motroles}")
 
                     for role in self.roles:
+                        print(f"role {role}")
                         self.positions[name][role] = motpos[role]
+                        print(f"self.positions[name][role] - {self.positions[name][role]}")
                 else:
                     logging.getLogger().error("No name for position.")
 
@@ -194,6 +201,13 @@ class MultiplePositions(Equipment):
             self.connect(mot, "moveDone", self.checkPosition)
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
+
+        for key, value in self.positions.items():
+            print(f"key {key} value {value}")
+            print(f"value.items() {value.items()}")
+            for key2, value2 in value.items():
+                print(f"key2 {key2} value2 {value2}")
+        print(f"$$$$$$$$$$$$$$$ self.positions {self.positions} ")
 
     def get_state(self):
         if not self.is_ready():
