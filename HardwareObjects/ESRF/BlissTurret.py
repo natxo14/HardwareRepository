@@ -4,9 +4,10 @@ from bliss.config import static
 class BlissTurret(HardwareObject):
     
     def __init__(self, name):
-        Device.__init__(self, name)
+        HardwareObject.__init__(self, name)
         
     def init(self):
+        print(f"##########BLISSTURRET init self.turret_name : {self.turret_name}")
         self.username = self.turret_name
 
         cfg = static.get_config()
@@ -45,5 +46,18 @@ class BlissTurret(HardwareObject):
     def update_values(self):
         self.emit("positionChanged", (self.get_value(),))
         self.emit("modeChanged", (self.get_mode(),))
-
+    
+    def get_positions(self):
+        elements = []
+        try:
+            for el in self["elements"]:
+                elements.append(
+                    {
+                        "symbol": el.getProperty("symbol"),
+                        "energy": el.getProperty("energy"),
+                    }
+                )
+        except IndexError:
+            pass
+        return elements 
 
