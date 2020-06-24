@@ -2,13 +2,27 @@
 <object class="MultiplePositions">
   <username>Optic Zoom</username>
   <motors>
-        <device role="zoom" hwrid="/calc_mot2"></device>
+    <motor>
+      <name>zoom</name>
+    </motor>
+    <motor>
+      <name>light</name>
+    </motor>
   </motors>
+  <object role="zoom" hwrid="/mockupMotM1"></object>
+  <object role="light" href="/mockupMotOmega"></object>
+  <!--
+    motors>
+        <device role="zoom" hwrid="/calc_mot2"></device-->
+        <!--object role="zoom" href="/calc_mot2"></object-->
+        <!--object role="light" href="/calc_mot1"></object-->
+        <!--role role="zoom" href="/calc_mot2"></role-->
+        <!--object role="light" href="/calc_mot1"></object>
+  </motors-->
 
   <deltas>
         <zoom>0.1</zoom>
-        <gain>20</gain>
-        <exposure>20</exposure>
+        <light>2000</light>
   </deltas>
 
   <positions>
