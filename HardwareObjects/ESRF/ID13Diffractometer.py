@@ -57,14 +57,6 @@ class ID13Diffractometer(GenericDiffractometer):
     #     self.centring_hwobj = None
     #     self.minikappa_correction_hwobj = None 
     def init(self):
-        #self.smargon = self.getObjectByRole("smargon")
-        #self.connect(self.smargon, "stateChanged", self.smargon_state_changed)
-
-        #self.lightarm_hwobj = self.getObjectByRole("lightarm")
-        # self.centring_hwobj = self.getObjectByRole('centring')
-
-        self.px1conf_ho = self.getObjectByRole("px1configuration")
-        self.px1env_ho = self.getObjectByRole("px1environment")
 
         self.pixels_per_mm_x = 0
         self.pixels_per_mm_y = 0
