@@ -2685,7 +2685,7 @@ class GraphicsView(QtImport.QGraphicsView):
         :param event:
         :return:
         """
-        self.wheelSignal.emit(event.delta())
+        self.wheelSignal.emit(event.angleDelta())
 
         """
         //Get the original screen centerpoint

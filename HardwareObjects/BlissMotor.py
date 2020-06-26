@@ -120,12 +120,13 @@ class BlissMotor(AbstractMotor):
             (list): Motor states as list of BlissMotorStates enum
         """
         state = self.motor_obj.state.current_states_names
-        state_list = self._state2enum(state[0])[1]
+        state_list = []
+        state_list.append(self._state2enum(state[0])[1])
         if len(state) > 1:
             for _state in state[1:]:
                 state_list.append(self._state2enum(_state)[1])
 
-        return state_list
+        return state_list[0]
 
     def _update_state(self, state=None):
         """Check if the state has changed. Emits signal stateChanged.

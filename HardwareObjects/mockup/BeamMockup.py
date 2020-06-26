@@ -94,6 +94,17 @@ class BeamMockup(AbstractBeam):
         self._beam_position_on_screen = (beam_x, beam_y)
         self.emit("beamPosChanged", (self._beam_position_on_screen,))
 
+    def set_beam_position(self, beam_x, beam_y):
+        """
+        Sets beam mark position on screen
+        #TODO move method to sample_view
+        Args:
+            beam_x (int): horizontal position in pixels
+            beam_y (int): vertical position in pixels
+        """
+        self._beam_position_on_screen = (beam_x, beam_y)
+        self.emit("beamPosChanged", (self._beam_position_on_screen,))
+
     def get_slits_gap(self):
         """
         Returns: tuple with beam size in microns
