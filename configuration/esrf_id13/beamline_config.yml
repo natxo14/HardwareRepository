@@ -23,11 +23,11 @@ _objects:
     # on one object that require the other to be already loaded.
     #
     # Hardware:
-    - session: session.xml
-    - machine_info: mach-info-mockup.xml
+    # - session: session.xml
+    # - machine_info: mach-info-mockup.xml
     # - transmission: attenuators-mockup.xml
     # - transmission: transmission-mockup.xml
-    - energy: energy-mockup.xml
+    # - energy: energy-mockup.xml
     - beam: beam-info.xml
     - sample_view: sample-view.xml
     # - flux: flux-mockup.xml
@@ -41,8 +41,8 @@ _objects:
     # - plate_manipulator: plate-manipulator.xml
     - diffractometer: diffractometer-mockup.xml
     #- diffractometer: mini-diff-mockup.xml
-    #- microscope: graphics.xml
-    - lims: lims-client-mockup.xml
+    - microscope: graphicsWMockupCamera.xml
+    # - lims: lims-client-mockup.xml
     # - queue_manager: queue.xml
     # - queue_model: queue-model.xml
     # Procedures:
