@@ -93,7 +93,7 @@ SIGNAL
     description:    sent when after a position change of any of the motor
                     the object is not in any of the predefined positions
 
-    name:           position_reached
+    name:           predefinedPositionChanged
     parameter:      positionName
     description:    sent when after a position change of any of the motor
                     the object has reach a predefined position.
@@ -265,10 +265,22 @@ class MultiplePositions(Equipment):
         for mne,pos in self.positions[name].items():
         self.motors[mne].set_value(pos)
         """
+    def get_positions(self):
+        """
+        return the dictionary of all the positions.
+        """
+        return self.positions
+
+    def get_current_position(self):
+        """
+        return current position's values
+        """
+        current_position = self.get_value()
+        return self.positions.get(current_position)
 
     def get_value(self):
         """
-        Returns the name of the position
+        Returns the name of the current position
         It checks the positions of all the 'role' motors
         If all of them are within +/- delta tolerance, return pos name
         """
@@ -316,8 +328,8 @@ class MultiplePositions(Equipment):
             self.emit("no_position", ())
             return None
         else:
-            self.emit("position_reached", (posName,))
-            #print(f"checkPosition emit(position_reached) {posName}")
+            self.emit("predefinedPositionChanged", (posName,))
+            #print(f"checkPosition emit(predefinedPositionChanged) {posName}")
             return posName
 
     def setNewPositions(self, name, newPositions):
