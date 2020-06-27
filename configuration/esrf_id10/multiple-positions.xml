@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<object class="MultiplePositions">
+    <username>CDI Zoom</username>
+    <mode>absolute</mode>
+    <motors>
+        <motor>
+            <name>zoom</name>
+        </motor>
+        <motor>
+            <name>gain</name>
+        </motor>
+        <motor>
+            <name>exposure</name>
+        </motor>
+    </motors>
+	
+    <object role="zoom" href="/zoom"></object>
+    <object role="gain" href="/progain"></object>
+    <object role="exposure" href="/proexp"></object>
+    
+    <deltas>
+        <zoom>0.1</zoom>
+        <gain>20</gain>
+        <exposure>20</exposure>
+    </deltas>
+	
+    <positions>
+        <position>
+            <name>1X</name>
+            <color>#ff0000</color>
+            <zoom>6.0</zoom>
+            <gain>3.0</gain>
+            <exposure>0.1</exposure>
+            <resox>-3.37837837838e-06</resox>
+            <resoy>3.87596899225e-06</resoy>
+            <beamx>333.0</beamx>
+            <beamy>241.0</beamy>
+        </position>
+        <position>
+            <name>2X</name>
+            <zoom>5.0</zoom>
+            <gain>6</gain>
+            <exposure>0.1</exposure>
+            <resox>-2.34741784038e-06</resox>
+            <resoy>2.59067357513e-06</resoy>
+            <beamx>333</beamx>
+            <beamy>241</beamy>
+        </position>
+        <position>
+            <name>3x</name>
+            <color>#0000ff</color>
+            <zoom>4.0</zoom>
+            <gain>8.0</gain>
+            <exposure>0.1</exposure>
+            <resox>-1.61290322581e-06</resox>
+            <resoy>1.78571428571e-06</resoy>
+            <beamx>333</beamx>
+            <beamy>241</beamy>
+        </position>
+        <position>
+            <name>4X</name>
+            <color>#ff0000</color>
+            <zoom>3</zoom>
+            <gain>10</gain>
+            <exposure>0.1</exposure>
+            <resox>-8.92857142857e-07</resox>
+            <resoy>1.06382978723e-06</resoy>
+            <beamx>333</beamx>
+            <beamy>241</beamy>
+        </position>
+        <position>
+            <name>5X</name>
+            <zoom>2</zoom>
+            <gain>13</gain>
+            <exposure>0.1</exposure>
+            <resox>-6.94444444444e-07</resox>
+            <resoy>8.06451612903e-07</resoy>
+            <beamx>333</beamx>
+            <beamy>241</beamy>
+        </position>
+        <position>
+            <name>6X</name>
+            <color>#0000ff</color>
+            <zoom>1</zoom>
+            <gain>15</gain>
+            <exposure>0.2</exposure>
+            <resox>-4.71698113208e-07</resox>
+            <resoy>5.23560209424e-07</resoy>
+            <beamx>333</beamx>
+            <beamy>241</beamy>
+        </position>
+        <position>
+            <name>7X</name>
+            <color>#0000ff</color>
+            <zoom>0</zoom>
+            <gain>15</gain>
+            <exposure>0.4</exposure>
+            <resox>-3.22580645161e-07</resox>
+            <resoy>3.663003663e-07</resoy>
+            <beamx>333.0</beamx>
+            <beamy>241.0</beamy>
+        </position>
+    </positions>
+</object>
