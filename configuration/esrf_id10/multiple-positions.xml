@@ -15,8 +15,8 @@
     </motors>
 	
     <object role="zoom" href="/zoom"></object>
-    <object role="gain" href="/progain"></object>
-    <object role="exposure" href="/proexp"></object>
+    <!--object role="gain" href="/progain"></object>
+    <object role="exposure" href="/proexp"></object-->
     
     <deltas>
         <zoom>0.1</zoom>
