@@ -88,12 +88,12 @@ SIGNAL
     parameter:      state
     description:    send the new state of the object when it changes
 
-    name:           noPosition
+    name:           no_position
     parameter:      None
     description:    sent when after a position change of any of the motor
                     the object is not in any of the predefined positions
 
-    name:           positionReached
+    name:           predefinedPositionChanged
     parameter:      positionName
     description:    sent when after a position change of any of the motor
                     the object has reach a predefined position.
@@ -159,17 +159,18 @@ class MultiplePositions(Equipment):
         motors = self["motors"]
 
         self.motor_hwobj_list = []
-        print(f"@@@@@@@@@@@@@@@@@@@@@@ motors {motors} {type(motors)} is None - {motors is None} - {motors.objectsNames()}")
+        #print(f"@@@@@@@@@@@@@@@@@@@@@@ motors {motors} {type(motors)} is None - {motors is None} - {motors.objectsNames()}")
         for mot in motors:
                 name = mot.getProperty("name")
                 temp_motor_hwobj = self.getObjectByRole(name)
-                self.motor_hwobj_list.append(temp_motor_hwobj)
-                print(f"@@@@@@@@@@@@@@@@@@@@@@ motors  name {name} motor {id(temp_motor_hwobj)}")
+                if temp_motor_hwobj is not None:
+                    self.motor_hwobj_list.append(temp_motor_hwobj)
+                print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
 
         #self.roles = motors.getRoles()
         self.roles = self.getRoles()
         tmp = self.getObjectByRole("zoom")
-        print(f"@@@@@@@@@@@@@@@@@@@@@@ tmp {tmp} {type(tmp)}")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS tmp {tmp} {type(tmp)}")
         self.deltas = {}
         try:
             # WARNING self.deltas is a LINK to the INTERNAL properties dictionary
@@ -179,48 +180,70 @@ class MultiplePositions(Equipment):
         except BaseException:
             logging.getLogger().error("No deltas.")
 
+        self.roles_positions = {}
         self.positions = {}
         self.positions_names_list = []
         try:
             positions = self["positions"]
-            print(f"@@@@@@@@@@@@@@@@@@@@@@ positions {positions} {type(positions)}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS positions {positions} {type(positions)}")
         except BaseException:
             logging.getLogger().error("No positions.")
         else:
             for position in positions:
                 name = position.getProperty("name")
-                print(f"name {name}")
+                #print(f"name {name}")
                 if name is not None:
                     self.positions_names_list.append(name)
-                    self.positions[name] = {}
+                    self.roles_positions[name] = {}
 
                     motpos = position.getProperties()
                     motroles = list(motpos.keys())
-                    print(f"motpos {motpos}")
-                    print(f"motroles {motroles}")
+                    print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motpos {motpos}")
+                    #print(f"motroles {motroles}")
 
                     for role in self.roles:
-                        print(f"role {role}")
-                        self.positions[name][role] = motpos[role]
-                        print(f"self.positions[{name}][{role}] - {self.positions[name][role]}")
+                        #print(f"role {role}")
+                        self.roles_positions[name][role] = motpos[role]
+                        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.roles_positions[{name}][{role}] - {self.roles_positions[name][role]}")
                 else:
                     logging.getLogger().error("No name for position.")
 
         self.motors = {}
-        print(f"@@@@@@@@@@@@@@@@@@@@@@  motors {type(motors)}")
-        print(f"@@@@@@@@@@@@@@@@@@@@@@  self.roles {self.roles}")
+        #print(f"@@@@@@@@@@@@@@@@@@@@@@  motors {type(motors)}")
+        ##print(f"@@@@@@@@@@@@@@@@@@@@@@  self.roles {self.roles}")
         #for mot in self["motors"]:
         for mot in self.motor_hwobj_list:
-            print(f"@@@@@@@@@@@@@@@@ mot - {mot}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name} mot {id(mot)}")
             #self.motors[mot.getMotorMnemonic()] = mot
             self.connect(mot, "moveDone", self.checkPosition)
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
 
-        for key, value in self.positions.items():
-            print(f"key {key} value {value}")
+        #for key, value in self.roles_positions.items():
+            #print(f"key {key} value {value}")
             #for key2, value2 in value.items():
-        print(f"$$$$$$$$$$$$$$$ self.positions {self.positions} ")
+        #print(f"$$$$$$$$$$$$$$$ self.roles_positions {self.roles_positions} ")
+        self.positions = self.get_positions()
+
+    def get_positions(self):
+        positions = []
+        try:
+            for el in self["positions"]:
+                positions.append(
+                    {
+                        "name": el.getProperty("name"),
+                        "zoom": el.getProperty("zoom"),
+                        "beamx": el.getProperty("beamx"),
+                        "beamy": el.getProperty("beamy"),
+                        "resox": el.getProperty("resox"),
+                        "resoy": el.getProperty("resoy"),
+                        "resox": el.getProperty("resox"),
+                        "resoy": el.getProperty("resoy"),
+                    }
+                )
+        except IndexError:
+            pass
+        return positions 
 
     def get_positions_names_list(self):
         return self.positions_names_list
@@ -230,7 +253,10 @@ class MultiplePositions(Equipment):
             return ""
 
         state = "READY"
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state - {len(self.motor_hwobj_list)}")
+            
         for mot in self.motor_hwobj_list:
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - mot {id(mot)}")
             if mot.get_state() == HardwareObjectState.BUSY:
                 state = "MOVING"
             elif mot.get_state() in {HardwareObjectState.UNKNOWN,
@@ -246,44 +272,63 @@ class MultiplePositions(Equipment):
         self.checkPosition()
 
     def moveToPosition(self, name, wait=False):
-        print(f"$$$$$$$$$$$$$$$ moveToPosition {name} ")
+        #print(f"$$$$$$$$$$$$$$$ moveToPosition {name} ")
 
         move_list = []
         for role in self.roles:
             device = self.getObjectByRole(role)
-            pos = self.positions[name][role]
+            pos = self.roles_positions[name][role]
             move_list.append((device, pos))
-        print(f"$$$$$$$$$$$$$$$ moveToPosition  move_list {move_list} ")
+        #print(f"$$$$$$$$$$$$$$$ moveToPosition  move_list {move_list} ")
         for mot, pos in move_list:
             if mot is not None:
-                print(f"$$$$$$$$$$$$$$$ moveToPosition  mot.set_value(pos) {mot} {pos} ")
+                #print(f"$$$$$$$$$$$$$$$ moveToPosition  mot.set_value(pos) {mot} {pos} ")
                 mot.set_value(pos)
 
         if wait:
             [mot.waitEndOfMove() for mot, pos in move_list if mot is not None]
         """
-        for mne,pos in self.positions[name].items():
+        for mne,pos in self.roles_positions[name].items():
         self.motors[mne].set_value(pos)
         """
+    def get_positions(self):
+        """
+        return the dictionary of all the positions with all properties
+        """
+        return self.positions
+
+    def get_current_position(self):
+        """
+        return current position's all properties
+        """
+        current_position = self.get_value()
+        return self.positions.get(current_position)
 
     def get_value(self):
         """
-        Returns the name of the position
+        Returns the name of the current position
         It checks the positions of all the 'role' motors
         If all of them are within +/- delta tolerance, return pos name
         """
+        #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value ")
         if not self.is_ready():
+            #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
             return None
 
-        for posName, position in self.positions.items():
+        for posName, position in self.roles_positions.items():
             findPosition = 0
 
             for role in self.roles:
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - role {role} ")
                 pos = position[role]
-                mot = self.getDeviceByRole(role)
-
+                role_str = "\"" + str(role) + "\""
+                mot = self.getObjectByRole(role)
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR mot  - {type(mot)} -")
+                
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - pos {pos} -")
                 if mot is not None:
                     motpos = mot.get_value()
+                    #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - motpos {motpos} -")
                     try:
                         if (
                             motpos < pos + self.deltas[role]
@@ -300,17 +345,17 @@ class MultiplePositions(Equipment):
 
     def checkPosition(self, *args):
         if not self.is_ready():
-            print(f"checkPosition not self.is_ready() { self.is_ready()}")
+            #print(f"checkPosition not self.is_ready() { self.is_ready()}")
             return None
 
         posName = self.get_value()
 
         if posName is None:
-            self.emit("noPosition", ())
+            self.emit("no_position", ())
             return None
         else:
-            self.emit("positionReached", (posName,))
-            print(f"checkPosition emit(positionReached) {posName}")
+            self.emit("predefinedPositionChanged", (posName,))
+            #print(f"checkPosition emit(predefinedPositionChanged) {posName}")
             return posName
 
     def setNewPositions(self, name, newPositions):
@@ -321,7 +366,7 @@ class MultiplePositions(Equipment):
             return
 
         for role, pos in list(newPositions.items()):
-            self.positions[name][role] = pos
+            self.roles_positions[name][role] = pos
             position.setProperty(role, pos)
 
         self.checkPosition()
