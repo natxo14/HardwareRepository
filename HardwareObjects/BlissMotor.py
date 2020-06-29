@@ -91,6 +91,8 @@ class BlissMotor(AbstractMotor):
         # init state to match motor's one
         self.update_state(self.get_state())
 
+        print(f"######## BLISS MOTOR init - type {type(self)} - name {self.motor_obj.name}")
+        
     def _state2enum(self, state):
         """Translate the state to HardwareObjectState and BlissMotorStates
         Args:
@@ -111,7 +113,9 @@ class BlissMotor(AbstractMotor):
         Returns:
             (enum 'HardwareObjectState'): Motor state.
         """
+        #print(f"######## BLISS MOTOR get_state - type {type(self)} - name {self.motor_obj.name}")
         state = self.motor_obj.state.current_states_names[0]
+        print(f"######## BLISS MOTOR get_state - state - {state} - states {self.motor_obj.state.current_states_names}")
         return self._state2enum(state)[0]
 
     def get_specific_state(self):
@@ -190,3 +194,12 @@ class BlissMotor(AbstractMotor):
     def name(self):
         """Get the motor name. Should be removed when GUI ready"""
         return self.actuator_name
+    
+    # def update_value(self, value=None):
+    #     """Check if the value has changed. Emits signal valueChanged.
+    #     Args:
+    #         value (float): value
+    #     """
+
+    #     AbstractMotor.update_value(value)
+    #     self.emit("valueChanged", (value,))

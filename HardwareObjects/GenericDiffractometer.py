@@ -244,7 +244,7 @@ class GenericDiffractometer(HardwareObject):
         #     logging.getLogger("HWR").debug(
         #         "Diffractometer: " + "Camera hwobj is not defined"
         #     )
-
+        
         if HWR.beamline.beam is not None:
             self.beam_position = HWR.beamline.beam.get_beam_position_on_screen()
             self.connect(
@@ -308,14 +308,18 @@ class GenericDiffractometer(HardwareObject):
             *self.centring_motors_list
         )
 
+        print(f"################ GENERICDIFF self.centring_motors_list  - {self.centring_motors_list}")
         for motor_name in self.centring_motors_list:
             # NBNB TODO refactor configuration, and set properties directly (see below)
             temp_motor_hwobj = self.getObjectByRole(motor_name)
+            print(f"################ GENERICDIFF for motor_name in self.centring_motors_list  - {motor_name} - {type(temp_motor_hwobj)}")
             if temp_motor_hwobj is not None:
                 logging.getLogger("HWR").debug(
                     "Diffractometer: Adding "
-                    + "%s motor to centring motors" % motor_name
+                    + "%s motor to centring motors" % motor_name 
                 )
+                print(f"################ GENERICDIFF temp_motor_hwobj name {temp_motor_hwobj.name()}  ")
+            
 
                 self.motor_hwobj_dict[motor_name] = temp_motor_hwobj
                 self.connect(temp_motor_hwobj, "stateChanged", self.motor_state_changed)
@@ -345,6 +349,9 @@ class GenericDiffractometer(HardwareObject):
                     % motor_name
                 )
 
+        print(f"################ GENERICDIFF self.motor_hwobj_dict  - {self.motor_hwobj_dict.keys()}")
+        for mot in self.motor_hwobj_dict:
+            print(f"################ GENERICDIFF self.motor_hwobj_dict  - {type(mot)}")
         # sample changer -----------------------------------------------------
         if HWR.beamline.sample_changer is None:
             logging.getLogger("HWR").warning(
@@ -688,14 +695,14 @@ class GenericDiffractometer(HardwareObject):
     #     return self.current_positions_dict.get("phi")
 
     def get_snapshot(self):
-        if HWR.beamline.microscope:
-            return HWR.beamline.microscope.take_snapshot()
+        if HWR.beamline.sample_view:
+            return HWR.beamline.sample_view.camera.take_snapshot()
 
     def save_snapshot(self, filename):
         """
         """
-        if HWR.beamline.microscope:
-            return HWR.beamline.microscope.save_snapshot(filename)
+        if HWR.beamline.sample_view:
+            return HWR.beamline.sample_view.camera.save_snapshot(filename)
 
     def get_pixels_per_mm(self):
         """

@@ -6,15 +6,15 @@
         <motor>
             <name>zoom</name>
         </motor>
-        <motor>
+        <!--motor>
             <name>gain</name>
         </motor>
         <motor>
             <name>exposure</name>
-        </motor>
+        </motor-->
     </motors>
 	
-    <object role="zoom" href="/zoom"></object>
+    <object href="/zoom" role="zoom"/>
     <!--object role="gain" href="/progain"></object>
     <object role="exposure" href="/proexp"></object-->
     

@@ -27,10 +27,10 @@ _objects:
     #- machine_info: mach-info-mockup.xml
     #- transmission: transmission-mockup.xml
     #- energy: energy-mockup.xml
-    - sample_view: graphics.xml
     - beam: beam-info.xml
-    - diffractometer: diffractometer-mockup.xml
-    - microscope: graphics.xml
+    - sample_view: graphics.xml
+    - diffractometer: id10-diffractometer.xml #diffractometer-mockup.xml
+    #- microscope: graphics.xml
     #- flux: flux-mockup.xml
     #- detector: detector-mockup.xml
     #- resolution: resolution-mockup.xml

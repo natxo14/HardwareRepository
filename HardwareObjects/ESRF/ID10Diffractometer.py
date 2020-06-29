@@ -64,7 +64,7 @@ class ID10Diffractometer(GenericDiffractometer):
         self.pixels_per_mm_x = 0
         self.pixels_per_mm_y = 0
         self.centring_point_number = 3
-        self.delta_phi = 0.1
+        self.delta_phi = 0.3
 
         GenericDiffractometer.init(self)
 
@@ -74,6 +74,8 @@ class ID10Diffractometer(GenericDiffractometer):
             GenericDiffractometer.CENTRING_METHOD_MOVE_TO_BEAM: self.start_move_to_beam,
         }
 
+        self.update_zoom_calibration()
+
     def get_pixels_per_mm(self):
         self.update_zoom_calibration()
         return GenericDiffractometer.get_pixels_per_mm(self)
@@ -81,15 +83,17 @@ class ID10Diffractometer(GenericDiffractometer):
     def update_zoom_calibration(self):
         """
         """
-        print(f"ID10Diffractometer update_zoom_calibration")
+        print(f"##################ID10Diffractometer update_zoom_calibration")
         if "zoom" not in self.motor_hwobj_dict:
             # not initialized yet
             return
 
         zoom_motor = self.motor_hwobj_dict["zoom"]
 
+        print(f"##################ID10Diffractometer zoom_motor {id(zoom_motor)}")
         props = zoom_motor.get_current_position()
-
+        print(f"##################ID10Diffractometer zoom_motor props {props} - keys {props.keys()}")
+        
         if "resox" in props.keys() and "resoy" in props.keys():
             self.pixels_per_mm_x = float(props["resox"])
             self.pixels_per_mm_y = float(props["resoy"])
@@ -98,14 +102,68 @@ class ID10Diffractometer(GenericDiffractometer):
             self.pixels_per_mm_y = 0
 
         if "beamx" in props.keys() and "beamy" in props.keys():
-            self.beam_xc = float(props["beamx"])
-            self.beam_yc = float(props["beamy"])
-
+            self.beam_position = [float(props["beamx"]), float(props["beamy"])]
+        else:
+            self.beam_position = [0, 0]
+        
         if 0 not in [self.pixels_per_mm_x, self.pixels_per_mm_y]:
             self.emit(
                 "pixelsPerMmChanged", ((self.pixels_per_mm_x, self.pixels_per_mm_y),)
             )
 
+    def get_centred_point_from_coord(self, x, y, return_by_names=None):
+        """
+        Descript. :
+        """
+        beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
+        dx = (x - beam_pos_x) / self.pixels_per_mm_x
+        dy = (y - beam_pos_y) / self.pixels_per_mm_y
+        
+        pos = {
+            "phiz": float(dy),
+            "sampy": float(dx),
+        }
+
+        if return_by_names:
+            pos = self.convert_from_obj_to_name(pos)
+        return pos
+
+    # def start_move_to_beam(
+    #     self, coord_x=None, coord_y=None, omega=None, wait_result=None
+    # ):
+    #     """
+    #     Descript. :
+    #     """
+    #     try:
+    #         self.emit_progress_message("Move to beam...")
+    #         self.centring_time = time.time()
+    #         curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    #         self.centring_status = {
+    #             "valid": True,
+    #             "startTime": curr_time,
+    #             "endTime": curr_time,
+    #         }
+    #         if coord_x is None and coord_y is None:
+    #             coord_x = self.beam_position[0]
+    #             coord_y = self.beam_position[1]
+
+    #         motors = self.get_centred_point_from_coord(
+    #             coord_x, coord_y, return_by_names=True
+    #         )
+    #         if omega is not None:
+    #             motors["phi"] = omega
+
+    #         self.centring_status["motors"] = motors
+    #         self.centring_status["valid"] = True
+    #         self.centring_status["angleLimit"] = True
+    #         self.emit_progress_message("")
+    #         self.accept_centring()
+    #         self.current_centring_method = None
+    #         self.current_centring_procedure = None
+    #     except BaseException:
+    #         logging.exception("Diffractometer: Could not complete 2D centring")
+
+    
     def id10_manual_centring(self, sample_info=None, wait_result=None):
         """
         """
@@ -186,9 +244,52 @@ class ID10Diffractometer(GenericDiffractometer):
 
         self.current_centring_procedure.link(self.centring_done)
 
-    def set_centring_parameter(self, centring_point_number, delta_phi):
-        self.centring_point_number = centring_point_number
-        self.delta_phi = delta_phi
+    def set_centring_parameters(self, centring_point_number, delta_phi):
+        """
+        Descript. :
+        """
+        self.centring_point_number = int(centring_point_number)
+        self.delta_phi = float(delta_phi)
 
     def get_centred_point_from_coord(self, coord_x, coord_y, return_by_names=True):
-        pass
+        """
+        Descript. :
+        """
+        beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
+
+        self.update_zoom_calibration()
+
+        self.pixels_per_mm_x
+        self.pixels_per_mm_y
+
+        dx = (coord_x - beam_pos_x) / self.pixels_per_mm_x
+        dy = (coord_y - beam_pos_y) / self.pixels_per_mm_y
+
+        if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
+            return 0, 0
+        
+
+        #        chi_angle = math.radians(self.chiAngle)
+        #        chiRot = numpy.matrix([math.cos(chi_angle), -math.sin(chi_angle),
+        #                               math.sin(chi_angle), math.cos(chi_angle)])
+        #        chiRot.shape = (2,2)
+        #        sx, sy = numpy.dot(numpy.array([0, dsy]),
+        #                           numpy.array(chiRot)) ))
+
+        return {
+            "phi": self.centringPhi.get_value(),
+            "phiz": float(phiz),
+            "phiy": float(phiy),
+            "sampx": float(sampx),
+            "sampy": float(sampy),
+        }
+
+    def zoom_motor_predefined_position_changed(self, position_name, offset=None):
+        """
+        """
+        if not position_name:
+            return
+        
+        self.update_zoom_calibration()
+        self.emit("zoomMotorPredefinedPositionChanged", (position_name, offset))
+

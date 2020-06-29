@@ -163,13 +163,14 @@ class MultiplePositions(Equipment):
         for mot in motors:
                 name = mot.getProperty("name")
                 temp_motor_hwobj = self.getObjectByRole(name)
-                self.motor_hwobj_list.append(temp_motor_hwobj)
-        #        print(f"@@@@@@@@@@@@@@@@@@@@@@ motors  name {name} motor {id(temp_motor_hwobj)}")
+                if temp_motor_hwobj is not None:
+                    self.motor_hwobj_list.append(temp_motor_hwobj)
+                print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
 
         #self.roles = motors.getRoles()
         self.roles = self.getRoles()
         tmp = self.getObjectByRole("zoom")
-        #print(f"@@@@@@@@@@@@@@@@@@@@@@ tmp {tmp} {type(tmp)}")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS tmp {tmp} {type(tmp)}")
         self.deltas = {}
         try:
             # WARNING self.deltas is a LINK to the INTERNAL properties dictionary
@@ -183,7 +184,7 @@ class MultiplePositions(Equipment):
         self.positions_names_list = []
         try:
             positions = self["positions"]
-            #print(f"@@@@@@@@@@@@@@@@@@@@@@ positions {positions} {type(positions)}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS positions {positions} {type(positions)}")
         except BaseException:
             logging.getLogger().error("No positions.")
         else:
@@ -196,13 +197,13 @@ class MultiplePositions(Equipment):
 
                     motpos = position.getProperties()
                     motroles = list(motpos.keys())
-                    #print(f"motpos {motpos}")
+                    print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motpos {motpos}")
                     #print(f"motroles {motroles}")
 
                     for role in self.roles:
                         #print(f"role {role}")
                         self.positions[name][role] = motpos[role]
-                        #print(f"self.positions[{name}][{role}] - {self.positions[name][role]}")
+                        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions[{name}][{role}] - {self.positions[name][role]}")
                 else:
                     logging.getLogger().error("No name for position.")
 
@@ -211,13 +212,13 @@ class MultiplePositions(Equipment):
         ##print(f"@@@@@@@@@@@@@@@@@@@@@@  self.roles {self.roles}")
         #for mot in self["motors"]:
         for mot in self.motor_hwobj_list:
-            #print(f"@@@@@@@@@@@@@@@@ mot - {mot}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name} mot {id(mot)}")
             #self.motors[mot.getMotorMnemonic()] = mot
             self.connect(mot, "moveDone", self.checkPosition)
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
 
-        for key, value in self.positions.items():
+        #for key, value in self.positions.items():
             #print(f"key {key} value {value}")
             #for key2, value2 in value.items():
         #print(f"$$$$$$$$$$$$$$$ self.positions {self.positions} ")
@@ -230,7 +231,10 @@ class MultiplePositions(Equipment):
             return ""
 
         state = "READY"
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state - {len(self.motor_hwobj_list)}")
+            
         for mot in self.motor_hwobj_list:
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - mot {id(mot)}")
             if mot.get_state() == HardwareObjectState.BUSY:
                 state = "MOVING"
             elif mot.get_state() in {HardwareObjectState.UNKNOWN,
