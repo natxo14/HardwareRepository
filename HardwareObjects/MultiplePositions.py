@@ -180,6 +180,7 @@ class MultiplePositions(Equipment):
         except BaseException:
             logging.getLogger().error("No deltas.")
 
+        self.roles_positions = {}
         self.positions = {}
         self.positions_names_list = []
         try:
@@ -193,7 +194,7 @@ class MultiplePositions(Equipment):
                 #print(f"name {name}")
                 if name is not None:
                     self.positions_names_list.append(name)
-                    self.positions[name] = {}
+                    self.roles_positions[name] = {}
 
                     motpos = position.getProperties()
                     motroles = list(motpos.keys())
@@ -202,8 +203,8 @@ class MultiplePositions(Equipment):
 
                     for role in self.roles:
                         #print(f"role {role}")
-                        self.positions[name][role] = motpos[role]
-                        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions[{name}][{role}] - {self.positions[name][role]}")
+                        self.roles_positions[name][role] = motpos[role]
+                        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.roles_positions[{name}][{role}] - {self.roles_positions[name][role]}")
                 else:
                     logging.getLogger().error("No name for position.")
 
@@ -218,10 +219,31 @@ class MultiplePositions(Equipment):
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
 
-        #for key, value in self.positions.items():
+        #for key, value in self.roles_positions.items():
             #print(f"key {key} value {value}")
             #for key2, value2 in value.items():
-        #print(f"$$$$$$$$$$$$$$$ self.positions {self.positions} ")
+        #print(f"$$$$$$$$$$$$$$$ self.roles_positions {self.roles_positions} ")
+        self.positions = self.get_positions()
+
+    def get_positions(self):
+        positions = []
+        try:
+            for el in self["positions"]:
+                positions.append(
+                    {
+                        "name": el.getProperty("name"),
+                        "zoom": el.getProperty("zoom"),
+                        "beamx": el.getProperty("beamx"),
+                        "beamy": el.getProperty("beamy"),
+                        "resox": el.getProperty("resox"),
+                        "resoy": el.getProperty("resoy"),
+                        "resox": el.getProperty("resox"),
+                        "resoy": el.getProperty("resoy"),
+                    }
+                )
+        except IndexError:
+            pass
+        return positions 
 
     def get_positions_names_list(self):
         return self.positions_names_list
@@ -255,7 +277,7 @@ class MultiplePositions(Equipment):
         move_list = []
         for role in self.roles:
             device = self.getObjectByRole(role)
-            pos = self.positions[name][role]
+            pos = self.roles_positions[name][role]
             move_list.append((device, pos))
         #print(f"$$$$$$$$$$$$$$$ moveToPosition  move_list {move_list} ")
         for mot, pos in move_list:
@@ -266,18 +288,18 @@ class MultiplePositions(Equipment):
         if wait:
             [mot.waitEndOfMove() for mot, pos in move_list if mot is not None]
         """
-        for mne,pos in self.positions[name].items():
+        for mne,pos in self.roles_positions[name].items():
         self.motors[mne].set_value(pos)
         """
     def get_positions(self):
         """
-        return the dictionary of all the positions.
+        return the dictionary of all the positions with all properties
         """
         return self.positions
 
     def get_current_position(self):
         """
-        return current position's values
+        return current position's all properties
         """
         current_position = self.get_value()
         return self.positions.get(current_position)
@@ -293,7 +315,7 @@ class MultiplePositions(Equipment):
             #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
             return None
 
-        for posName, position in self.positions.items():
+        for posName, position in self.roles_positions.items():
             findPosition = 0
 
             for role in self.roles:
@@ -344,7 +366,7 @@ class MultiplePositions(Equipment):
             return
 
         for role, pos in list(newPositions.items()):
-            self.positions[name][role] = pos
+            self.roles_positions[name][role] = pos
             position.setProperty(role, pos)
 
         self.checkPosition()
