@@ -28,8 +28,8 @@ _objects:
     #- transmission: transmission-mockup.xml
     #- energy: energy-mockup.xml
     - beam: beam-info.xml
-    - sample_view: graphicsWMockupCamera.xml #graphics.xml
-    - diffractometer: diffractometer-mockup.xml # id13-diffractometer.xml
+    - sample_view: graphics.xml #graphicsWMockupCamera.xml #
+    - diffractometer: id13-diffractometer.xml #diffractometer-mockup.xml # 
     #- microscope: graphics.xml
     #- flux: flux-mockup.xml
     #- detector: detector-mockup.xml
