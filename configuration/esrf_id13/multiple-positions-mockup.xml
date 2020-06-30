@@ -14,7 +14,7 @@
         </motor-->
     </motors>
 	
-    <object href="/m0" role="zoom"/>
+    <object href="/m0-mockup" role="zoom"/>
     <!--object role="gain" href="/progain"></object>
     <object role="exposure" href="/proexp"></object-->
     

@@ -737,12 +737,16 @@ class QtGraphicsManager(AbstractSampleView):
         :param pixels_per_mm: two floats for scaling
         :type pixels_per_mm: list with two floats
         """
-
+                
         if type(pixels_per_mm) in (list, tuple):
+            print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {pixels_per_mm} - {type(pixels_per_mm[0])}")
             if pixels_per_mm != self.pixels_per_mm:
                 self.pixels_per_mm = pixels_per_mm
+                print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm != self.pixels_per_mm")
                 for item in self.graphics_view.graphics_scene.items():
+                    print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {type(item)}")
                     if isinstance(item, GraphicsLib.GraphicsItem):
+                        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {type(item)}")
                         item.set_pixels_per_mm(self.pixels_per_mm)
                 self.graphics_view.graphics_scene.update()
 

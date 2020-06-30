@@ -1,17 +1,18 @@
 <equipment class="ESRF.ID13Diffractometer">
+  <object href="/ths" role="phi"/>
   <!--object href="/diff-kappa-mockup" role="kappa"/>
   <object href="/diff-kappaphi-mockup" role="kappa_phi"/-->
   
   <!-- Beam info included in GenericDiff like HWR.beamline.beam . Next don't needed-->  
   <!--object href="/beam-info" role="beam_info"/-->
- 
+
   <!-- Next block added by rhfogh for better representation of move_motor behaviour -->
-  <object href="/robz-mockup" role="phiz"/>
-  <object href="/roby-mockup" role="phiy"/>
-  <object href="/robz2-mockup" role="sampx"/>
-  <object href="/m0-mockup" role="sampy"/>
-  <object href="/multiple-positions-mockup" role="zoom"/>
-  <object href="/omega-mockup" role="phi"/>
+  <object href="/sz" role="phiz"/>
+  <object href="/thy" role="phiy"/>
+  <object href="/sx" role="sampx"/>
+  <object href="/sy" role="sampy"/>
+  <object href="/multiple-positions" role="zoom"/>
+
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>
 
   <sample_centring>True</sample_centring>
@@ -19,9 +20,11 @@
   <zoom_centre>{"x":340,"y":250}</zoom_centre>
   <!--omega_reference>{"actuator_name": "phiz", "position":-0.2224, "camera_axis":"x"}</omega_reference-->
 
-   <!-- MD2 -->
+  <!-- MD2 -->
   <!-- <gridDirection>{"fast": (1, 0), "slow": (0, -1)}</gridDirection>  -->
   <!--sample_mount_mode>sample_changer</sample_mount_mode-->
   <!-- MD3 -->
   <!--grid_direction>{"fast": (0, 1), "slow": (1, 0), "omega_ref": 0}</grid_direction -->
-</equipment>
+
+
+</equipment> 
