@@ -159,12 +159,14 @@ class MultiplePositions(Equipment):
         motors = self["motors"]
 
         self.motor_hwobj_list = []
+        self.motor_hwobj_dict = {}
         #print(f"@@@@@@@@@@@@@@@@@@@@@@ motors {motors} {type(motors)} is None - {motors is None} - {motors.objectsNames()}")
         for mot in motors:
                 name = mot.getProperty("name")
                 temp_motor_hwobj = self.getObjectByRole(name)
                 if temp_motor_hwobj is not None:
                     self.motor_hwobj_list.append(temp_motor_hwobj)
+                    self.motor_hwobj_dict[name] = temp_motor_hwobj
                 print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
 
         #self.roles = motors.getRoles()
@@ -213,7 +215,7 @@ class MultiplePositions(Equipment):
         ##print(f"@@@@@@@@@@@@@@@@@@@@@@  self.roles {self.roles}")
         #for mot in self["motors"]:
         for mot in self.motor_hwobj_list:
-            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name} mot {id(mot)}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name()} mot {id(mot)}")
             #self.motors[mot.getMotorMnemonic()] = mot
             self.connect(mot, "moveDone", self.checkPosition)
             self.connect(mot, "valueChanged", self.checkPosition)
@@ -226,6 +228,27 @@ class MultiplePositions(Equipment):
         self.positions = self.read_positions()
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions {self.positions}")
     
+    def get_zoom_hwr_obj(self):
+        return self.motor_hwobj_dict.get("zoom", None)
+    
+    def get_zoom_positions(self):
+        """
+        returns
+        tag_dict:
+        { 
+            "pos_namei" : zoom_valuei,
+        }
+        """
+        zoom_pos_dict = {}
+        positions = self["positions"]
+        try:
+            for position in positions:
+                zoom_pos_dict[position.getProperty("name")] = position.getProperty("zoom")
+        except IndexError:
+            pass
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS get_zoom_positions {zoom_pos_dict}")
+        return zoom_pos_dict
+   
     def read_positions(self):
         positions_list = []
         positions = self["positions"]

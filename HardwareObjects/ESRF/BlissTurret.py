@@ -5,16 +5,17 @@ class BlissTurret(HardwareObject):
     
     def __init__(self, name):
         HardwareObject.__init__(self, name)
-        
+
     def init(self):
-        print(f"##########BLISSTURRET init self.turret_name : {self.turret_name}")
         self.username = self.turret_name
+
+        print(f"##########BLISSTURRET init self.positions : {self.username}")
 
         cfg = static.get_config()
         self.turret = cfg.get(self.turret_name)
         self.connect(self.turret, "position", self.position_changed)
         self.connect(self.turret, "mode", self.mode_changed)
-    
+      
     def connectNotify(self, signal):
         if signal == "positionChanged":
             self.emit("positionChanged", (self.get_value(),))
@@ -46,18 +47,3 @@ class BlissTurret(HardwareObject):
     def update_values(self):
         self.emit("positionChanged", (self.get_value(),))
         self.emit("modeChanged", (self.get_mode(),))
-    
-    def get_positions(self):
-        elements = []
-        try:
-            for el in self["elements"]:
-                elements.append(
-                    {
-                        "symbol": el.getProperty("symbol"),
-                        "energy": el.getProperty("energy"),
-                    }
-                )
-        except IndexError:
-            pass
-        return elements 
-

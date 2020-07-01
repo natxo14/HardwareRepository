@@ -1595,6 +1595,7 @@ class GraphicsItemScale(GraphicsItem):
        vertical scale is two times shorter.
     """
 
+    HOR_LINE_LEN_NANOS = (1000,)
     HOR_LINE_LEN_MICRONS = (300, 200, 100, 50)
     HOR_LINE_LEN_MM = (10, 5, 2, 1)
 
@@ -1708,8 +1709,23 @@ class GraphicsItemScale(GraphicsItem):
         :param pixels_per_mm: (float, float)
         :return:
         """
+        print(f"GraphicsItemScale set_pixels_per_mm {pixels_per_mm}")
         self.pixels_per_mm = pixels_per_mm
+        for line_len in GraphicsItemScale.HOR_LINE_LEN_NANOS:
+            print(f"GraphicsItemScale HOR_LINE_LEN_NANOS set_pixels_per_mm line_len - {line_len} - {self.pixels_per_mm[0] * line_len}")
+            if (
+                self.pixels_per_mm[0] * line_len / 1000000 <= 200
+                and self.pixels_per_mm[0] * line_len / 1000000 > 50
+            ):
+                self.__scale_len = line_len
+                self.__scale_unit = "nm"
+                self.__scale_len_pix = int(
+                    self.pixels_per_mm[0] * self.__scale_len / 1000000
+                )
+                return
+
         for line_len in GraphicsItemScale.HOR_LINE_LEN_MICRONS:
+            print(f"GraphicsItemScale HOR_LINE_LEN_MICRONS set_pixels_per_mm line_len - {line_len} - {self.pixels_per_mm[0] * line_len}")
             if (
                 self.pixels_per_mm[0] * line_len / 1000 <= 200
                 and self.pixels_per_mm[0] * line_len / 1000 > 50
@@ -1722,6 +1738,7 @@ class GraphicsItemScale(GraphicsItem):
                 return
 
         for line_len in GraphicsItemScale.HOR_LINE_LEN_MM:
+            print(f"GraphicsItemScale HOR_LINE_LEN_MM set_pixels_per_mm line_len - {line_len} - {self.pixels_per_mm[0] * line_len}")
             if self.pixels_per_mm[0] * line_len <= 200:
                 self.__scale_len = line_len
                 self.__scale_unit = "mm"

@@ -95,8 +95,8 @@ class ID13Diffractometer(GenericDiffractometer):
         print(f"##################ID10Diffractometer zoom_motor props {props} - keys {props.keys()}")
         
         if "resox" in props.keys() and "resoy" in props.keys():
-            self.pixels_per_mm_x = abs(float(props["resox"]))
-            self.pixels_per_mm_y = abs(float(props["resoy"]))
+            self.pixels_per_mm_x = abs(1.0/float(props["resox"]))/1000.0
+            self.pixels_per_mm_y = abs(1.0/float(props["resoy"]))/1000.0
         else:
             self.pixels_per_mm_x = 0
             self.pixels_per_mm_y = 0
