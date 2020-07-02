@@ -76,6 +76,45 @@ def prepare(centring_motors_dict):
 
     return phi, phiy, phiz, sampx, sampy
 
+def calibrate(
+    motor_dict,
+    hor_motor_delta,
+    ver_motor_delta,
+):
+    global USER_CLICKED_EVENT
+
+    initial_positions = dict(
+        [(m, m.get_value()) for m in motor_dict.values()]
+    )
+
+    USER_CLICKED_EVENT = gevent.event.AsyncResult()
+
+    calibration_two_points = []
+    try:
+        num_clicks = 0
+        while i < 2:
+            try:
+                    x, y = USER_CLICKED_EVENT.get()
+                except BaseException:
+                    raise RuntimeError("Aborted while waiting for calibration 1st click")
+                USER_CLICKED_EVENT = gevent.event.AsyncResult()
+                calibration_two_points.append((x,y))
+                                
+                if num_clicks == 0:
+                    print("calibrate : first click {x},{y})
+                    motor_dict["horizontal"].set_value(hor_motor_delta)
+                    motor_dict["vertical"].set_value(ver_motor_delta)
+                if num_clicks == 1:
+                    print("calibrate : second click {x},{y})
+                READY_FOR_NEXT_POINT.set()    
+                num_clicks += 1
+    except BaseException:
+        logging.exception("Exception while calibrating")
+        move_motors(initial_positions)
+        raise
+
+    return calibration_two_points
+
 
 def start(
     centring_motors_dict,

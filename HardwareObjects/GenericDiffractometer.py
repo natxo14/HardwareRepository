@@ -1077,6 +1077,7 @@ class GenericDiffractometer(HardwareObject):
         """
         Descript. :
         """
+        print(f"################ GENERIC DIFF image_clicked {x} , {y}")
         if self.use_sample_centring:
             sample_centring.user_click(x, y)
         else:

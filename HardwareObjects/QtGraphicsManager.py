@@ -99,6 +99,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.auto_grid_size_mm = (0, 0)
 
         self.omega_axis_info_dict = {}
+        self.in_calibration_state = None
         self.in_centring_state = None
         self.in_grid_drawing_state = None
         self.in_measure_distance_state = None
@@ -783,6 +784,8 @@ class QtGraphicsManager(AbstractSampleView):
         """
         if self.in_centring_state:
             self.graphics_centring_lines_item.add_position(pos_x, pos_y)
+            self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
+        elif self.in_calibration_state:
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
         elif self.wait_grid_drawing_click:
             self.in_grid_drawing_state = True
@@ -1492,6 +1495,18 @@ class QtGraphicsManager(AbstractSampleView):
             self.wait_measure_distance_click = False
             self.in_measure_distance_state = True
             self.start_graphics_item(self.graphics_measure_distance_item)
+
+    def start_calibration(self):
+        """
+        Start camera calibration
+        """
+            self.in_calibration_state = True
+
+    def stop_calibration(self):
+        """
+        Start camera calibration
+        """
+            self.in_calibration_state = False
 
     def start_measure_angle(self, wait_click=False):
         """Angle measuring method

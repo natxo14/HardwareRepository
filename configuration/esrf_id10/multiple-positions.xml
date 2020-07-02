@@ -31,7 +31,7 @@
             <zoom>6.0</zoom>
             <gain>3.0</gain>
             <exposure>0.1</exposure>
-            <resox>-3.37837837838e-06</resox>
+            <resox>3.37837837838e-06</resox>
             <resoy>3.87596899225e-06</resoy>
             <beamx>333.0</beamx>
             <beamy>241.0</beamy>
@@ -41,7 +41,7 @@
             <zoom>5.0</zoom>
             <gain>6</gain>
             <exposure>0.1</exposure>
-            <resox>-2.34741784038e-06</resox>
+            <resox>2.34741784038e-06</resox>
             <resoy>2.59067357513e-06</resoy>
             <beamx>333</beamx>
             <beamy>241</beamy>
@@ -52,7 +52,7 @@
             <zoom>4.0</zoom>
             <gain>8.0</gain>
             <exposure>0.1</exposure>
-            <resox>-1.61290322581e-06</resox>
+            <resox>1.61290322581e-06</resox>
             <resoy>1.78571428571e-06</resoy>
             <beamx>333</beamx>
             <beamy>241</beamy>
@@ -63,7 +63,7 @@
             <zoom>3</zoom>
             <gain>10</gain>
             <exposure>0.1</exposure>
-            <resox>-8.92857142857e-07</resox>
+            <resox>8.92857142857e-07</resox>
             <resoy>1.06382978723e-06</resoy>
             <beamx>333</beamx>
             <beamy>241</beamy>
@@ -73,7 +73,7 @@
             <zoom>2</zoom>
             <gain>13</gain>
             <exposure>0.1</exposure>
-            <resox>-6.94444444444e-07</resox>
+            <resox>6.94444444444e-07</resox>
             <resoy>8.06451612903e-07</resoy>
             <beamx>333</beamx>
             <beamy>241</beamy>
@@ -84,7 +84,7 @@
             <zoom>1</zoom>
             <gain>15</gain>
             <exposure>0.2</exposure>
-            <resox>-4.71698113208e-07</resox>
+            <resox>4.71698113208e-07</resox>
             <resoy>5.23560209424e-07</resoy>
             <beamx>333</beamx>
             <beamy>241</beamy>
@@ -95,7 +95,7 @@
             <zoom>0</zoom>
             <gain>15</gain>
             <exposure>0.4</exposure>
-            <resox>-3.22580645161e-07</resox>
+            <resox>3.22580645161e-07</resox>
             <resoy>3.663003663e-07</resoy>
             <beamx>333.0</beamx>
             <beamy>241.0</beamy>

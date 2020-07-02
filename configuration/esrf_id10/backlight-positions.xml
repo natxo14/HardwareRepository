@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<object class="MultiplePositions">
+    <username>CDI Back Light</username>
+    <mode>absolute</mode>
+    <motors>
+        <motor>
+            <name>zoom</name>
+        </motor>
+    </motors>
+
+    <device role="blight" hwrid="/blight"></device>
+	
+    <deltas>
+        <blight>0.1</blight>
+    </deltas>
+	
+    <positions>
+        <position>
+            <name>In</name>
+            <color>#ff0000</color>
+            <blight>17.2</blight>
+        </position>
+        <position>
+            <name>Out</name>
+            <blight>32.5</blight>
+            <color>#ffff00</color>
+        </position>
+    </positions>
+</object>

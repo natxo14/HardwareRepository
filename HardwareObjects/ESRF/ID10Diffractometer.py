@@ -95,8 +95,8 @@ class ID10Diffractometer(GenericDiffractometer):
         print(f"##################ID10Diffractometer zoom_motor props {props} - keys {props.keys()}")
         
         if "resox" in props.keys() and "resoy" in props.keys():
-            self.pixels_per_mm_x = float(props["resox"])
-            self.pixels_per_mm_y = float(props["resoy"])
+            self.pixels_per_mm_x = abs(1.0/float(props["resox"]))/1000.0
+            self.pixels_per_mm_y = abs(1.0/float(props["resoy"]))/1000.0
         else:
             self.pixels_per_mm_x = 0
             self.pixels_per_mm_y = 0
@@ -107,6 +107,10 @@ class ID10Diffractometer(GenericDiffractometer):
             self.beam_position = [0, 0]
         
         if 0 not in [self.pixels_per_mm_x, self.pixels_per_mm_y]:
+            print(f"##################ID10Diffractometer emit( \
+                pixelsPerMmChanged {self.pixels_per_mm_x} - {self.pixels_per_mm_y} \
+                {self.beam_position}")
+        
             self.emit(
                 "pixelsPerMmChanged", ((self.pixels_per_mm_x, self.pixels_per_mm_y),)
             )
@@ -292,4 +296,3 @@ class ID10Diffractometer(GenericDiffractometer):
         
         self.update_zoom_calibration()
         self.emit("zoomMotorPredefinedPositionChanged", (position_name, offset))
-
