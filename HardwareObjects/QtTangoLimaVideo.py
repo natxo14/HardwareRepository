@@ -86,7 +86,7 @@ class QtTangoLimaVideo(AbstractVideoDevice):
 
     def set_cam_encoding(self, cam_encoding):
         if cam_encoding == "yuv422p":
-            self.device.video_mode = "YUV422"
+            self.device.video_mode = "YUV422PACKED"
         elif cam_encoding == "y8":
             self.device.video_mode = "Y8"
         elif cam_encoding.lower() == "bayer_rg16":
@@ -111,7 +111,7 @@ class QtTangoLimaVideo(AbstractVideoDevice):
             _, ver, img_mode, frame_number, width, height, _, _, _, _ = struct.unpack(
                 header_fmt, img_data[1][: struct.calcsize(header_fmt)]
             )
-            raw_buffer = np.fromstring(img_data[1][32:], np.uint16)
+            raw_buffer = np.frombuffer(img_data[1][32:], np.uint16)
         return raw_buffer, width, height
 
     def get_gain(self):
