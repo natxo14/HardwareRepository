@@ -159,12 +159,14 @@ class MultiplePositions(Equipment):
         motors = self["motors"]
 
         self.motor_hwobj_list = []
+        self.motor_hwobj_dict = {}
         #print(f"@@@@@@@@@@@@@@@@@@@@@@ motors {motors} {type(motors)} is None - {motors is None} - {motors.objectsNames()}")
         for mot in motors:
                 name = mot.getProperty("name")
                 temp_motor_hwobj = self.getObjectByRole(name)
                 if temp_motor_hwobj is not None:
                     self.motor_hwobj_list.append(temp_motor_hwobj)
+                    self.motor_hwobj_dict[name] = temp_motor_hwobj
                 print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
 
         #self.roles = motors.getRoles()
@@ -181,7 +183,7 @@ class MultiplePositions(Equipment):
             logging.getLogger().error("No deltas.")
 
         self.roles_positions = {}
-        self.positions = {}
+        self.positions = []
         self.positions_names_list = []
         try:
             positions = self["positions"]
@@ -213,7 +215,7 @@ class MultiplePositions(Equipment):
         ##print(f"@@@@@@@@@@@@@@@@@@@@@@  self.roles {self.roles}")
         #for mot in self["motors"]:
         for mot in self.motor_hwobj_list:
-            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name} mot {id(mot)}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name()} mot {id(mot)}")
             #self.motors[mot.getMotorMnemonic()] = mot
             self.connect(mot, "moveDone", self.checkPosition)
             self.connect(mot, "valueChanged", self.checkPosition)
@@ -223,27 +225,50 @@ class MultiplePositions(Equipment):
             #print(f"key {key} value {value}")
             #for key2, value2 in value.items():
         #print(f"$$$$$$$$$$$$$$$ self.roles_positions {self.roles_positions} ")
-        self.positions = self.get_positions()
-
-    def get_positions(self):
-        positions = []
+        self.positions = self.read_positions()
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions {self.positions}")
+    
+    def get_zoom_hwr_obj(self):
+        return self.motor_hwobj_dict.get("zoom", None)
+    
+    def get_zoom_positions(self):
+        """
+        returns
+        tag_dict:
+        { 
+            "pos_namei" : zoom_valuei,
+        }
+        """
+        zoom_pos_dict = {}
+        positions = self["positions"]
         try:
-            for el in self["positions"]:
-                positions.append(
+            for position in positions:
+                zoom_pos_dict[position.getProperty("name")] = position.getProperty("zoom")
+        except IndexError:
+            pass
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS get_zoom_positions {zoom_pos_dict}")
+        return zoom_pos_dict
+   
+    def read_positions(self):
+        positions_list = []
+        positions = self["positions"]
+        try:
+            for position in positions:
+                positions_list.append(
                     {
-                        "name": el.getProperty("name"),
-                        "zoom": el.getProperty("zoom"),
-                        "beamx": el.getProperty("beamx"),
-                        "beamy": el.getProperty("beamy"),
-                        "resox": el.getProperty("resox"),
-                        "resoy": el.getProperty("resoy"),
-                        "resox": el.getProperty("resox"),
-                        "resoy": el.getProperty("resoy"),
+                        "name": position.getProperty("name"),
+                        "zoom": position.getProperty("zoom"),
+                        "beamx": position.getProperty("beamx"),
+                        "beamy": position.getProperty("beamy"),
+                        "resox": position.getProperty("resox"),
+                        "resoy": position.getProperty("resoy"),
+                        "resox": position.getProperty("resox"),
+                        "resoy": position.getProperty("resoy"),
                     }
                 )
         except IndexError:
             pass
-        return positions 
+        return positions_list 
 
     def get_positions_names_list(self):
         return self.positions_names_list
@@ -287,22 +312,35 @@ class MultiplePositions(Equipment):
 
         if wait:
             [mot.waitEndOfMove() for mot, pos in move_list if mot is not None]
+        
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - moveToPosition - {name} - self {id(self)}")
+        self.emit("predefinedPositionChanged", name)
         """
         for mne,pos in self.roles_positions[name].items():
         self.motors[mne].set_value(pos)
         """
     def get_positions(self):
         """
-        return the dictionary of all the positions with all properties
+        return the list of all the positions with all properties
         """
         return self.positions
 
     def get_current_position(self):
         """
-        return current position's all properties
+        return current position's all properties as dict
         """
         current_position = self.get_value()
-        return self.positions.get(current_position)
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {current_position} - {type(current_position)}")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {self.positions}")
+
+        for position in self.positions:
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position loop - {position}")
+
+            if current_position in position.values():
+                print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - found in  - {position}")
+                return position
+        return None
+        #return self.positions.get(current_position)
 
     def get_value(self):
         """
@@ -310,25 +348,25 @@ class MultiplePositions(Equipment):
         It checks the positions of all the 'role' motors
         If all of them are within +/- delta tolerance, return pos name
         """
-        #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value ")
+        print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value ")
         if not self.is_ready():
-            #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
+            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
             return None
 
         for posName, position in self.roles_positions.items():
             findPosition = 0
 
             for role in self.roles:
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - role {role} ")
+                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - role {role} ")
                 pos = position[role]
                 role_str = "\"" + str(role) + "\""
                 mot = self.getObjectByRole(role)
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR mot  - {type(mot)} -")
+                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR mot  - {type(mot)} -")
                 
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - pos {pos} -")
+                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - pos {pos} -")
                 if mot is not None:
                     motpos = mot.get_value()
-                    #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - motpos {motpos} -")
+                    print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - motpos {motpos} -")
                     try:
                         if (
                             motpos < pos + self.deltas[role]
@@ -338,7 +376,9 @@ class MultiplePositions(Equipment):
                     except BaseException:
                         continue
 
+            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR findPosition  - {findPosition} -")                
             if findPosition == len(self.roles):
+                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR {findPosition} {len(self.roles)} - {posName}")                
                 return posName
 
         return None

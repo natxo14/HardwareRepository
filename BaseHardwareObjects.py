@@ -493,7 +493,7 @@ class HardwareObjectMixin(CommandContainer):
         if state != self._state:
             self._state = state
             self.emit("stateChanged", (self._state,))
-
+                
     def update_specific_state(self, state=None):
         """Update self._specific_state, and emit specificStateChanged if appropriate
 
@@ -529,7 +529,7 @@ class HardwareObjectMixin(CommandContainer):
         """
         self.update_state()
         self.update_specific_state()
-
+        
     # Moved from HardwareObjectNode
     def clear_gevent(self):
         """Clear gevent tasks, called when disconnecting a HardwareObject.

@@ -217,7 +217,6 @@ class QtGraphicsManager(AbstractSampleView):
 
         if self.diffractometer_hwobj is not None:
             pixels_per_mm = self.diffractometer_hwobj.get_pixels_per_mm()
-            print(f"######### QtGraphicMananger init(): self.diffractometer_hwobj.get_pixels_per_mm() {pixels_per_mm}" )
             self.diffractometer_pixels_per_mm_changed(pixels_per_mm)
             GraphicsLib.GraphicsItemGrid.set_grid_direction(
                 self.diffractometer_hwobj.get_grid_direction()
@@ -277,7 +276,6 @@ class QtGraphicsManager(AbstractSampleView):
             HWR.beamline.beam.evaluate_beam_info()
             self.beam_info_dict = HWR.beamline.beam.get_beam_info_dict()
             self.beam_position = HWR.beamline.beam.get_beam_position_on_screen()
-            print(f"######### QtGraphicMananger init(): HWR.beamline.beam beam_position{self.beam_position}" )
             self.connect(
                 HWR.beamline.beam, "beamPosChanged", self.beam_position_changed
             )
@@ -739,12 +737,16 @@ class QtGraphicsManager(AbstractSampleView):
         :param pixels_per_mm: two floats for scaling
         :type pixels_per_mm: list with two floats
         """
-        print(f"######### QtGraphicMananger diffractometer_pixels_per_mm_changed {pixels_per_mm}")
+                
         if type(pixels_per_mm) in (list, tuple):
+            print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {pixels_per_mm} - {type(pixels_per_mm[0])}")
             if pixels_per_mm != self.pixels_per_mm:
                 self.pixels_per_mm = pixels_per_mm
+                print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm != self.pixels_per_mm")
                 for item in self.graphics_view.graphics_scene.items():
+                    print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {type(item)}")
                     if isinstance(item, GraphicsLib.GraphicsItem):
+                        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {type(item)}")
                         item.set_pixels_per_mm(self.pixels_per_mm)
                 self.graphics_view.graphics_scene.update()
 

@@ -43,10 +43,8 @@ class ESRFBeam(AbstractBeam):
         self._slits = {}
         self._complex = None
         self._definer_type = None
-        print(f"#####################3 ESRFBeam __init__()")
-        
+
     def init(self):
-        print(f"#####################3 ESRFBeam init()")
         """ Initialize hardware """
         AbstractBeam.init(self)
         self._aperture = self.getObjectByRole("aperture")

@@ -339,6 +339,7 @@ class GenericDiffractometer(HardwareObject):
                         "predefinedPositionChanged",
                         self.zoom_motor_predefined_position_changed,
                     )
+                    print(f"################ GENERICDIFF motor_name == zoom {id(temp_motor_hwobj)}")
                     self.connect(
                         temp_motor_hwobj, "stateChanged", self.zoom_motor_state_changed
                     )
@@ -350,8 +351,8 @@ class GenericDiffractometer(HardwareObject):
                 )
 
         print(f"################ GENERICDIFF self.motor_hwobj_dict  - {self.motor_hwobj_dict.keys()}")
-        for mot in self.motor_hwobj_dict:
-            print(f"################ GENERICDIFF self.motor_hwobj_dict  - {type(mot)}")
+        #for mot in self.motor_hwobj_dict:
+            #print(f"################ GENERICDIFF self.motor_hwobj_dict  - {type(mot)}")
         # sample changer -----------------------------------------------------
         if HWR.beamline.sample_changer is None:
             logging.getLogger("HWR").warning(
