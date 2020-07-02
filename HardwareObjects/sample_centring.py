@@ -31,6 +31,7 @@ def multiPointCentre(z, phis):
 
 USER_CLICKED_EVENT = None
 CURRENT_CENTRING = None
+CURRENT_CALIBRATING = None
 SAVED_INITIAL_POSITIONS = {}
 READY_FOR_NEXT_POINT = gevent.event.Event()
 
@@ -76,6 +77,66 @@ def prepare(centring_motors_dict):
 
     return phi, phiy, phiz, sampx, sampy
 
+def start_calibrate(
+    motor_dict,
+    hor_motor_delta,
+    ver_motor_delta,
+):
+    global CURRENT_CALIBRATING
+    print(f"SAMPLE CENTRING --start_calibrate ")
+
+    CURRENT_CALIBRATING = gevent.spawn(
+        calibrate,
+        motor_dict,
+        hor_motor_delta,
+        ver_motor_delta,
+    )
+
+    return CURRENT_CALIBRATING
+
+def calibrate(
+    motor_dict,
+    hor_motor_delta,
+    ver_motor_delta,
+):
+    global USER_CLICKED_EVENT
+
+    initial_positions = dict(
+        [(m, m.get_value()) for m in motor_dict.values()]
+    )
+
+    print(f"SAMPLE CENTRING -- calibrate - initial_positions :{initial_positions}")
+
+    USER_CLICKED_EVENT = gevent.event.AsyncResult()
+
+    print(f"SAMPLE CENTRING -- after USER_CLICKED_EVENT")
+    calibration_two_points = []
+    try:
+        num_clicks = 0
+        print(f"SAMPLE CENTRING -- inside try num_clicks - {num_clicks}")
+        while num_clicks < 2:
+            try:
+                print(f"SAMPLE CENTRING -- inside 2nd Try num_clicks - {num_clicks}")
+                x, y = USER_CLICKED_EVENT.get()
+            except BaseException:
+                raise RuntimeError("Aborted while waiting for calibration 1st click")
+            USER_CLICKED_EVENT = gevent.event.AsyncResult()
+            calibration_two_points.append((x,y))
+                            
+            if num_clicks == 0:
+                print(f"calibrate : first click {x},{y}")
+                motor_dict["horizontal"].set_value_relative(hor_motor_delta)
+                motor_dict["vertical"].set_value_relative(ver_motor_delta)
+            if num_clicks == 1:
+                print(f"calibrate : second click {x},{y}")
+            READY_FOR_NEXT_POINT.set()    
+            num_clicks += 1
+    except BaseException:
+        logging.exception("Exception while calibrating")
+        move_motors(initial_positions)
+        raise
+
+    return calibration_two_points
 
 def start(
     centring_motors_dict,
