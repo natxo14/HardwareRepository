@@ -782,6 +782,9 @@ class QtGraphicsManager(AbstractSampleView):
                 - pointSelected
                 - infoMsg
         """
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger mouse_clicked - {pos_x} - {pos_y}")
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_calibration_state - {self.in_calibration_state}")
+                        
         if self.in_centring_state:
             self.graphics_centring_lines_item.add_position(pos_x, pos_y)
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
@@ -1500,13 +1503,17 @@ class QtGraphicsManager(AbstractSampleView):
         """
         Start camera calibration
         """
-            self.in_calibration_state = True
+        self.in_calibration_state = True
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger start_calibration - {self.in_calibration_state}")
+        
 
     def stop_calibration(self):
         """
         Start camera calibration
         """
-            self.in_calibration_state = False
+        self.in_calibration_state = False
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger stop_calibration - {self.in_calibration_state}")
+        
 
     def start_measure_angle(self, wait_click=False):
         """Angle measuring method

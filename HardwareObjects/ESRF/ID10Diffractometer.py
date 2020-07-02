@@ -65,6 +65,8 @@ class ID10Diffractometer(GenericDiffractometer):
         self.pixels_per_mm_y = 0
         self.centring_point_number = 3
         self.delta_phi = 0.3
+        self.calibration_h_mot_delta = 0.2
+        self.calibration_v_mot_delta = 0.2
 
         GenericDiffractometer.init(self)
 
@@ -248,6 +250,13 @@ class ID10Diffractometer(GenericDiffractometer):
 
         self.current_centring_procedure.link(self.centring_done)
 
+    def set_calibration_parameters(self, h_motor_delta, v_motor_delta):
+        """
+        Descript. :
+        """
+        self.calibration_h_mot_delta = h_motor_delta
+        self.calibration_v_mot_delta = v_motor_delta
+
     def set_centring_parameters(self, centring_point_number, delta_phi):
         """
         Descript. :
@@ -296,3 +305,32 @@ class ID10Diffractometer(GenericDiffractometer):
         
         self.update_zoom_calibration()
         self.emit("zoomMotorPredefinedPositionChanged", (position_name, offset))
+
+    def start_manual_calibration(self):
+        """
+        """
+        self.emit_progress_message("Start manual calibration...")
+        print(f"ID10DIFFRACTOMETER--start_manual_calibration {self.calibration_h_mot_delta} - {self.calibration_v_mot_delta} ")
+
+        self.current_calibration_procedure = sample_centring.start_calibrate(
+                {
+                    "horizontal": self.centring_phiy,
+                    "vertical": self.centring_phiz,
+
+                },
+                self.calibration_h_mot_delta,
+                self.calibration_v_mot_delta
+            )
+
+        self.current_calibration_procedure.link(self.calibration_done)
+
+    def calibration_done(self, calibration_procedure):
+        try:
+            calibration_points = calibration_procedure.get()
+            if isinstance(calibration_points, gevent.GreenletExit):
+                raise calibration_points
+        except BaseException:
+            logging.exception("Could not complete calibration")
+            self.emit_centring_failed()
+        
+        print(f"##################ID10Diffractometer - calibration_done - {calibration_points}")
