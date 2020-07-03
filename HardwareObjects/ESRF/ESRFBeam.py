@@ -69,6 +69,10 @@ class ESRFBeam(AbstractBeam):
             self._beam_width = float(beam_position.split()[0])
             self._beam_height = float(beam_position.split()[1])
 
+        beam_shape = self.getProperty("beam_shape")
+        print(f"################################ESRBEAM {beam_shape}" )
+        if beam_shape:
+            self._beam_shape = BeamShape.RECTANGULAR
 
     def _emit_beam_info_change(self, *args, **kwargs):
         self.emit_beam_info_change()
@@ -243,7 +247,7 @@ class ESRFBeam(AbstractBeam):
             beam_x_y (tuple): Position (x, y) [pixel]
         """
         self._beam_position_on_screen = beam_x_y
-        self.emit("beamPosChanged", self._beam_position_on_screen)
+        self.emit("beamPosChanged", (self._beam_position_on_screen,))
 
     ##AJOUTER get_beam_size | get_beam_shape
     def get_beam_shape(self):

@@ -4,4 +4,5 @@
     <defaultBeamDivergence>(12.0, 5.0)</defaultBeamDivergence>
     <beam_position>330 241</beam_position>
     <beam_size>4 6</beam_size>
+    <beam_shape>rectangular</beam_shape>
 </object>

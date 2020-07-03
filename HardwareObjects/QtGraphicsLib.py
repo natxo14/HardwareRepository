@@ -249,6 +249,7 @@ class GraphicsItemBeam(GraphicsItem):
         painter.setPen(self.custom_pen)
 
         if self.beam_is_rectangle:
+            print(f" GraphicsItemBeam Paint rectangle")
             painter.drawRect(
                 self.beam_position[0] * self.scene().image_scale
                 - self.beam_size_pix[0] / 2 * self.scene().image_scale,

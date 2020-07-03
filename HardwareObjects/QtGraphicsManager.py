@@ -110,6 +110,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_beam_define_state = None
         self.in_magnification_mode = None
         self.in_one_click_centering = None
+        self.in_move_to_position = None
         self.wait_grid_drawing_click = None
         self.wait_measure_distance_click = None
         self.wait_measure_angle_click = None
@@ -824,6 +825,8 @@ class QtGraphicsManager(AbstractSampleView):
             # self.graphics_beam_define_item.store_coord(pos_x, pos_y)
         elif self.in_one_click_centering:
             self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
+        elif self.in_move_to_position:
+            self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
         else:
             self.emit("pointSelected", None)
             self.emit("infoMsg", "")
@@ -852,6 +855,8 @@ class QtGraphicsManager(AbstractSampleView):
         :param pos_y: screen coordinate Y
         :type pos_y: int
         """
+
+        print(f"############################### QtGraphicsManager mouse_double_clicked")
         if self.in_measure_distance_state:
             self.stop_measure_distance()
         elif self.in_measure_angle_state:
@@ -861,9 +866,11 @@ class QtGraphicsManager(AbstractSampleView):
         elif self.in_beam_define_state:
             self.stop_beam_define()
         else:
+            print(f"############################### QtGraphicsManager move_to_beam")
             self.diffractometer_hwobj.move_to_beam(pos_x, pos_y)
         self.emit("imageDoubleClicked", pos_x, pos_y)
-
+        print(f"############################### QtGraphicsManager self.emit(imageDoubleClicked")
+           
     def mouse_released(self, pos_x, pos_y):
         """Mouse release method. Used to finish grid drawing and item
            selection with selection rectangle
@@ -1645,8 +1652,8 @@ class QtGraphicsManager(AbstractSampleView):
         self.graphics_move_beam_mark_item.hide()
         self.graphics_view.graphics_scene.update()
         HWR.beamline.beam.set_beam_position_on_screen(
-            self.graphics_move_beam_mark_item.end_coord[0],
-            self.graphics_move_beam_mark_item.end_coord[1],
+            (self.graphics_move_beam_mark_item.end_coord[0],
+            self.graphics_move_beam_mark_item.end_coord[1])
         )
         self.emit("infoMsg", "")
 
@@ -1724,13 +1731,21 @@ class QtGraphicsManager(AbstractSampleView):
         self.emit("infoMsg", "Click on the screen to create centring points")
         self.in_one_click_centering = True
         self.graphics_centring_lines_item.setVisible(True)
-
+        
     def stop_one_click_centring(self):
         self.set_cursor_busy(False)
         self.emit("infoMsg", "")
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
-
+    
+    def start_move_center_to_point(self):
+        self.emit("infoMsg", "Click on the screen to move camera center")
+        self.in_move_to_position = True
+        
+    def stop_move_center_to_point(self):
+        self.emit("infoMsg", "")
+        self.in_move_to_position = False
+    
     def start_visual_align(self):
         """Starts visual align procedure when two centring points are selected
            Orientates two points along the osc axes

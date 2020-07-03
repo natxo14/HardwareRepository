@@ -26,6 +26,7 @@ from HardwareRepository.HardwareObjects.GenericDiffractometer import (
 )
 from HardwareRepository.HardwareObjects import sample_centring
 from HardwareRepository.BaseHardwareObjects import HardwareObject
+from HardwareRepository.BaseHardwareObjects import HardwareObjectState
 from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
@@ -82,6 +83,24 @@ class ID1013Diffractometer(GenericDiffractometer):
         self.update_zoom_calibration()
         return GenericDiffractometer.get_pixels_per_mm(self)
     
+    def update_beam_position(self):
+        print(f"##################ID10Diffractometer update_beam_position")
+        if "zoom" not in self.motor_hwobj_dict:
+            # not initialized yet
+            return
+        zoom_motor = self.motor_hwobj_dict["zoom"]
+        props = zoom_motor.get_current_position()
+        
+        if "beamx" in props.keys() and "beamy" in props.keys():
+            self.beam_position = (int(props["beamx"]), int(props["beamy"]))
+        else:
+            self.beam_position = (0,0)
+
+        if HWR.beamline.beam is not None:
+            HWR.beamline.beam.set_beam_position_on_screen(self.beam_position)
+        
+        print(f"##################ID10Diffractometer update_beam_position - {self.beam_position} - {props['name']}")
+        
     def update_zoom_calibration(self):
         """
         """
@@ -268,35 +287,37 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         Descript. :
         """
+        print(f"################ ID1013 DIFF get_centred_point_from_coord {coord_x} , {coord_y}")
         beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
 
         self.update_zoom_calibration()
 
-        self.pixels_per_mm_x
-        self.pixels_per_mm_y
-
-        dx = (coord_x - beam_pos_x) / self.pixels_per_mm_x
-        dy = (coord_y - beam_pos_y) / self.pixels_per_mm_y
-
         if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
             return 0, 0
         
+        dx = (coord_x - beam_pos_x) / self.pixels_per_mm_x
+        dy = (coord_y - beam_pos_y) / self.pixels_per_mm_y
 
-        #        chi_angle = math.radians(self.chiAngle)
-        #        chiRot = numpy.matrix([math.cos(chi_angle), -math.sin(chi_angle),
-        #                               math.sin(chi_angle), math.cos(chi_angle)])
-        #        chiRot.shape = (2,2)
-        #        sx, sy = numpy.dot(numpy.array([0, dsy]),
-        #                           numpy.array(chiRot)) ))
-
-        return {
-            "phi": self.centringPhi.get_value(),
-            "phiz": float(phiz),
-            "phiy": float(phiy),
-            "sampx": float(sampx),
-            "sampy": float(sampy),
+        output = {
+            "phiz": float(dx),
+            "phiy": float(dy),
         }
+        print(f"################ ID1013 DIFF get_centred_point_from_coord out output {output}")
+        
+        return output
 
+    def is_ready(self):
+        """
+        Detects if device is ready
+        """
+        print(f" ################ ID1013 DIFF is_ready:")
+        for motor in self.motor_hwobj_dict.values():
+            print(f"Motor : {motor.name()} state {motor.get_state()}")
+        return all( motor.get_state == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
+        
+        # return self.current_state == DiffractometerState.tostring(
+        #     DiffractometerState.Ready
+        # )
     def zoom_motor_predefined_position_changed(self, position_name, offset=None):
         """
         """
@@ -304,6 +325,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             return
         
         self.update_zoom_calibration()
+        self.update_beam_position()
         self.emit("zoomMotorPredefinedPositionChanged", (position_name, offset))
 
     def start_manual_calibration(self):
