@@ -5,7 +5,7 @@ class BlissVolpi(HardwareObject):
     
     def __init__(self, name):
         #AbstractMotor.__init__(self, name)
-        Device.__init__(self, name)
+        HardwareObject.__init__(self, name)
         
     def init(self):
         self.username = self.volpi_name

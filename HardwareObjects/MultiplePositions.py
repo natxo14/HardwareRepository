@@ -297,6 +297,9 @@ class MultiplePositions(Equipment):
         self.checkPosition()
 
     def moveToPosition(self, name, wait=False):
+        """
+        move to position with name = name
+        """
         #print(f"$$$$$$$$$$$$$$$ moveToPosition {name} ")
 
         move_list = []
