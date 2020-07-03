@@ -243,6 +243,7 @@ class ESRFBeam(AbstractBeam):
             beam_x_y (tuple): Position (x, y) [pixel]
         """
         self._beam_position_on_screen = beam_x_y
+        self.emit("beamPosChanged", self._beam_position_on_screen)
 
     ##AJOUTER get_beam_size | get_beam_shape
     def get_beam_shape(self):
