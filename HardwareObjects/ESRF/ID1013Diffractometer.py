@@ -32,7 +32,7 @@ __credits__ = ["MXCuBE collaboration"]
 __version__ = "2.2."
 __status__ = "Draft"
 
-class ID10Diffractometer(GenericDiffractometer):
+class ID1013Diffractometer(GenericDiffractometer):
     """
     Descript. :
     """
@@ -334,3 +334,8 @@ class ID10Diffractometer(GenericDiffractometer):
             self.emit_centring_failed()
         
         print(f"##################ID10Diffractometer - calibration_done - {calibration_points}")
+        self.emit("new_calibration_done", (calibration_points,))
+
+
+    def emit_calibration_ended(self):
+        self.emit("new_calibration_done", (method, self.get_centring_status()))
