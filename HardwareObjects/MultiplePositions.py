@@ -340,6 +340,16 @@ class MultiplePositions(Equipment):
         return the list of all the positions with all properties
         """
         return self.positions
+    
+    def get_position(self, pos_name):
+        """
+        return all properties of position with name pos_name as dict
+        """
+        for position in self.positions:
+            if pos_name == position["name"]:
+                return position
+        
+        return None
 
     def get_current_position(self):
         """
@@ -430,12 +440,15 @@ class MultiplePositions(Equipment):
         self.commit_changes()
 
     def get_position_key_value(self, name, key):
-        position = self.__getPositionObject(name)
+        position = self.get_position(name)
+        return position[key]
+        
+        # position = self.__getPositionObject(name)
 
-        if position is None:
-            return None
+        # if position is None:
+        #     return None
 
-        return position.getProperty(key)
+        # return position.getProperty(key)
 
     def save_xml_position_key_value(self, name, key, value):
 
@@ -455,7 +468,11 @@ class MultiplePositions(Equipment):
         
         # .write(self.xml_source())
     
-
+    def set_position_key_value(self, name, key, value):
+        for position in self.positions:
+            if name in position['name']:
+                position[key] = value
+        
     def setPositionKeyValue(self, name, key, value):
         from PyQt5.QtCore import pyqtRemoveInputHook
         pyqtRemoveInputHook()

@@ -36,8 +36,8 @@
             <exposure>0.1</exposure>
             <resox>-2.34741784038e-06</resox>
             <resoy>2.59067357513e-06</resoy>
-            <beamx>275.0</beamx>
-            <beamy>289.0</beamy>
+            <beamx>275</beamx>
+            <beamy>289</beamy>
         </position>
         <position>
             <name>3x</name>
@@ -58,8 +58,8 @@
             <exposure>0.1</exposure>
             <resox>-8.92857142857e-07</resox>
             <resoy>1.06382978723e-06</resoy>
-            <beamx>333</beamx>
-            <beamy>241</beamy>
+            <beamx>208.0</beamx>
+            <beamy>293.0</beamy>
         </position>
         <position>
             <name>5X</name>
