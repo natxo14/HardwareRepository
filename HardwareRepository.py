@@ -46,7 +46,7 @@ _timers = []
 
 beamline = None
 BEAMLINE_CONFIG_FILE = "beamline_config.yml"
-
+hardware_repository_path = None
 
 def load_from_yaml(configuration_file, role, _container=None, _table=None):
     """
@@ -246,6 +246,7 @@ def init_hardware_repository(configuration_path):
     """
     global _instance
     global beamline
+    global hardware_repository_path
 
     if _instance is not None or beamline is not None:
         raise RuntimeError(
@@ -261,10 +262,17 @@ def init_hardware_repository(configuration_path):
         configuration_path = lookup_path
 
     logging.getLogger("HWR").info("Hardware repository: %s", configuration_path)
+    hardware_repository_path = configuration_path
+
     _instance = __HardwareRepositoryClient(configuration_path)
     _instance.connect()
     beamline = load_from_yaml(BEAMLINE_CONFIG_FILE, role="beamline")
 
+def getHardwareRepositoryConfigPath():
+    """
+    Get the HardwareRepository path
+    """
+    return hardware_repository_path[0]
 
 def getHardwareRepository():
     """

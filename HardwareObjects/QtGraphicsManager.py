@@ -110,7 +110,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_beam_define_state = None
         self.in_magnification_mode = None
         self.in_one_click_centering = None
-        self.in_move_to_position = None
+        self.in_move_to_clicked_point = None
         self.wait_grid_drawing_click = None
         self.wait_measure_distance_click = None
         self.wait_measure_angle_click = None
@@ -555,6 +555,7 @@ class QtGraphicsManager(AbstractSampleView):
         :param position: beam position on a screen
         :type position: list of two int
         """
+        print(f"$$$$$$$$$$$$$$$QtGraphicsManager beam_position_changed {position}")
         if position:
             self.beam_position = position
             for graphics_item in self.graphics_view.graphics_scene.items():
@@ -791,6 +792,7 @@ class QtGraphicsManager(AbstractSampleView):
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
         elif self.in_calibration_state:
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
+            self.emit("infoMsg", "Click on second point on the image to end calibration")
         elif self.wait_grid_drawing_click:
             self.in_grid_drawing_state = True
             self.graphics_grid_draw_item.set_draw_mode(True)
@@ -825,8 +827,9 @@ class QtGraphicsManager(AbstractSampleView):
             # self.graphics_beam_define_item.store_coord(pos_x, pos_y)
         elif self.in_one_click_centering:
             self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
-        elif self.in_move_to_position:
-            self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
+        elif self.in_move_to_clicked_point:
+            self.diffractometer_hwobj.start_move_to_clicked_point(pos_x, pos_y)
+            self.in_move_to_clicked_point = False
         else:
             self.emit("pointSelected", None)
             self.emit("infoMsg", "")
@@ -1512,8 +1515,8 @@ class QtGraphicsManager(AbstractSampleView):
         """
         self.in_calibration_state = True
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger start_calibration - {self.in_calibration_state}")
-        
-
+        self.emit("infoMsg", "Click on one point on the image to start calibration")
+    
     def stop_calibration(self):
         """
         Start camera calibration
@@ -1738,13 +1741,13 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
     
-    def start_move_center_to_point(self):
-        self.emit("infoMsg", "Click on the screen to move camera center")
-        self.in_move_to_position = True
+    # def start_move_center_to_point(self):
+    #     self.emit("infoMsg", "Click on the screen to move camera center")
+    #     self.in_move_to_clicked_point = True
         
-    def stop_move_center_to_point(self):
-        self.emit("infoMsg", "")
-        self.in_move_to_position = False
+    # def stop_move_center_to_point(self):
+    #     self.emit("infoMsg", "")
+    #     self.in_move_to_clicked_point = False
     
     def start_visual_align(self):
         """Starts visual align procedure when two centring points are selected

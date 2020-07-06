@@ -235,10 +235,14 @@ class ESRFBeam(AbstractBeam):
             try:
                 self._beam_position_on_screen = HWR.beamline.diffractometer.get_beam_position()
             except AttributeError:
-                self._beam_position_on_screen = (
-                    HWR.beamline.sample_view.camera.get_width() / 2,
-                    HWR.beamline.sample_view.camera.get_height() / 2,
-                )
+                try:
+                    self._beam_position_on_screen = (
+                        HWR.beamline.sample_view.camera.get_width() / 2,
+                        HWR.beamline.sample_view.camera.get_height() / 2,
+                    )
+                except AttributeError:
+                    return (0, 0)
+        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ESRFBEAM- get_beam_position_on_screen  {self._beam_position_on_screen}")
         return self._beam_position_on_screen
 
     def set_beam_position_on_screen(self, beam_x_y):
@@ -246,6 +250,7 @@ class ESRFBeam(AbstractBeam):
         Returns:
             beam_x_y (tuple): Position (x, y) [pixel]
         """
+        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ESRFBEAM- set_beam_position_on_screen  {beam_x_y}")
         self._beam_position_on_screen = beam_x_y
         self.emit("beamPosChanged", (self._beam_position_on_screen,))
 

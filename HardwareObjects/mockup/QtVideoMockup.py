@@ -70,6 +70,14 @@ class QtVideoMockup(AbstractVideoDevice):
         )
         self.emit("imageReceived", self.image)
 
+    def get_width(self):
+        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ QtVideoMockup- get_width  {self.image.width()}")
+        return self.image.width()
+    
+    def get_height(self):
+        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ QtVideoMockup- height  {self.image.height()}")
+        return self.image.height()
+
     def save_snapshot(self, filename, image_type="PNG"):
         qimage = QImage(self.image)
         qimage.save(filename, image_type)

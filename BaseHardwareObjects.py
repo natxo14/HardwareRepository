@@ -142,6 +142,7 @@ class HardwareObjectNode(object):
     def __init__(self, nodeName):
         """Constructor"""
         self.__dict__["_propertySet"] = PropertySet()
+        #self._propertySet = PropertySet()
         self.__objectsNames = []
         self.__objects = []
         self._objectsByRole = {}
@@ -161,6 +162,9 @@ class HardwareObjectNode(object):
 
     def getRoles(self):
         return list(self._objectsByRole.keys())
+
+    def getPath(self):
+        return self._path
 
     def setPath(self, path):
         """Set the 'path' of the Hardware Object in the XML file describing it
@@ -673,12 +677,15 @@ class HardwareObject(HardwareObjectNode, HardwareObjectMixin):
         from .HardwareRepository import getHardwareRepository
 
         def get_changes(node):
+            import pdb
+            pdb.set_trace()
             updates = list(node._propertySet.getChanges())
             if node:
                 for subnode in node:
                     updates += get_changes(subnode)
 
             if isinstance(node, HardwareObject):
+                pdb.set_trace()
                 if updates:
                     getHardwareRepository().update(node.name(), updates)
                 return []

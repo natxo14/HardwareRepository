@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <object class="MultiplePositions">
     <username>CDI Zoom</username>
     <mode>absolute</mode>
@@ -6,17 +5,11 @@
         <motor>
             <name>zoom</name>
         </motor>
-        <!--motor>
-            <name>gain</name>
-        </motor>
-        <motor>
-            <name>exposure</name>
-        </motor-->
+        
     </motors>
 	
-    <object href="/m0-mockup" role="zoom"/>
-    <!--object role="gain" href="/progain"></object>
-    <object role="exposure" href="/proexp"></object-->
+    <object href="/m0-mockup" role="zoom" />
+    
     
     <deltas>
         <zoom>0.1</zoom>
@@ -43,8 +36,8 @@
             <exposure>0.1</exposure>
             <resox>-2.34741784038e-06</resox>
             <resoy>2.59067357513e-06</resoy>
-            <beamx>333</beamx>
-            <beamy>241</beamy>
+            <beamx>275.0</beamx>
+            <beamy>289.0</beamy>
         </position>
         <position>
             <name>3x</name>

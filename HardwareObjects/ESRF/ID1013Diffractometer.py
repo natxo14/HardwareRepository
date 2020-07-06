@@ -97,6 +97,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             self.beam_position = (0,0)
 
         if HWR.beamline.beam is not None:
+            print(f"##################ID10Diffractometer update_beam_position HWR.beamline.beam not none - {self.beam_position}")
             HWR.beamline.beam.set_beam_position_on_screen(self.beam_position)
         
         print(f"##################ID10Diffractometer update_beam_position - {self.beam_position} - {props['name']}")
@@ -135,58 +136,33 @@ class ID1013Diffractometer(GenericDiffractometer):
             self.emit(
                 "pixelsPerMmChanged", ((self.pixels_per_mm_x, self.pixels_per_mm_y),)
             )
-
-    def get_centred_point_from_coord(self, x, y, return_by_names=None):
+    
+    def start_move_to_clicked_point(
+        self, coord_x=None, coord_y=None
+    ):
         """
         Descript. :
+        Move center of the image to the clicked point
         """
-        beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
-        dx = (x - beam_pos_x) / self.pixels_per_mm_x
-        dy = (y - beam_pos_y) / self.pixels_per_mm_y
-        
-        pos = {
-            "phiz": float(dy),
-            "sampy": float(dx),
-        }
+        try:
+            print(f"##################ID10Diffractometer start_move_to_clicked_point {coord_x} {coord_y}")
+            
+            self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
+            self.centring_time = time.time()
+            #curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            
+            if coord_x is None and coord_y is None:
+                coord_x = self.beam_position[0]
+                coord_y = self.beam_position[1]
 
-        if return_by_names:
-            pos = self.convert_from_obj_to_name(pos)
-        return pos
-
-    # def start_move_to_beam(
-    #     self, coord_x=None, coord_y=None, omega=None, wait_result=None
-    # ):
-    #     """
-    #     Descript. :
-    #     """
-    #     try:
-    #         self.emit_progress_message("Move to beam...")
-    #         self.centring_time = time.time()
-    #         curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
-    #         self.centring_status = {
-    #             "valid": True,
-    #             "startTime": curr_time,
-    #             "endTime": curr_time,
-    #         }
-    #         if coord_x is None and coord_y is None:
-    #             coord_x = self.beam_position[0]
-    #             coord_y = self.beam_position[1]
-
-    #         motors = self.get_centred_point_from_coord(
-    #             coord_x, coord_y, return_by_names=True
-    #         )
-    #         if omega is not None:
-    #             motors["phi"] = omega
-
-    #         self.centring_status["motors"] = motors
-    #         self.centring_status["valid"] = True
-    #         self.centring_status["angleLimit"] = True
-    #         self.emit_progress_message("")
-    #         self.accept_centring()
-    #         self.current_centring_method = None
-    #         self.current_centring_procedure = None
-    #     except BaseException:
-    #         logging.exception("Diffractometer: Could not complete 2D centring")
+            motors = self.get_centred_point_from_coord(
+                coord_x, coord_y
+            )
+            print(f"##################ID10Diffractometer start_move_to_clicked_point - motors - {motors}")
+            
+            self.move_to_motors_positions(motors)
+        except BaseException:
+            logging.exception("Diffractometer: Could not complete 2D centring")
 
     
     def id10_manual_centring(self, sample_info=None, wait_result=None):
@@ -283,7 +259,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         self.centring_point_number = int(centring_point_number)
         self.delta_phi = float(delta_phi)
 
-    def get_centred_point_from_coord(self, coord_x, coord_y, return_by_names=True):
+    def get_centred_point_from_coord(self, coord_x, coord_y):
         """
         Descript. :
         """
@@ -295,16 +271,16 @@ class ID1013Diffractometer(GenericDiffractometer):
         if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
             return 0, 0
         
-        dx = (coord_x - beam_pos_x) / self.pixels_per_mm_x
-        dy = (coord_y - beam_pos_y) / self.pixels_per_mm_y
+        rmove_x = (coord_x - beam_pos_x) / self.pixels_per_mm_x
+        rmove_y = (coord_y - beam_pos_y) / self.pixels_per_mm_y
 
-        output = {
-            "phiz": float(dx),
-            "phiy": float(dy),
+        motors_rel_move = {
+            "phiz": float(rmove_x),
+            "phiy": float(rmove_y),
         }
-        print(f"################ ID1013 DIFF get_centred_point_from_coord out output {output}")
+        print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_rel_move {motors_rel_move}")
         
-        return output
+        return motors_rel_move
 
     def is_ready(self):
         """
@@ -313,7 +289,10 @@ class ID1013Diffractometer(GenericDiffractometer):
         print(f" ################ ID1013 DIFF is_ready:")
         for motor in self.motor_hwobj_dict.values():
             print(f"Motor : {motor.name()} state {motor.get_state()}")
-        return all( motor.get_state == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
+        all_ready = all( motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
+        
+        print(f" ################ ID1013 DIFF is_ready: ALL IS READY {all_ready}")
+        return all_ready
         
         # return self.current_state == DiffractometerState.tostring(
         #     DiffractometerState.Ready
@@ -321,6 +300,7 @@ class ID1013Diffractometer(GenericDiffractometer):
     def zoom_motor_predefined_position_changed(self, position_name, offset=None):
         """
         """
+        print(f"################ ID1013 DIFF zoom_motor_predefined_position_changed {position_name}")
         if not position_name:
             return
         

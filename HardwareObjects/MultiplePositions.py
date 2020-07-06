@@ -150,6 +150,17 @@ import logging
 
 
 class MultiplePositions(Equipment):
+    """
+    CODING NOTES:
+    handling data from xml file:
+    load only ONCE with read_positions
+    Then access to data and modify it with self.positions
+    Is this risky?? Good Practice?? Is better to access self["positions"] data ??
+    Guess that self["positions"] data is created when reading xml file.
+
+    TODO: when xml data is edited and saved by user: RELOAD IT. HOW TO DO IT??
+    """
+
     def init(self):
         try:
             self.mode
@@ -277,18 +288,20 @@ class MultiplePositions(Equipment):
         if not self.is_ready():
             return ""
 
-        state = "READY"
+        state = HardwareObjectState.READY
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state - {len(self.motor_hwobj_list)}")
             
         for mot in self.motor_hwobj_list:
             print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - mot {id(mot)}")
             if mot.get_state() == HardwareObjectState.BUSY:
-                state = "MOVING"
-            elif mot.get_state() in {HardwareObjectState.UNKNOWN,
+                state = HardwareObjectState.BUSY
+            if mot.get_state() in {HardwareObjectState.UNKNOWN,
                                       HardwareObjectState.WARNING,
                                       HardwareObjectState.FAULT,
                                       HardwareObjectState.OFF}:
-                return "UNUSABLE"
+                return mot.get_state()
+            else:
+                return HardwareObjectState.UNKNOWN
 
         return state
 
@@ -388,17 +401,18 @@ class MultiplePositions(Equipment):
 
     def checkPosition(self, *args):
         if not self.is_ready():
-            #print(f"checkPosition not self.is_ready() { self.is_ready()}")
+            print(f"checkPosition not self.is_ready() { self.is_ready()}")
             return None
 
         posName = self.get_value()
 
+        print(f"checkPosition posName {posName}")
         if posName is None:
             self.emit("no_position", ())
             return None
         else:
+            print(f"checkPosition emit(predefinedPositionChanged) {posName}")
             self.emit("predefinedPositionChanged", (posName,))
-            #print(f"checkPosition emit(predefinedPositionChanged) {posName}")
             return posName
 
     def setNewPositions(self, name, newPositions):
@@ -423,7 +437,31 @@ class MultiplePositions(Equipment):
 
         return position.getProperty(key)
 
+    def save_xml_position_key_value(self, name, key, value):
+
+        xml_tree = cElementTree.fromstring(self.xml_source())
+        positions = xml_tree.find("positions")
+        
+        pos_list = positions.findall("position")
+        # from PyQt5.QtCore import pyqtRemoveInputHook
+        # pyqtRemoveInputHook()
+        # import pdb
+        # pdb.set_trace()
+
+        # for pos in pos_list:
+        #     if pos.find("name").text == name:
+        #         if pos.find(key) is not None:
+        #             pos.set('beamx', value)
+        
+        # .write(self.xml_source())
+    
+
     def setPositionKeyValue(self, name, key, value):
+        from PyQt5.QtCore import pyqtRemoveInputHook
+        pyqtRemoveInputHook()
+        import pdb
+        pdb.set_trace()
+
         xml_tree = cElementTree.fromstring(self.xml_source())
         positions = xml_tree.find("positions")
 
@@ -432,7 +470,10 @@ class MultiplePositions(Equipment):
             if pos.find("name").text == name:
                 if pos.find(key) is not None:
                     position = self.__getPositionObject(name)
+                    print(f"position : {position} - value {value} - key {key}")
+                    pdb.set_trace()
                     position.setProperty(key, str(value))
+                    pdb.set_trace()
                     self.commit_changes()
                     return True
                 else:

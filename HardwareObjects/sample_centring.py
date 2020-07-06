@@ -121,7 +121,7 @@ def calibrate(
             except BaseException:
                 raise RuntimeError("Aborted while waiting for calibration 1st click")
             USER_CLICKED_EVENT = gevent.event.AsyncResult()
-            calibration_two_points.append((x,y))
+            calibration_two_points.append((x, y))
                             
             if num_clicks == 0:
                 print(f"calibrate : first click {x},{y}")

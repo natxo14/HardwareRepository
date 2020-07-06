@@ -343,6 +343,8 @@ class GenericDiffractometer(HardwareObject):
                     self.connect(
                         temp_motor_hwobj, "stateChanged", self.zoom_motor_state_changed
                     )
+                    # make update_beam_position happen to use data from multiple_position xml file:
+                    temp_motor_hwobj.checkPosition()
             else:
                 logging.getLogger("HWR").warning(
                     "Diffractometer: Motor "
@@ -532,6 +534,7 @@ class GenericDiffractometer(HardwareObject):
         """
         Detects if device is ready
         """
+        print(f"##################GENERIC Difffractometer wait_device_ready {self.current_state}")
         return self.current_state == DiffractometerState.tostring(
             DiffractometerState.Ready
         )
@@ -547,8 +550,10 @@ class GenericDiffractometer(HardwareObject):
         :param timeout: timeout in second
         :type timeout: int
         """
+        print(f"##################GENERIC Difffractometer wait_device_ready")
         with gevent.Timeout(timeout, Exception("Timeout waiting for device ready")):
             while not self.is_ready():
+                print(f"##################GENERIC Difffractometer wait_device_ready not self.is_ready()")
                 time.sleep(0.01)
 
     def execute_server_task(self, method, timeout=30, *args):
