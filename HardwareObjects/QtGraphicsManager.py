@@ -810,7 +810,8 @@ class QtGraphicsManager(AbstractSampleView):
         elif self.in_calibration_state:
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
             self.create_calibration_point((pos_x, pos_y))
-            self.emit("infoMsg", "Click on second point on the image to end calibration")
+            #self.set_cursor_busy(True)
+            self.emit("infoMsg", "Wait motors to move before calibration's 2nd click")
         elif self.wait_grid_drawing_click:
             self.in_grid_drawing_state = True
             self.graphics_grid_draw_item.set_draw_mode(True)
@@ -1096,7 +1097,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.emit("gridClicked", (grid, image, line, image_num))
 
     def set_cursor_busy(self, state):
-        return
+        #return
         if state:
             QtImport.QApplication.setOverrideCursor(
                 QtImport.QCursor(QtImport.Qt.BusyCursor)
@@ -1105,9 +1106,10 @@ class QtGraphicsManager(AbstractSampleView):
             QtImport.QApplication.setOverrideCursor(self.cursor)
 
     def set_cursor_target(self, state):
+        print(f"set_cursor_target state : {state}")
         if state:
             self.cursor = QtImport.QCursor(
-                QtImport.QPixmap(Icons.load_icon("Point"), 0, 0)
+                QtImport.QPixmap(Icons.load_pixmap("Point"))
             )
         else:
             self.cursor = QtImport.Qt.ArrowCursor
