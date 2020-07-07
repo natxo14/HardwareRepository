@@ -137,15 +137,16 @@ class ID1013Diffractometer(GenericDiffractometer):
                 "pixelsPerMmChanged", ((self.pixels_per_mm_x, self.pixels_per_mm_y),)
             )
     
-    def start_move_to_clicked_point(
+    def move_to_clicked_point(
         self, coord_x=None, coord_y=None
     ):
         """
         Descript. :
         Move center of the image to the clicked point
         """
+        
         try:
-            print(f"##################ID10Diffractometer start_move_to_clicked_point {coord_x} {coord_y}")
+            print(f"##################ID10Diffractometer move_to_clicked_point {coord_x} {coord_y}")
             
             self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
             self.centring_time = time.time()
@@ -158,7 +159,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             motors = self.get_centred_point_from_coord(
                 coord_x, coord_y
             )
-            print(f"##################ID10Diffractometer start_move_to_clicked_point - motors - {motors}")
+            print(f"##################ID10Diffractometer move_to_clicked_point - motors - {motors}")
             
             self.move_to_motors_positions(motors)
         except BaseException:
@@ -169,7 +170,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         """
         centring_points = self.centring_point_number
-        centring_phi_incr = self.delta_phi
+        phi_range_val = self.delta_phi * (centring_points - 1)
 
         self.emit_progress_message("Manual N click centring...")
         logging.getLogger("HWR").debug(
@@ -190,7 +191,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             self.beam_position[0],
             self.beam_position[1],
             n_points=centring_points,
-            phi_incr=centring_phi_incr,
+            phi_range=phi_range_val,
         )
 
         self.current_centring_procedure.link(self.centring_done)
@@ -259,7 +260,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         self.centring_point_number = int(centring_point_number)
         self.delta_phi = float(delta_phi)
 
-    def get_centred_point_from_coord(self, coord_x, coord_y):
+    def get_centred_point_from_coord(self, coord_x, coord_y, return_by_names=False,):
         """
         Descript. :
         """
@@ -288,7 +289,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         print(f" ################ ID1013 DIFF is_ready:")
         for motor in self.motor_hwobj_dict.values():
-            print(f"Motor : {motor.name()} state {motor.get_state()}")
+            print(f"################ ID1013 DIFF is_ready: Motor : {motor.name()} state {motor.get_state()}")
         all_ready = all( motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
         
         print(f" ################ ID1013 DIFF is_ready: ALL IS READY {all_ready}")

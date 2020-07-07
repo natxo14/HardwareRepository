@@ -289,10 +289,10 @@ class MultiplePositions(Equipment):
             return ""
 
         state = HardwareObjectState.READY
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state - {len(self.motor_hwobj_list)}")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state in list: - {[mot.name() for mot in self.motor_hwobj_list]}")
             
         for mot in self.motor_hwobj_list:
-            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - mot {id(mot)}")
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot {mot.name()} - get_state : {mot.get_state()}")
             if mot.get_state() == HardwareObjectState.BUSY:
                 state = HardwareObjectState.BUSY
             if mot.get_state() in {HardwareObjectState.UNKNOWN,
@@ -300,16 +300,14 @@ class MultiplePositions(Equipment):
                                       HardwareObjectState.FAULT,
                                       HardwareObjectState.OFF}:
                 return mot.get_state()
-            else:
-                return HardwareObjectState.UNKNOWN
-
+        
         return state
 
     def stateChanged(self, state):
         self.emit("stateChanged", (self.get_state(),))
         self.checkPosition()
 
-    def moveToPosition(self, name, wait=False):
+    def moveToPosition(self, name, wait=True):
         """
         move to position with name = name
         """
@@ -327,7 +325,7 @@ class MultiplePositions(Equipment):
                 mot.set_value(pos)
 
         if wait:
-            [mot.waitEndOfMove() for mot, pos in move_list if mot is not None]
+            [mot.wait_end_of_move(4) for mot, pos in move_list if mot is not None]
         
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - moveToPosition - {name} - self {id(self)}")
         self.emit("predefinedPositionChanged", name)
@@ -418,7 +416,7 @@ class MultiplePositions(Equipment):
 
         print(f"checkPosition posName {posName}")
         if posName is None:
-            self.emit("no_position", ())
+            self.emit("no_position", (None))
             return None
         else:
             print(f"checkPosition emit(predefinedPositionChanged) {posName}")

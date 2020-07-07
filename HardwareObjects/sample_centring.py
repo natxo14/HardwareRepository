@@ -146,6 +146,7 @@ def start(
     beam_yc,
     chi_angle=0,
     n_points=3,
+    phi_range=180,
 ):
     global CURRENT_CENTRING
 
@@ -164,6 +165,7 @@ def start(
         beam_yc,
         chi_angle,
         n_points,
+        phi_range,
     )
     return CURRENT_CENTRING
 

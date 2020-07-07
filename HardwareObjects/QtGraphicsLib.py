@@ -555,15 +555,11 @@ class GraphicsItemPoint(GraphicsItem):
         self.scene().itemDoubleClickedSignal.emit(self)
         self.update()
 
-class GraphicsItemCalibrationPoint(GraphicsItem):
+class GraphicsItemCalibrationPoint(GraphicsItemPoint):
     """
     Calibration point: feedback given for calibration
-    """
-
-    def __init__(
-        self, centred_position=None, full_centring=True, position_x=0, position_y=0
-    ):
-        """
+    Like GraphicsItemPoint but with other color
+    
         :param: parent
         :param centred position: motor positions
         :type centred_position: dict with motors positions
@@ -575,65 +571,6 @@ class GraphicsItemCalibrationPoint(GraphicsItem):
         :type position_y: int
         """
 
-        GraphicsItem.__init__(self, position_x, position_y)
-
-        self.__full_centring = full_centring
-        self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
-
-        if centred_position is None:
-            self.__centred_position = queue_model_objects.CentredPosition()
-            self.__centred_position.centring_method = False
-        else:
-            self.__centred_position = centred_position
-
-        self.start_coord = [position_x, position_y]
-        self.setPos(position_x - 10, position_y - 10)
-
-    def boundingRect(self):
-        """Returns adjusted rect
-
-        :returns: QRect
-        """
-
-        return self.rect.adjusted(0, 0, 20, 20)
-
-    def get_display_name(self):
-        """Returns display name
-
-        :return: str
-        """
-        return "Point %d" % self.index
-
-    def get_full_name(self):
-        """Returns full name
-
-        :return: str
-        """
-        full_name = "Point %d" % self.index
-        try:
-            full_name += " (kappa: %0.2f phi: %0.2f)" % (
-                self.__centred_position.kappa,
-                self.__centred_position.kappa_phi,
-            )
-        except BaseException:
-            pass
-        return full_name
-
-    def get_centred_position(self):
-        """Return centered position
-
-        :return: cpos
-        """
-        return self.__centred_position
-
-    def set_centred_position(self, centred_position):
-        """Sets centred position
-
-        :param centred_position:
-        :return:
-        """
-        self.__centred_position = centred_position
-
     def paint(self, painter, option, widget):
         """
         Main pain method
@@ -642,19 +579,13 @@ class GraphicsItemCalibrationPoint(GraphicsItem):
         :param widget:
         :return:
         """
-        self.custom_pen.setWidth(1)
-        if self.used_count > 0:
-            self.custom_pen.setColor(QtImport.Qt.red)
-        else:
-            self.custom_pen.setWidth(1)
-            if self.base_color:
-                self.custom_pen.setColor(self.base_color)
-            else:
-                self.custom_pen.setColor(NORMAL_COLOR)
+        
+        self.custom_pen.setWidth(2)
+        self.custom_pen.setColor(QtImport.Qt.red)
 
         if self.isSelected():
             self.custom_pen.setColor(SELECTED_COLOR)
-            self.custom_pen.setWidth(2)
+            self.custom_pen.setWidth(3)
 
         painter.setPen(self.custom_pen)
         painter.drawEllipse(0, 0, 20, 20)
@@ -674,30 +605,7 @@ class GraphicsItemCalibrationPoint(GraphicsItem):
             painter.drawText(22, 27,
                              "%s exposure(s)" % self.used_count)
         """
-
-    def set_start_position(self, position_x, position_y):
-        """Sets start position
-
-        :param position_x: horizontal coordinate
-        :type position_y: int
-        :param position_y: vertical coordinate
-        :type position_y: int
-        :return: None
-        """
-        if position_x is not None and position_y is not None:
-            self.start_coord[0] = position_x
-            self.start_coord[1] = position_y
-            self.setPos(position_x - 10, position_y - 10)
-            self.scene().update()
-
-    def mouseDoubleClickEvent(self, event):
-        """Emits itemDoubleClickedSignal
-
-        :param event: Qt event
-        :return:
-        """
-        self.scene().itemDoubleClickedSignal.emit(self)
-        self.update()
+    
 class GraphicsItemLine(GraphicsItem):
     """Line class"""
 
@@ -2920,6 +2828,7 @@ class GraphicsCameraFrame(QtImport.QGraphicsPixmapItem):
         :param event:
         :return:
         """
+        print(f"class GraphicsCameraFrame mousePressEvent event.button() {event.button()}")
         position = QtImport.QPointF(event.scenePos())
         self.scene().mouseClickedSignal.emit(
             position.x(), position.y(), event.button() == QtImport.Qt.LeftButton

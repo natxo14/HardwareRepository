@@ -1164,6 +1164,8 @@ class GenericDiffractometer(HardwareObject):
         Descript. :
         """
         self.emit("progressMessage", (msg,))
+        if HWR.beamline.sample_view:
+            HWR.beamline.sample_view.emit("infoMsg", (msg,))
 
     def get_centring_status(self):
         """

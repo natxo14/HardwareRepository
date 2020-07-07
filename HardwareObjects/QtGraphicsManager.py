@@ -64,7 +64,7 @@ except ImportError:
     except ImportError:
         pass
 
-from gui.utils import QtImport
+from gui.utils import Icons, QtImport
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects import QtGraphicsLib as GraphicsLib
@@ -682,7 +682,22 @@ class QtGraphicsManager(AbstractSampleView):
             self.add_shape(point, emit)
             cpos.set_index(point.index)
             return point
-
+    
+    def create_calibration_point(self, point_position, ):
+        calibration_point = GraphicsLib.GraphicsItemCalibrationPoint(
+                None, False, point_position[0], point_position[1]
+            )
+        self.graphics_view.graphics_scene.addItem(calibration_point)
+        self.graphics_view.graphics_scene.update()
+    
+    def delete_calibration_points(self):
+        
+        for shape in self.graphics_view.graphics_scene.items():
+            if type(shape) is GraphicsLib.GraphicsItemCalibrationPoint:
+                self.graphics_view.graphics_scene.removeItem(shape)
+        
+        self.graphics_view.graphics_scene.update()
+    
     def diffractometer_centring_successful(self, method, centring_status):
         """Last stage in centring procedure
 
@@ -786,12 +801,15 @@ class QtGraphicsManager(AbstractSampleView):
         """
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger mouse_clicked - {pos_x} - {pos_y}")
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_calibration_state - {self.in_calibration_state}")
-                        
+        if not left_click:
+            return
+
         if self.in_centring_state:
             self.graphics_centring_lines_item.add_position(pos_x, pos_y)
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
         elif self.in_calibration_state:
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
+            self.create_calibration_point((pos_x, pos_y))
             self.emit("infoMsg", "Click on second point on the image to end calibration")
         elif self.wait_grid_drawing_click:
             self.in_grid_drawing_state = True
@@ -828,7 +846,7 @@ class QtGraphicsManager(AbstractSampleView):
         elif self.in_one_click_centering:
             self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
         elif self.in_move_to_clicked_point:
-            self.diffractometer_hwobj.start_move_to_clicked_point(pos_x, pos_y)
+            self.diffractometer_hwobj.move_to_clicked_point(pos_x, pos_y)
             self.in_move_to_clicked_point = False
         else:
             self.emit("pointSelected", None)
@@ -1002,6 +1020,7 @@ class QtGraphicsManager(AbstractSampleView):
                 if item.isSelected():
                     self.delete_shape(item)
         elif key_event == "Escape":
+            self.stop_calibration()
             self.stop_measure_distance()
             self.stop_measure_angle()
             self.stop_measure_area()
@@ -1077,13 +1096,23 @@ class QtGraphicsManager(AbstractSampleView):
         self.emit("gridClicked", (grid, image, line, image_num))
 
     def set_cursor_busy(self, state):
-        return 
+        return
         if state:
             QtImport.QApplication.setOverrideCursor(
                 QtImport.QCursor(QtImport.Qt.BusyCursor)
             )
         else:
             QtImport.QApplication.setOverrideCursor(self.cursor)
+
+    def set_cursor_target(self, state):
+        if state:
+            self.cursor = QtImport.QCursor(
+                QtImport.QPixmap(Icons.load_icon("Point"), 0, 0)
+            )
+        else:
+            self.cursor = QtImport.Qt.ArrowCursor
+        
+        QtImport.QApplication.setOverrideCursor(self.cursor)
 
     def get_graphics_view(self):
         """Rturns current GraphicsView
@@ -1522,6 +1551,9 @@ class QtGraphicsManager(AbstractSampleView):
         Start camera calibration
         """
         self.in_calibration_state = False
+        self.delete_calibration_points()
+        self.graphics_view.graphics_scene.update()
+        self.emit("infoMsg", "")
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger stop_calibration - {self.in_calibration_state}")
         
 
@@ -1741,13 +1773,16 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
     
-    # def start_move_center_to_point(self):
-    #     self.emit("infoMsg", "Click on the screen to move camera center")
-    #     self.in_move_to_clicked_point = True
+    def start_move_to_clicked_point(self):
+        # TODO : need to cancel rest of events ??
+        self.emit("infoMsg", "Click on the screen to move camera center")
+        self.in_move_to_clicked_point = True
+        self.set_cursor_target(True)
         
-    # def stop_move_center_to_point(self):
-    #     self.emit("infoMsg", "")
-    #     self.in_move_to_clicked_point = False
+    def stop_move_to_clicked_point(self):
+        self.emit("infoMsg", "")
+        self.in_move_to_clicked_point = False
+        self.set_cursor_target(False)
     
     def start_visual_align(self):
         """Starts visual align procedure when two centring points are selected

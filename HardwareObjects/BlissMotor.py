@@ -26,6 +26,10 @@ Example xml file:
 </device>
 """
 
+import time
+import gevent
+from gevent import Timeout
+
 import enum
 from bliss.config import static
 from HardwareRepository.HardwareObjects.abstract.AbstractMotor import AbstractMotor
@@ -115,7 +119,7 @@ class BlissMotor(AbstractMotor):
         """
         #print(f"######## BLISS MOTOR get_state - type {type(self)} - name {self.motor_obj.name}")
         state = self.motor_obj.state.current_states_names[0]
-        print(f"######## BLISS MOTOR get_state - state - {state} - states {self.motor_obj.state.current_states_names}")
+        print(f"######## BLISS MOTOR {self.name()} get_state - state - {state} - states {self.motor_obj.state.current_states_names}")
         return self._state2enum(state)[0]
 
     def get_specific_state(self):
@@ -203,3 +207,11 @@ class BlissMotor(AbstractMotor):
 
     #     AbstractMotor.update_value(value)
     #     self.emit("valueChanged", (value,))
+
+    def wait_end_of_move(self, timeout=None):
+        """wait untill motor stops moving"""
+        
+        with gevent.Timeout(timeout), False:
+            time.sleep(0.1)
+            while self.get_state() == HardwareObjectState.MOVING:
+                time.sleep(0.1)
