@@ -592,13 +592,7 @@ class GraphicsItemCalibrationPoint(GraphicsItemPoint):
         painter.drawLine(0, 0, 20, 20)
         painter.drawLine(0, 20, 20, 0)
 
-        if self.index:
-            display_str = str(self.index)
-        else:
-            display_str = "#"
-        if self.isSelected():
-            display_str += " selected"
-        painter.drawText(22, 0, display_str)
+        painter.drawText(22, 0, "calibration point")
 
         """
         if self.isSelected() and self.used_count > 0:

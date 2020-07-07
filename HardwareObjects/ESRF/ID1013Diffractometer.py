@@ -301,7 +301,7 @@ class ID1013Diffractometer(GenericDiffractometer):
     def zoom_motor_predefined_position_changed(self, position_name, offset=None):
         """
         """
-        print(f"################ ID1013 DIFF zoom_motor_predefined_position_changed {position_name}")
+        print(f"################ ID1013 DIFF zoom_motor_predefined_position_changed position_name :{position_name}")
         if not position_name:
             return
         

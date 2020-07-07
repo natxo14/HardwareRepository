@@ -61,6 +61,7 @@ class BlissMotorStates(enum.Enum):
     OFF = 6
     DISABLED = 7
     UNKNOWN = 8
+    INCLOSEDLOOPWINDOW = 9
 
 
 class BlissMotor(AbstractMotor):
@@ -73,6 +74,7 @@ class BlissMotor(AbstractMotor):
         "FAULT": HardwareObjectState.FAULT,
         "LIMPOS": HardwareObjectState.READY,
         "LIMNEG": HardwareObjectState.READY,
+        "INCLOSEDLOOPWINDOW": HardwareObjectState.READY,
         "HOME": HardwareObjectState.READY,
         "OFF": HardwareObjectState.OFF,
         "DISABLED": HardwareObjectState.OFF,
@@ -112,15 +114,30 @@ class BlissMotor(AbstractMotor):
         _state = self.SPECIFIC_TO_HWR_STATE.get(state, HardwareObjectState.UNKNOWN)
         return _state, _specific_state
 
+    def _check_state(self, state):
+        """
+        if state is a list, returns the first found HardwareObjectState
+        if state 'single', translates to a HardwareObjectState
+        """
+        if isinstance(state, list):
+            for stat in state:
+                if stat in self.SPECIFIC_TO_HWR_STATE:
+                    return self.SPECIFIC_TO_HWR_STATE[stat]
+        else:
+            if state in self.SPECIFIC_TO_HWR_STATE:
+                return self.SPECIFIC_TO_HWR_STATE[state]
+        return HardwareObjectState.UNKNOWN
+        
     def get_state(self):
         """Get the motor state.
         Returns:
             (enum 'HardwareObjectState'): Motor state.
         """
         #print(f"######## BLISS MOTOR get_state - type {type(self)} - name {self.motor_obj.name}")
-        state = self.motor_obj.state.current_states_names[0]
-        print(f"######## BLISS MOTOR {self.name()} get_state - state - {state} - states {self.motor_obj.state.current_states_names}")
-        return self._state2enum(state)[0]
+        state = self.motor_obj.state.current_states_names
+        state = self._check_state(state)
+        #print(f"######## BLISS MOTOR get_state - state - {state} - states {self.motor_obj.state.current_states_names}")
+        return state
 
     def get_specific_state(self):
         """Get the motor state.
@@ -209,9 +226,11 @@ class BlissMotor(AbstractMotor):
     #     self.emit("valueChanged", (value,))
 
     def wait_end_of_move(self, timeout=None):
-        """wait untill motor stops moving"""
+        """
+        Descript. : waits till the motor stops
+        """
         
-        with gevent.Timeout(timeout), False:
+        with gevent.Timeout(timeout, False):
             time.sleep(0.1)
-            while self.get_state() == HardwareObjectState.MOVING:
+            while self.get_state() == HardwareObjectState.BUSY:
                 time.sleep(0.1)

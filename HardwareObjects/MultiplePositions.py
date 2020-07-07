@@ -228,7 +228,7 @@ class MultiplePositions(Equipment):
         for mot in self.motor_hwobj_list:
             print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name()} mot {id(mot)}")
             #self.motors[mot.getMotorMnemonic()] = mot
-            self.connect(mot, "moveDone", self.checkPosition)
+            # useless ??self.connect(mot, "moveDone", self.checkPosition)
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
 
@@ -354,14 +354,14 @@ class MultiplePositions(Equipment):
         return current position's all properties as dict
         """
         current_position = self.get_value()
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {current_position} - {type(current_position)}")
+        #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {current_position} - {type(current_position)}")
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {self.positions}")
 
         for position in self.positions:
-            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position loop - {position}")
+            #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position loop - {position}")
 
             if current_position in position.values():
-                print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - found in  - {position}")
+                #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - found in  - {position}")
                 return position
         return None
         #return self.positions.get(current_position)
@@ -372,38 +372,41 @@ class MultiplePositions(Equipment):
         It checks the positions of all the 'role' motors
         If all of them are within +/- delta tolerance, return pos name
         """
-        print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value ")
+        print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value self.roles {self.roles}")
         if not self.is_ready():
-            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
+            #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
             return None
 
-        for posName, position in self.roles_positions.items():
-            findPosition = 0
+        for pos_name, position in self.roles_positions.items():
+            find_position = 0
 
             for role in self.roles:
-                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - role {role} ")
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - role {role} ")
                 pos = position[role]
                 role_str = "\"" + str(role) + "\""
                 mot = self.getObjectByRole(role)
-                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR mot  - {type(mot)} -")
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR mot  - {type(mot)} -")
                 
-                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - pos {pos} -")
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - pos {pos} -")
                 if mot is not None:
                     motpos = mot.get_value()
-                    print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - motpos {motpos} -")
+                    #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - motpos {motpos} -")
                     try:
                         if (
                             motpos < pos + self.deltas[role]
                             and motpos > pos - self.deltas[role]
                         ):
-                            findPosition += 1
+                            find_position += 1
                     except BaseException:
                         continue
 
-            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR findPosition  - {findPosition} -")                
-            if findPosition == len(self.roles):
-                print(f"$$$$$$$$$$$$$$$MULTIPOSHWR {findPosition} {len(self.roles)} - {posName}")                
-                return posName
+                    if find_position > 0:
+                        print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value findPosition  - {find_position} - motor name {mot.name()} - position {motpos} - ")                
+            
+
+            if find_position == len(self.roles):
+                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR {find_position} {len(self.roles)} - {pos_name}")                
+                return pos_name
 
         return None
 
@@ -417,9 +420,10 @@ class MultiplePositions(Equipment):
         print(f"checkPosition posName {posName}")
         if posName is None:
             self.emit("no_position", (None))
+            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR  checkPosition emit(no_position) {posName}")
             return None
         else:
-            print(f"checkPosition emit(predefinedPositionChanged) {posName}")
+            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR  checkPosition emit(predefinedPositionChanged) {posName}")
             self.emit("predefinedPositionChanged", (posName,))
             return posName
 
