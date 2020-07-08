@@ -60,16 +60,17 @@ class ID1013Diffractometer(GenericDiffractometer):
     #     self.centring_hwobj = None
     #     self.minikappa_correction_hwobj = None 
     def init(self):
-
-         # Internal values -----------------------------------------------------
+        
+        # Internal values -----------------------------------------------------
         self.pixels_per_mm_x = 0
         self.pixels_per_mm_y = 0
         self.centring_point_number = 3
         self.delta_phi = 0.3
         self.calibration_h_mot_delta = 0.2
         self.calibration_v_mot_delta = 0.2
-
+        
         GenericDiffractometer.init(self)
+
 
         self.centring_methods = {
             GenericDiffractometer.CENTRING_METHOD_MANUAL: self.id10_manual_centring,
@@ -243,8 +244,6 @@ class ID1013Diffractometer(GenericDiffractometer):
             self.emit_centring_successful()
             self.emit_progress_message("")
             self.ready_event.set()
-
-        self.current_centring_procedure.link(self.centring_done)
 
     def set_calibration_parameters(self, h_motor_delta, v_motor_delta):
         """

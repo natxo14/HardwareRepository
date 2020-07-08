@@ -729,7 +729,7 @@ class GenericDiffractometer(HardwareObject):
     def start_centring_method(self, method, sample_info=None, wait=False):
         """
         """
-
+        print(f"""####################GENERICDIFF start_centring_metod:""")
         if self.current_centring_method is not None:
             logging.getLogger("HWR").error(
                 "Diffractometer: already in centring method %s"
@@ -746,6 +746,8 @@ class GenericDiffractometer(HardwareObject):
 
         try:
             centring_method = self.centring_methods[method]
+            print(f"""####################GENERICDIFF start_centring_metod:
+                {centring_method.__name__}""")
         except KeyError as diag:
             logging.getLogger("HWR").error(
                 "Diffractometer: unknown centring method (%s)" % str(diag)
@@ -1085,9 +1087,10 @@ class GenericDiffractometer(HardwareObject):
         print(f"################ GENERIC DIFF image_clicked {x} , {y}")
         if self.use_sample_centring:
             sample_centring.user_click(x, y)
+            self.emit("diff_image_clicked", (x, y))
         else:
             self.user_clicked_event.set((x, y))
-
+       
     def accept_centring(self):
         """
         Descript. :
