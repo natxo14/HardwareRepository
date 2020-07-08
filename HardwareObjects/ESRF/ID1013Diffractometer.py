@@ -263,20 +263,20 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         Descript. :
         """
-        print(f"################ ID1013 DIFF get_centred_point_from_coord {coord_x} , {coord_y}")
         beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
-
+        print(f"################ ID1013 DIFF get_centred_point_from_coord point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y}")
+        
         self.update_zoom_calibration()
 
         if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
             return 0, 0
         
-        rmove_x = (coord_x - beam_pos_x) / self.pixels_per_mm_x
-        rmove_y = (coord_y - beam_pos_y) / self.pixels_per_mm_y
+        rmove_x = self.motor_hwobj_dict["phiy"].get_value() + (coord_x - beam_pos_x) / self.pixels_per_mm_x
+        rmove_y = self.motor_hwobj_dict["phiz"].get_value() + (coord_y - beam_pos_y) / self.pixels_per_mm_y
 
         motors_rel_move = {
-            "phiz": float(rmove_x),
-            "phiy": float(rmove_y),
+            "phiz": float(rmove_y),
+            "phiy": float(rmove_x),
         }
         print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_rel_move {motors_rel_move}")
         
@@ -289,7 +289,8 @@ class ID1013Diffractometer(GenericDiffractometer):
         print(f" ################ ID1013 DIFF is_ready:")
         for motor in self.motor_hwobj_dict.values():
             print(f"################ ID1013 DIFF is_ready: Motor : {motor.name()} state {motor.get_state()}")
-        all_ready = all( motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
+            print(f"################ ID1013 DIFF is_ready: Motor : {motor.name()} is READY: {motor.get_state() == HardwareObjectState.READY}")
+        all_ready = all(motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
         
         print(f" ################ ID1013 DIFF is_ready: ALL IS READY {all_ready}")
         return all_ready

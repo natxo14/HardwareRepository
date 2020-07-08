@@ -1,5 +1,11 @@
 from HardwareRepository.BaseHardwareObjects import HardwareObject
+from HardwareRepository.BaseHardwareObjects import HardwareObjectState
+
 from bliss.config import static
+
+import time
+import gevent
+from gevent import Timeout
 
 class BlissTurret(HardwareObject):
     
@@ -29,7 +35,7 @@ class BlissTurret(HardwareObject):
     def mode_changed(self, new_mode):
         self.emit("modeChanged", (new_mode,))
 
-    def set_mode(self,mode):
+    def set_mode(self, mode):
         self.turret.mode = mode
     
     def get_mode(self):
@@ -47,3 +53,16 @@ class BlissTurret(HardwareObject):
     def update_values(self):
         self.emit("positionChanged", (self.get_value(),))
         self.emit("modeChanged", (self.get_mode(),))
+    
+    def get_state(self):
+        return HardwareObjectState.READY
+
+    def wait_end_of_move(self, timeout=None):
+        """
+        Descript. : waits till the motor stops
+        """
+        with gevent.Timeout(timeout, False):
+            time.sleep(0.1)
+            while self.get_state() == HardwareObjectState.BUSY:
+                time.sleep(0.1)
+

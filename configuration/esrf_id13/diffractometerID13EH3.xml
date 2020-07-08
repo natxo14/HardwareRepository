@@ -7,12 +7,12 @@
   <!--object href="/beam-info" role="beam_info"/-->
 
   <!-- Next block added by rhfogh for better representation of move_motor behaviour -->
-  <object href="/ustrz" role="phiz"/>
-  <object href="/ustry" role="phiy"/>
-  <object href="/ustrx" role="phix"/>
-  <object href="/umcenx" role="sampx"/>
-  <object href="/umceny" role="sampy"/>
-  <object href="/multiple-positions" role="zoom"/>
+  <object href="/nnz" role="phiz"/>
+  <object href="/nny" role="phiy"/>
+  <object href="/nnx" role="phix"/>
+  <object href="/nnv" role="sampx"/>
+  <object href="/nnu" role="sampy"/>
+  <object href="/multiple-positionsID13EH3" role="zoom"/>
 
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>
 
