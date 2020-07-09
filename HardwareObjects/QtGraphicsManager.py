@@ -810,7 +810,7 @@ class QtGraphicsManager(AbstractSampleView):
 
         if self.in_centring_state:
             self.graphics_centring_lines_item.add_position(pos_x, pos_y)
-            self.diffractometer_hwobj.image_clicked(pos_x, pos_y, use_mode="calibration")
+            self.diffractometer_hwobj.image_clicked(pos_x, pos_y, use_mode="centring")
         elif self.in_calibration_state:
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
             self.create_calibration_point((pos_x, pos_y))
