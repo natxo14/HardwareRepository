@@ -56,8 +56,8 @@
             <zoom>3</zoom>
             <gain>10</gain>
             <exposure>0.1</exposure>
-            <resox>0.0004926108374384237</resox>
-            <resoy>0.001226993865030675</resoy>
+            <resox>8.87596899225e-07</resox>
+            <resoy>8.37837837838e-07</resoy>
             <beamx>208.0</beamx>
             <beamy>293.0</beamy>
         </position>

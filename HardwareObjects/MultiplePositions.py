@@ -46,7 +46,7 @@ METHOD
     description:    return an and on the state of all the  motor used in the
                     object
 
-    name:           moveToPosition
+    name:           move_to_position
     input par.:     name
     output par.:    None
     description:    move all motors to the predefined position "position"
@@ -289,10 +289,10 @@ class MultiplePositions(Equipment):
             return ""
 
         state = HardwareObjectState.READY
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state in list: - {[mot.name() for mot in self.motor_hwobj_list]}")
+        #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state in list: - {[mot.name() for mot in self.motor_hwobj_list]}")
             
         for mot in self.motor_hwobj_list:
-            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot {mot.name()} - get_state : {mot.get_state()}")
+            #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot {mot.name()} - get_state : {mot.get_state()}")
             if mot.get_state() == HardwareObjectState.BUSY:
                 state = HardwareObjectState.BUSY
             if mot.get_state() in {HardwareObjectState.UNKNOWN,
@@ -307,27 +307,27 @@ class MultiplePositions(Equipment):
         self.emit("stateChanged", (self.get_state(),))
         self.checkPosition()
 
-    def moveToPosition(self, name, wait=True):
+    def move_to_position(self, name, wait=True):
         """
         move to position with name = name
         """
-        #print(f"$$$$$$$$$$$$$$$ moveToPosition {name} ")
+        #print(f"$$$$$$$$$$$$$$$ move_to_position {name} ")
 
         move_list = []
         for role in self.roles:
             device = self.getObjectByRole(role)
             pos = self.roles_positions[name][role]
             move_list.append((device, pos))
-        #print(f"$$$$$$$$$$$$$$$ moveToPosition  move_list {move_list} ")
+        #print(f"$$$$$$$$$$$$$$$ move_to_position  move_list {move_list} ")
         for mot, pos in move_list:
             if mot is not None:
-                #print(f"$$$$$$$$$$$$$$$ moveToPosition  mot.set_value(pos) {mot} {pos} ")
+                #print(f"$$$$$$$$$$$$$$$ move_to_position  mot.set_value(pos) {mot} {pos} ")
                 mot.set_value(pos)
 
         if wait:
             [mot.wait_end_of_move(4) for mot, pos in move_list if mot is not None]
         
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - moveToPosition - {name} - self {id(self)}")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - move_to_position - {name} - self {id(self)}")
         self.emit("predefinedPositionChanged", name)
         """
         for mne,pos in self.roles_positions[name].items():
@@ -355,7 +355,7 @@ class MultiplePositions(Equipment):
         """
         current_position = self.get_value()
         #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {current_position} - {type(current_position)}")
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {self.positions}")
+        #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {self.positions}")
 
         for position in self.positions:
             #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position loop - {position}")
@@ -415,17 +415,17 @@ class MultiplePositions(Equipment):
             print(f"checkPosition not self.is_ready() { self.is_ready()}")
             return None
 
-        posName = self.get_value()
+        pos_name = self.get_value()
 
-        print(f"checkPosition posName {posName}")
-        if posName is None:
+        print(f"checkPosition pos_name {pos_name}")
+        if pos_name is None:
             self.emit("no_position", (None))
-            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR  checkPosition emit(no_position) {posName}")
+            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR  checkPosition emit(no_position) {pos_name}")
             return None
         else:
-            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR  checkPosition emit(predefinedPositionChanged) {posName}")
-            self.emit("predefinedPositionChanged", (posName,))
-            return posName
+            print(f"$$$$$$$$$$$$$$$MULTIPOSHWR  checkPosition emit(predefinedPositionChanged) {pos_name}")
+            self.emit("predefinedPositionChanged", (pos_name,))
+            return pos_name
 
     def setNewPositions(self, name, newPositions):
         position = self.__getPositionObject(name)

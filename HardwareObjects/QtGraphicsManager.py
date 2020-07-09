@@ -579,6 +579,7 @@ class QtGraphicsManager(AbstractSampleView):
            Updates point screen coordinates and grid coorner coordinates.
            If diffractometer not ready then hides all shapes.
         """
+        print(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: args (usually state) {args}")
         if self.diffractometer_hwobj.is_ready() and not self.in_centring_state:
             for shape in self.get_shapes():
                 if isinstance(shape, GraphicsLib.GraphicsItemPoint):
@@ -801,12 +802,15 @@ class QtGraphicsManager(AbstractSampleView):
         """
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger mouse_clicked - {pos_x} - {pos_y}")
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_calibration_state - {self.in_calibration_state}")
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_centring_state - {self.in_centring_state}")
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_move_to_clicked_point - {self.in_move_to_clicked_point}")
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_one_click_centering - {self.in_one_click_centering}")
         if not left_click:
             return
 
         if self.in_centring_state:
             self.graphics_centring_lines_item.add_position(pos_x, pos_y)
-            self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
+            self.diffractometer_hwobj.image_clicked(pos_x, pos_y, use_mode="calibration")
         elif self.in_calibration_state:
             self.diffractometer_hwobj.image_clicked(pos_x, pos_y)
             self.create_calibration_point((pos_x, pos_y))

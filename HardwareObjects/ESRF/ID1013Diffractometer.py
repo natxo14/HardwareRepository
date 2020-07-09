@@ -68,6 +68,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         self.delta_phi = 0.3
         self.calibration_h_mot_delta = 0.2
         self.calibration_v_mot_delta = 0.2
+        self.current_calibration_procedure = None
         
         GenericDiffractometer.init(self)
 
@@ -166,6 +167,17 @@ class ID1013Diffractometer(GenericDiffractometer):
         except BaseException:
             logging.exception("Diffractometer: Could not complete 2D centring")
 
+    def image_clicked(self, x, y, use_mode=None):
+        """
+        Descript. :
+        """
+        print(f"################ GENERIC DIFF image_clicked {x} , {y}")
+        if self.use_sample_centring:
+            sample_centring.user_click(x, y)
+            if use_mode == "centring":
+                self.emit("centring_image_clicked", (x, y))
+        else:
+            self.user_clicked_event.set((x, y))
     
     def id10_manual_centring(self, sample_info=None, wait_result=None):
         """
@@ -197,53 +209,53 @@ class ID1013Diffractometer(GenericDiffractometer):
 
         self.current_centring_procedure.link(self.centring_done)
 
-    def centring_done(self, centring_procedure):
-        """
-        Descript. :
-        """
-        logging.getLogger("HWR").debug("Diffractometer: centring procedure done.")
-        try:
-            motor_pos = centring_procedure.get()
-            if isinstance(motor_pos, gevent.GreenletExit):
-                raise motor_pos
-        except BaseException:
-            logging.exception("Could not complete centring")
-            self.emit_centring_failed()
-        else:
-            logging.getLogger("HWR").debug(
-                "Diffractometer: centring procedure done. %s" % motor_pos
-            )
+    # def centring_done(self, centring_procedure):
+    #     """
+    #     Descript. :
+    #     """
+    #     logging.getLogger("HWR").debug("Diffractometer: centring procedure done.")
+    #     try:
+    #         motor_pos = centring_procedure.get()
+    #         if isinstance(motor_pos, gevent.GreenletExit):
+    #             raise motor_pos
+    #     except BaseException:
+    #         logging.exception("Could not complete centring")
+    #         self.emit_centring_failed()
+    #     else:
+    #         logging.getLogger("HWR").debug(
+    #             "Diffractometer: centring procedure done. %s" % motor_pos
+    #         )
 
-            for motor in motor_pos:
-                position = motor_pos[motor]
-                logging.getLogger("HWR").debug(
-                    "   - motor is %s - going to %s" % (motor.name(), position)
-                )
+    #         for motor in motor_pos:
+    #             position = motor_pos[motor]
+    #             logging.getLogger("HWR").debug(
+    #                 "   - motor is %s - going to %s" % (motor.name(), position)
+    #             )
 
-            self.emit_progress_message("Moving sample to centred position...")
-            self.emit_centring_moving()
-            try:
-                self.move_to_motors_positions(motor_pos, wait=True)
-            except BaseException:
-                logging.exception("Could not move to centred position")
-                self.emit_centring_failed()
-            else:
-                # done already by px1_center
-                pass
-                # if 3 click centring move -180
-                # if not self.in_plate_mode():
-                # self.wait_device_ready()
-                # self.motor_hwobj_dict['phi'].set_value_relative(-180, timeout=None)
+    #         self.emit_progress_message("Moving sample to centred position...")
+    #         self.emit_centring_moving()
+    #         try:
+    #             self.move_to_motors_positions(motor_pos, wait=True)
+    #         except BaseException:
+    #             logging.exception("Could not move to centred position")
+    #             self.emit_centring_failed()
+    #         else:
+    #             # done already by px1_center
+    #             pass
+    #             # if 3 click centring move -180
+    #             # if not self.in_plate_mode():
+    #             # self.wait_device_ready()
+    #             # self.motor_hwobj_dict['phi'].set_value_relative(-180, timeout=None)
 
-            if (
-                self.current_centring_method
-                == GenericDiffractometer.CENTRING_METHOD_AUTO
-            ):
-                self.emit("newAutomaticCentringPoint", motor_pos)
-            self.centring_time = time.time()
-            self.emit_centring_successful()
-            self.emit_progress_message("")
-            self.ready_event.set()
+    #         if (
+    #             self.current_centring_method
+    #             == GenericDiffractometer.CENTRING_METHOD_AUTO
+    #         ):
+    #             self.emit("newAutomaticCentringPoint", motor_pos)
+    #         self.centring_time = time.time()
+    #         self.emit_centring_successful()
+    #         self.emit_progress_message("")
+    #         self.ready_event.set()
 
     def set_calibration_parameters(self, h_motor_delta, v_motor_delta):
         """
@@ -286,10 +298,10 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         Detects if device is ready
         """
-        print(f" ################ ID1013 DIFF is_ready:")
+        #print(f" ################ ID1013 DIFF is_ready:")
         for motor in self.motor_hwobj_dict.values():
-            print(f"################ ID1013 DIFF is_ready: Motor : {motor.name()} state {motor.get_state()}")
-            print(f"################ ID1013 DIFF is_ready: Motor : {motor.name()} is READY: {motor.get_state() == HardwareObjectState.READY}")
+            print(f"""################ ID1013 DIFF is_ready: Motor : {motor.name()} state {motor.get_state()}
+            - is READY: {motor.get_state() == HardwareObjectState.READY}""")
         all_ready = all(motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
         
         print(f" ################ ID1013 DIFF is_ready: ALL IS READY {all_ready}")
@@ -326,19 +338,24 @@ class ID1013Diffractometer(GenericDiffractometer):
             )
 
         self.current_calibration_procedure.link(self.calibration_done)
+    
+    def cancel_manual_calibration(self):
+        """
+        kills the greenlet
+        """
+        self.current_calibration_procedure.kill()
 
     def calibration_done(self, calibration_procedure):
         try:
             calibration_points = calibration_procedure.get()
             if isinstance(calibration_points, gevent.GreenletExit):
+                print(f"##################ID10Diffractometer - calibration_done - calibration_points is gevent.GreenletExit")
+                HWR.beamline.sample_view.stop_calibration()
                 raise calibration_points
+        
         except BaseException:
             logging.exception("Could not complete calibration")
-            self.emit_centring_failed()
+            raise
         
         print(f"##################ID10Diffractometer - calibration_done - {calibration_points}")
         self.emit("new_calibration_done", (calibration_points,))
-
-
-    def emit_calibration_ended(self):
-        self.emit("new_calibration_done", (method, self.get_centring_status()))

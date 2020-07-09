@@ -109,17 +109,23 @@ def calibrate(
 
     USER_CLICKED_EVENT = gevent.event.AsyncResult()
 
+    motors_moved = False
+
     print(f"SAMPLE CENTRING -- after USER_CLICKED_EVENT")
     calibration_two_points = []
     try:
         num_clicks = 0
         print(f"SAMPLE CENTRING -- inside try num_clicks - {num_clicks}")
         while num_clicks < 2:
-            try:
-                print(f"SAMPLE CENTRING -- inside 2nd Try num_clicks - {num_clicks}")
-                x, y = USER_CLICKED_EVENT.get()
-            except BaseException:
-                raise RuntimeError("Aborted while waiting for calibration 1st click")
+            print(f"SAMPLE CENTRING -- inside 2nd Try num_clicks - {num_clicks}")
+            x, y = USER_CLICKED_EVENT.get()
+            
+            # except BaseException:
+            #     logging.exception("Exception while calibrating")
+            #     print(f"SAMPLE CENTRING -- except BaseException: 1")
+            #     rais
+            #     e RuntimeError("Aborted while waiting for calibration 1st click")
+            
             USER_CLICKED_EVENT = gevent.event.AsyncResult()
             calibration_two_points.append((x, y))
                             
@@ -127,17 +133,21 @@ def calibrate(
                 print(f"calibrate : first click {x},{y}")
                 motor_dict["horizontal"].set_value_relative(hor_motor_delta)
                 motor_dict["vertical"].set_value_relative(ver_motor_delta)
+                motors_moved = True
             if num_clicks == 1:
                 print(f"calibrate : second click {x},{y}")
-            READY_FOR_NEXT_POINT.set()    
+            READY_FOR_NEXT_POINT.set()
             num_clicks += 1
+
     except BaseException:
+        print(f"SAMPLE CENTRING -- except BaseException")
         logging.exception("Exception while calibrating")
-        move_motors(initial_positions)
+        if motors_moved:
+            move_motors(initial_positions)
         raise
 
     return calibration_two_points
-
+    
 def start(
     centring_motors_dict,
     pixelsPerMm_Hor,
@@ -433,7 +443,7 @@ def centre_plate(
 
 
 def ready(*motors):
-    print([(m.actuator_name, m.is_ready()) for m in motors])
+    print(f"SAMPLE_CENTRING def READY() : {[(m.actuator_name, m.is_ready()) for m in motors]}")
     return all([m.is_ready() for m in motors])
 
 

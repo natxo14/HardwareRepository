@@ -322,7 +322,8 @@ class GenericDiffractometer(HardwareObject):
             
 
                 self.motor_hwobj_dict[motor_name] = temp_motor_hwobj
-                self.connect(temp_motor_hwobj, "stateChanged", self.motor_state_changed)
+                if motor_name != "zoom":
+                    self.connect(temp_motor_hwobj, "stateChanged", self.motor_state_changed)
                 self.connect(
                     temp_motor_hwobj, "valueChanged", self.centring_motor_moved
                 )
@@ -890,6 +891,7 @@ class GenericDiffractometer(HardwareObject):
         """
         Descript. :
         """
+        logging.getLogger("HWR").debug("Diffractometer: centring procedure done.")
         try:
             motor_pos = centring_procedure.get()
             if isinstance(motor_pos, gevent.GreenletExit):
@@ -1087,7 +1089,7 @@ class GenericDiffractometer(HardwareObject):
         print(f"################ GENERIC DIFF image_clicked {x} , {y}")
         if self.use_sample_centring:
             sample_centring.user_click(x, y)
-            self.emit("diff_image_clicked", (x, y))
+            self.emit("centring_image_clicked", (x, y))
         else:
             self.user_clicked_event.set((x, y))
        
@@ -1282,6 +1284,7 @@ class GenericDiffractometer(HardwareObject):
         """
         """
         self.emit("zoomMotorStateChanged", (state,))
+        print(f"################ GENERIC DIFF zoom_motor_state_changed emit minidiffStateChanged")
         self.emit("minidiffStateChanged", (state,))
 
     def zoom_motor_predefined_position_changed(self, position_name, offset):
@@ -1311,6 +1314,7 @@ class GenericDiffractometer(HardwareObject):
         """
         Descript. :
         """
+        print(f"################ GENERIC DIFF motor_state_changed emit minidiffStateChanged")
         self.emit("minidiffStateChanged", (state,))
 
     def current_phase_changed(self, current_phase):
