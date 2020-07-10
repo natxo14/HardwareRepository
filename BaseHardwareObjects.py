@@ -495,6 +495,7 @@ class HardwareObjectMixin(CommandContainer):
             self._ready_event.clear()
 
         if state != self._state:
+            logging.getLogger().debug(f"BASEHWROBJECT {self.name()} - prev {self._state} vs new {state} ; update_state emit stateChanged")
             self._state = state
             self.emit("stateChanged", (self._state,))
                 

@@ -92,7 +92,11 @@ class ID1013Diffractometer(GenericDiffractometer):
             return
         zoom_motor = self.motor_hwobj_dict["zoom"]
         props = zoom_motor.get_current_position()
-        
+        if props is None:
+            # unknow zoom motor position (intermediate or...)
+            print(f"##################ID10Diffractometer update_zoom_calibration zoom motor unkwon position")
+            return
+                
         if "beamx" in props.keys() and "beamy" in props.keys():
             self.beam_position = (int(props["beamx"]), int(props["beamy"]))
         else:
@@ -116,6 +120,11 @@ class ID1013Diffractometer(GenericDiffractometer):
 
         print(f"##################ID10Diffractometer zoom_motor {id(zoom_motor)}")
         props = zoom_motor.get_current_position()
+
+        if props is None:
+            # unknow zoom motor position (intermediate or...)
+            print(f"##################ID10Diffractometer update_zoom_calibration zoom motor unkwon position")
+            return
         print(f"##################ID10Diffractometer zoom_motor props {props} - keys {props.keys()}")
         
         if "resox" in props.keys() and "resoy" in props.keys():

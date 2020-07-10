@@ -579,7 +579,7 @@ class QtGraphicsManager(AbstractSampleView):
            Updates point screen coordinates and grid coorner coordinates.
            If diffractometer not ready then hides all shapes.
         """
-        print(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: args (usually state) {args}")
+        logging.getLogger().debug(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: args (usually state) {args}")
         if self.diffractometer_hwobj.is_ready() and not self.in_centring_state:
             for shape in self.get_shapes():
                 if isinstance(shape, GraphicsLib.GraphicsItemPoint):
