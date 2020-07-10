@@ -66,8 +66,8 @@ class ESRFBeam(AbstractBeam):
         
         beam_size = self.getProperty("beam_size")
         if beam_size:
-            self._beam_width = float(beam_position.split()[0])
-            self._beam_height = float(beam_position.split()[1])
+            self._beam_width = float(beam_size.split()[0])
+            self._beam_height = float(beam_size.split()[1])
 
         beam_shape = self.getProperty("beam_shape")
         print(f"################################ESRBEAM {beam_shape}" )
