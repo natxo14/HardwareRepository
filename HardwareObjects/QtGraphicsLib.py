@@ -249,13 +249,13 @@ class GraphicsItemBeam(GraphicsItem):
         self.custom_pen.setColor(QtImport.Qt.blue)
         painter.setPen(self.custom_pen)
 
-        print(f""" GraphicsItemBeam Paint
-            image_scale {self.scene().image_scale}
-            self.beam_size_pix[0] {self.beam_size_pix[0]}
-            self.beam_size_pix[1] {self.beam_size_pix[1]}
-            """)
+        #print(f""" GraphicsItemBeam Paint
+        #    image_scale {self.scene().image_scale}
+        #    self.beam_size_pix[0] {self.beam_size_pix[0]}
+        #    self.beam_size_pix[1] {self.beam_size_pix[1]}
+        #    """)
         if self.beam_is_rectangle:
-            print(f" GraphicsItemBeam Paint rectangle")
+            #print(f" GraphicsItemBeam Paint rectangle")
             painter.drawRect(
                 self.beam_position[0] * self.scene().image_scale
                 - self.beam_size_pix[0] / 2 * self.scene().image_scale,
@@ -265,7 +265,7 @@ class GraphicsItemBeam(GraphicsItem):
                 self.beam_size_pix[1] * self.scene().image_scale,
             )
         else:
-            print(f""" GraphicsItemBeam Paint ellipse""")
+            #print(f""" GraphicsItemBeam Paint ellipse""")
             painter.drawEllipse(
                 self.beam_position[0] * self.scene().image_scale
                 - self.beam_size_pix[0] / 2 * self.scene().image_scale,
