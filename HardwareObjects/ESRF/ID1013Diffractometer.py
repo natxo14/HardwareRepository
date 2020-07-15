@@ -148,7 +148,7 @@ class ID1013Diffractometer(GenericDiffractometer):
                 "pixelsPerMmChanged", ((self.pixels_per_mm_x, self.pixels_per_mm_y),)
             )
     
-    def move_to_clicked_point(
+    def move_beam_to_clicked_point(
         self, coord_x=None, coord_y=None
     ):
         """
@@ -157,7 +157,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         
         try:
-            print(f"##################ID10Diffractometer move_to_clicked_point {coord_x} {coord_y}")
+            print(f"##################ID10Diffractometer move_beam_to_clicked_point {coord_x} {coord_y}")
             
             self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
             self.centring_time = time.time()
@@ -170,7 +170,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             motors = self.get_centred_point_from_coord(
                 coord_x, coord_y
             )
-            print(f"##################ID10Diffractometer move_to_clicked_point - motors - {motors}")
+            print(f"##################ID10Diffractometer move_beam_to_clicked_point - motors - {motors}")
             
             self.move_to_motors_positions(motors)
         except BaseException:

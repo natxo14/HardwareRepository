@@ -110,7 +110,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_beam_define_state = None
         self.in_magnification_mode = None
         self.in_one_click_centering = None
-        self.in_move_to_clicked_point = None
+        self.in_move_beam_to_clicked_point = None
         self.wait_grid_drawing_click = None
         self.wait_measure_distance_click = None
         self.wait_measure_angle_click = None
@@ -305,6 +305,8 @@ class QtGraphicsManager(AbstractSampleView):
             self.image_scale_list = eval(self.getProperty("image_scale_list", "[]"))
             if len(self.image_scale_list) > 0:
                 self.image_scale = self.getProperty("default_image_scale")
+                if self.image_scale is None:
+                    self.image_scale = 1
                 self.set_image_scale(self.image_scale, self.image_scale is not None)
         except BaseException:
             pass
@@ -657,13 +659,14 @@ class QtGraphicsManager(AbstractSampleView):
         """Creates a new centring position and adds it to graphics point.
 
         :param centring_state:
-        :type centring_state: str
+        :type centring_state: bool
         :param centring_status: dictionary with motor pos and etc
         :type centring_status: dict
         :emits: centringInProgress
         """
         p_dict = {}
 
+        print(f"$$$$$$$$$$$$$$$QtGraphicsManager create_centring_point centring_status : {centring_status}")
         if "motors" in centring_status and "extraMotors" in centring_status:
 
             p_dict = dict(centring_status["motors"], **centring_status["extraMotors"])
@@ -803,8 +806,9 @@ class QtGraphicsManager(AbstractSampleView):
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger mouse_clicked - {pos_x} - {pos_y}")
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_calibration_state - {self.in_calibration_state}")
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_centring_state - {self.in_centring_state}")
-        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_move_to_clicked_point - {self.in_move_to_clicked_point}")
+        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_move_beam_to_clicked_point - {self.in_move_beam_to_clicked_point}")
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger in_one_click_centering - {self.in_one_click_centering}")
+        
         if not left_click:
             return
 
@@ -850,9 +854,9 @@ class QtGraphicsManager(AbstractSampleView):
             # self.graphics_beam_define_item.store_coord(pos_x, pos_y)
         elif self.in_one_click_centering:
             self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
-        elif self.in_move_to_clicked_point:
-            self.diffractometer_hwobj.move_to_clicked_point(pos_x, pos_y)
-            self.in_move_to_clicked_point = False
+        elif self.in_move_beam_to_clicked_point:
+            self.diffractometer_hwobj.move_beam_to_clicked_point(pos_x, pos_y)
+            self.stop_move_beam_to_clicked_point()
         else:
             self.emit("pointSelected", None)
             self.emit("infoMsg", "")
@@ -1030,6 +1034,10 @@ class QtGraphicsManager(AbstractSampleView):
             self.stop_measure_angle()
             self.stop_measure_area()
             self.stop_one_click_centring()
+            self.stop_move_beam_to_clicked_point()
+            # self.stop_move_beam_mark()
+            # if want to cancel move beam mark: need to tell from 
+            # clicked event and cancel event: boolean as parameter to change or not beam position
             if self.in_beam_define_state:
                 self.stop_beam_define()
             if self.in_magnification_mode:
@@ -1721,7 +1729,7 @@ class QtGraphicsManager(AbstractSampleView):
     def start_centring(self, tree_click=None):
         """Starts centring procedure
 
-        :param tree_click: centring with 3 clicks
+        :param tree_click: centring with N clicks
         :type tree_click: bool
         :emits: - centringInProgress as bool
                 - infoMsg: as str
@@ -1735,7 +1743,7 @@ class QtGraphicsManager(AbstractSampleView):
             self.diffractometer_hwobj.start_centring_method(
                 self.diffractometer_hwobj.CENTRING_METHOD_MANUAL
             )
-            self.emit("infoMsg", "3 click centring")
+            self.emit("infoMsg", "N click centring")
         else:
             # self.accept_centring()
             self.diffractometer_hwobj.start_move_to_beam(
@@ -1768,6 +1776,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.show_all_items()
 
     def start_one_click_centring(self):
+        print(f"QtGraphicsManager start_one_click_centring(self):")
         self.set_cursor_busy(True)
         self.emit("infoMsg", "Click on the screen to create centring points")
         self.in_one_click_centering = True
@@ -1779,15 +1788,15 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
     
-    def start_move_to_clicked_point(self):
+    def start_move_beam_to_clicked_point(self):
         # TODO : need to cancel rest of events ??
         self.emit("infoMsg", "Click on the screen to move camera center")
-        self.in_move_to_clicked_point = True
+        self.in_move_beam_to_clicked_point = True
         self.set_cursor_target(True)
         
-    def stop_move_to_clicked_point(self):
+    def stop_move_beam_to_clicked_point(self):
         self.emit("infoMsg", "")
-        self.in_move_to_clicked_point = False
+        self.in_move_beam_to_clicked_point = False
         self.set_cursor_target(False)
     
     def start_visual_align(self):
@@ -2060,7 +2069,10 @@ class QtGraphicsManager(AbstractSampleView):
         :type use_scale: bool
         :emits: imageScaleChanged
         """
-        self.graphics_view.scale(image_scale, image_scale)
+        q_transform = self.graphics_view.transform()
+        old_hor_scale = q_transform.m11()
+        old_ver_scale = q_transform.m22()
+        self.graphics_view.scale(float(image_scale/old_hor_scale), float(image_scale/old_ver_scale))
         return
         """
         scene_size = self.graphics_scene_size
