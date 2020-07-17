@@ -489,7 +489,9 @@ def center(
     X, Y, phi_positions = [], [], []
 
     phi_angle = phi_range / (n_points - 1)
-
+    
+    print(f"--------------------> STARTING CENTER WITH {n_points} points and phi angle {phi_angle}", pixelsPerMm_Hor)
+            
     try:
         i = 0
         while i < n_points:
@@ -555,6 +557,7 @@ def center(
         }
     )
 
+    print(f"--------------------> END CENTER WITH centred_pos {centred_pos}")
     return centred_pos
 
 

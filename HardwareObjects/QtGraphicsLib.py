@@ -107,7 +107,7 @@ class GraphicsItem(QtImport.QGraphicsItem):
         :returns: QRect
         """
 
-        return self.rect.adjusted(0, 0, 40, 40)
+        return self.rect.adjusted(0, 0, 20, 20)
 
     def set_size(self, width, height):
         """Sets fixed size

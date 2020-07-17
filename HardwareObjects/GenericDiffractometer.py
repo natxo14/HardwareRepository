@@ -32,6 +32,8 @@ from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 from HardwareRepository import HardwareRepository as HWR
 
+from gui.utils import QtImport
+
 try:
     unicode
 except:
@@ -859,6 +861,7 @@ class GenericDiffractometer(HardwareObject):
         Descript. :
         """
         try:
+            print(f"################ GENERIC DIFF start_move_to_beam point {coord_x} , {coord_y}")
             self.emit_progress_message("Move to beam...")
             self.centring_time = time.time()
             curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -874,6 +877,7 @@ class GenericDiffractometer(HardwareObject):
             motors = self.get_centred_point_from_coord(
                 coord_x, coord_y, return_by_names=True
             )
+            print(f"################ GENERIC DIFF start_move_to_beam aftr get_centred_point_from_coord")
             if omega is not None:
                 motors["phi"] = omega
 
@@ -900,6 +904,24 @@ class GenericDiffractometer(HardwareObject):
             logging.exception("Could not complete centring")
             self.emit_centring_failed()
         else:
+            motor_pos_str = ""
+            for key, value in motor_pos.items():
+                print(f"centring done : {key.name()} , {value}")
+                motor_pos_str += str(f"{key.name()} : {value} \n ")
+            if (
+                    QtImport.QMessageBox.warning(
+                        None,
+                        "Please confirm",
+                        f"Are you sure you want to move to following positions ?\n {motor_pos_str}",
+                        QtImport.QMessageBox.Yes,
+                        QtImport.QMessageBox.No,
+                    )
+                    == QtImport.QMessageBox.No
+                ):
+                logging.exception("Could not move to centred position")
+                self.emit_centring_failed()
+                return
+
             self.emit_progress_message("Moving sample to centred position...")
             self.emit_centring_moving()
 
@@ -963,6 +985,7 @@ class GenericDiffractometer(HardwareObject):
     def motor_positions_to_screen(self, centred_positions_dict):
         """
         """
+        print(f"################ GENERIC DIFF motor_positions_to_screen {centred_positions_dict}")
         if self.use_sample_centring:
             self.update_zoom_calibration()
             if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
@@ -1099,11 +1122,13 @@ class GenericDiffractometer(HardwareObject):
         Arg.      " fully_centred_point. True if 3 click centring
                     else False
         """
+        print(f"################ GENERIC DIFF accept_centring")
         self.centring_status["valid"] = True
         self.centring_status["accepted"] = True
         centring_status = self.get_centring_status()
         if "motors" not in centring_status:
             centring_status["motors"] = self.get_positions()
+        print(f"################ GENERIC DIFF accept_centring emit centringAccepted")
         self.emit("centringAccepted", (True, centring_status))
         self.emit("fsmConditionChanged", "centering_position_accepted", True)
 
