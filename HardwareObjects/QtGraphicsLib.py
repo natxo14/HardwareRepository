@@ -28,6 +28,7 @@ Graphics item library:
  - GraphicsItemGrid : 2D grid
  - GraphicsItemScale : scale on the bottom left corner
  - GraphicsItemOmegaReference : omega rotation line
+ - GraphicsSquareROI : square ROI in image
  - GraphicsSelectTool : item selection tool
  - GraphicsItemCentringLine : centring lines for 3 click centring
  - GraphicsItemHistogram: histogram item
@@ -55,7 +56,9 @@ from HardwareRepository.ConvertUtils import string_types
 
 SELECTED_COLOR = QtImport.Qt.green
 NORMAL_COLOR = QtImport.Qt.yellow
+ROI_COLOR = QtImport.Qt.red
 SOLID_LINE_STYLE = QtImport.Qt.SolidLine
+DASH_DOT_LINE_STYLE = QtImport.Qt.DashDotLine
 SOLID_PATTERN_STYLE = QtImport.Qt.SolidPattern
 LIGHT_GREEN = QtImport.QColor(125, 181, 121)
 
@@ -1908,6 +1911,34 @@ class GraphicsItemText(GraphicsItem):
         """
         self.text = text
 
+class GraphicsSquareROITool(GraphicsItem):
+    """Draws a rectangle"""
+    def __init__(self, parent):
+        """
+        Init
+        :param parent:
+        """
+        GraphicsItem.__init__(self, parent)
+
+        self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
+        self.custom_pen.setWidth(2)
+        self.custom_pen.setColor(ROI_COLOR)
+
+    def paint(self, painter, option, widget):
+        """
+        Main pain class. Draws a selection rectangle
+        :param painter:
+        :param option:
+        :param widget:
+        :return:
+        """
+        painter.setPen(self.custom_pen)
+        painter.drawRect(
+            min(self.start_coord[0], self.end_coord[0]),
+            min(self.start_coord[1], self.end_coord[1]),
+            abs(self.start_coord[0] - self.end_coord[0]),
+            abs(self.start_coord[1] - self.end_coord[1]),
+        )
 
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""

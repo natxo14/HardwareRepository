@@ -680,6 +680,7 @@ class QtGraphicsManager(AbstractSampleView):
             screen_pos = self.diffractometer_hwobj.motor_positions_to_screen(
                 cpos.as_dict()
             )
+            print(f"$$$$$$$$$$$$$$$QtGraphicsManager create_centring_point motor_positions_to_screen : {screen_pos}")
             point = GraphicsLib.GraphicsItemPoint(
                 cpos, True, screen_pos[0], screen_pos[1]
             )
@@ -761,7 +762,7 @@ class QtGraphicsManager(AbstractSampleView):
         """
                 
         if type(pixels_per_mm) in (list, tuple):
-            print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {pixels_per_mm} - {type(pixels_per_mm[0])}")
+            print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm_changed {pixels_per_mm} - {type(pixels_per_mm[0])}")
             if pixels_per_mm != self.pixels_per_mm:
                 self.pixels_per_mm = pixels_per_mm
                 #print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm != self.pixels_per_mm")
