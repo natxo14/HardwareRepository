@@ -986,6 +986,13 @@ class GenericDiffractometer(HardwareObject):
         """
         """
         print(f"################ GENERIC DIFF motor_positions_to_screen {centred_positions_dict}")
+        print(f"""################ GENERIC DIFF  motor_positions_to_screen
+         - motor centring_phi:{self.centring_phi.get_value()}
+         - motor centring_sampx:{self.centring_sampx.get_value()} 
+         - motor centring_sampy:{self.centring_sampy.get_value()} 
+         - motor centring_phiy:{self.centring_phiy.get_value()} 
+         - motor centring_phiz:{self.centring_phiz.get_value()} 
+        """)
         if self.use_sample_centring:
             self.update_zoom_calibration()
             if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
@@ -1021,7 +1028,8 @@ class GenericDiffractometer(HardwareObject):
             )
 
             x = (phiy * self.pixels_per_mm_x) + self.beam_position[0]
-            y = dy + (phiz * self.pixels_per_mm_y) + self.beam_position[1]
+            #y = dy + (phiz * self.pixels_per_mm_y) + self.beam_position[1]
+            y = (phiz * self.pixels_per_mm_y) + self.beam_position[1]
 
             return x, y
         else:

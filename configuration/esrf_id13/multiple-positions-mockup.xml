@@ -90,8 +90,8 @@
             <exposure>0.4</exposure>
             <resox>-3.22580645161e-07</resox>
             <resoy>3.663003663e-07</resoy>
-            <beamx>333.0</beamx>
-            <beamy>241.0</beamy>
+            <beamx>216.0</beamx>
+            <beamy>358.0</beamy>
         </position>
     </positions>
 </object>

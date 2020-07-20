@@ -20,6 +20,8 @@
 import logging
 import gevent
 import time
+import numpy
+import math
 
 from HardwareRepository.HardwareObjects.GenericDiffractometer import (
     GenericDiffractometer
@@ -78,6 +80,17 @@ class ID1013Diffractometer(GenericDiffractometer):
             GenericDiffractometer.CENTRING_METHOD_AUTO: self.start_automatic_centring,
             GenericDiffractometer.CENTRING_METHOD_MOVE_TO_BEAM: self.start_move_to_beam,
         }
+
+        #set centring motors directions
+        try:
+            if self.use_sample_centring:
+                self.centring_phi.direction = -1
+                self.centring_phiz.direction = 1
+                self.centring_phiy.direction = 1
+                self.centring_sampx.direction = 1
+                self.centring_sampy.direction = 1
+        except BaseException:
+            pass  # used the default value
 
         self.update_zoom_calibration()
 
@@ -289,27 +302,55 @@ class ID1013Diffractometer(GenericDiffractometer):
         @return: dict
         """
         beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
-        print(f"################ ID1013 DIFF get_centred_point_from_coord point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y}")
         
         self.update_zoom_calibration()
 
         if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
             return 0, 0
         
-        rmove_x = self.motor_hwobj_dict["phiy"].get_value() + (coord_x - beam_pos_x) / self.pixels_per_mm_x
-        rmove_y = self.motor_hwobj_dict["phiz"].get_value() + (coord_y - beam_pos_y) / self.pixels_per_mm_y
+        print(f"################ ID1013 DIFF get_centred_point_from_coord point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE")
 
-        motors_rel_move = {
+        delta_x = (coord_x - beam_pos_x) / self.pixelsPerMmY
+        delta_y = (coord_y - beam_pos_y) / self.pixelsPerMmZ
+
+        phi_angle = math.radians(self.centring_phi.get_value())
+        sampx = self.centring_sampx.get_value()
+        sampy = self.centring_sampy.get_value()
+        phiy = self.centring_phiy.get_value()
+        phiz = self.centring_phiz.get_value()
+
+        rot_matrix = numpy.matrix(
+            [
+                math.cos(phi_angle),
+                -math.sin(phi_angle),
+                math.sin(phi_angle),
+                math.cos(phi_angle),
+            ]
+        )
+        rot_matrix.shape = (2, 2)
+        inv_rot_matrix = numpy.array(rot_matrix.I)
+
+        # TODO : assure formules:
+        # in MiniDiff delta_y is used: I think wrong: changes in vertical axe do
+        # not change projections in X plane
+        dsampx, dsampy = numpy.dot(numpy.array([0, delta_y]), inv_rot_matrix)
+        sampx = sampx + dsampx
+        sampy = sampy + dsampy
+
+        x_axis_motor_pos = phiy + delta_x
+        y_axis_motor_pos = phiz + delta_y
+
+        motors_positions = {
             "phi": self.centring_phi.get_value(),
-            "phiz": float(rmove_y),
-            "phiy": float(rmove_x),
-            "sampx": self.centring_sampx.get_value(),
-            "sampy": self.centring_sampy.get_value(),
+            "phiz": float(y_axis_motor_pos),
+            "phiy": float(x_axis_motor_pos),
+            "sampx": sampx,
+            "sampy": sampy,
         }
         
-        print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_rel_move {motors_rel_move}")
+        print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_positions {motors_positions}")
         
-        return motors_rel_move
+        return motors_positions
 
     def is_ready(self):
         """
