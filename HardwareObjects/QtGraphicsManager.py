@@ -102,6 +102,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_calibration_state = None
         self.in_centring_state = None
         self.in_grid_drawing_state = None
+        self.in_square_drawing_state = None
         self.in_measure_distance_state = None
         self.in_measure_angle_state = None
         self.in_measure_area_state = None
@@ -112,6 +113,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = None
         self.in_move_beam_to_clicked_point = None
         self.wait_grid_drawing_click = None
+        self.wait_square_drawing_click = None
         self.wait_measure_distance_click = None
         self.wait_measure_angle_click = None
         self.wait_measure_area_click = None
@@ -120,6 +122,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.point_count = 0
         self.line_count = 0
         self.grid_count = 0
+        self.square_roi_count = 0
         self.shape_dict = {}
         self.temp_animation_dir = None
         self.omega_move_delta = None
@@ -134,6 +137,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.graphics_centring_lines_item = None
         self.graphics_histogram_item = None
         self.graphics_grid_draw_item = None
+        self.graphics_square_draw_item = None
         self.graphics_measure_distance_item = None
         self.graphics_measure_angle_item = None
         self.graphics_measure_area_item = None
@@ -145,6 +149,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.graphics_move_down_item = None
         self.graphics_move_left_item = None
         self.graphics_magnification_item = None
+        
 
     def init(self):
         """Main init function. Initiates all graphics items, hwobjs and
@@ -688,7 +693,33 @@ class QtGraphicsManager(AbstractSampleView):
             cpos.set_index(point.index)
             return point
     
+    def create_square_roi(self):
+        """Creates a square ROI point as feedback to user.
+        Two points needed for calibrating the camera.
+        They disappear at the end of calibration process
+        :param point_position:
+        :type array x, y point position
+        """
+        if not self.wait_square_drawing_click:
+            
+            self.set_cursor_busy(True)
+            self.graphics_square_draw_item = GraphicsLib.GraphicsSquareROI(
+                None, 
+            )
+            
+            #self.graphics_view.graphics_scene.addItem(self.graphics_square_draw_item)
+            self.graphics_square_draw_item.index = self.square_roi_count
+            self.square_roi_count += 1
+            self.add_shape(self.graphics_square_draw_item)
+            self.wait_square_drawing_click = True
+    
     def create_calibration_point(self, point_position, ):
+        """Creates a calibration  point as feedback to user.
+        Two points needed for calibrating the camera.
+        They disappear at the end of calibration process
+        :param point_position:
+        :type array x, y point position
+        """
         calibration_point = GraphicsLib.GraphicsItemCalibrationPoint(
                 None, False, point_position[0], point_position[1]
             )
@@ -826,6 +857,10 @@ class QtGraphicsManager(AbstractSampleView):
             self.graphics_grid_draw_item.set_draw_mode(True)
             self.graphics_grid_draw_item.set_start_position(pos_x, pos_y)
             self.graphics_grid_draw_item.show()
+        elif self.wait_square_drawing_click:
+            self.in_square_drawing_state = True
+            self.graphics_square_draw_item.set_start_position(pos_x, pos_y)
+            self.graphics_square_draw_item.show()
         elif self.wait_measure_distance_click:
             self.start_graphics_item(self.graphics_measure_distance_item)
             self.in_measure_distance_state = True
@@ -928,6 +963,32 @@ class QtGraphicsManager(AbstractSampleView):
             self.shape_dict[
                 self.graphics_grid_draw_item.get_display_name()
             ] = self.graphics_grid_draw_item
+        elif self.in_square_drawing_state:
+            self.set_cursor_busy(False)
+            self.wait_square_drawing_click = False
+            self.in_square_drawing_state = False
+            self.de_select_all()
+            # set square distance and size
+            start_pos = self.graphics_square_draw_item.get_start_position()
+            end_pos = self.graphics_square_draw_item.get_end_position()
+            top_left_corner = (min(start_pos[0], end_pos[0]),
+                        max(start_pos[1], end_pos[1]))
+            delta_x_to_beam = self.beam_position[0] - top_left_corner[0]
+            delta_y_to_beam = self.beam_position[1] - top_left_corner[1]
+            
+            self.graphics_square_draw_item.set_distance_to_beam_mm(
+                (delta_x_to_beam, delta_y_to_beam),
+            )
+            size_pix = (abs( start_pos[0] - end_pos[0]),
+                        abs( start_pos[1] - end_pos[1]))
+            size_mm = (size_pix[0] / self.pixels_per_mm[0], 
+                       size_pix[0] / self.pixels_per_mm[0])
+            self.graphics_square_draw_item.set_item_size_mm(
+                size_mm
+            )
+            self.emit("shapeCreated", self.graphics_square_draw_item, "Square")
+            self.graphics_square_draw_item.setSelected(True)
+            
         elif self.in_beam_define_state:
             self.stop_beam_define()
         elif self.in_select_items_state:
@@ -967,6 +1028,10 @@ class QtGraphicsManager(AbstractSampleView):
                 self.graphics_grid_draw_item.set_end_position(
                     scene_point.x(), scene_point.y()
                 )
+        elif self.in_square_drawing_state:
+            self.graphics_square_draw_item.set_end_position(
+                    scene_point.x(), scene_point.y()
+            )
         elif self.in_measure_distance_state:
             self.graphics_measure_distance_item.set_coord(self.mouse_position)
         elif self.in_measure_angle_state:
@@ -1281,6 +1346,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.point_count = 0
         self.line_count = 0
         self.grid_count = 0
+        self.square_roi_count = 0
         for shape in self.get_shapes():
             if shape == self.auto_grid:
                 shape.hide()

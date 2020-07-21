@@ -104,6 +104,41 @@ class GraphicsItem(QtImport.QGraphicsItem):
 
         self.setPos(position_x, position_y)
 
+        # To redraw when zoom changes
+        # distance to start_coord
+        # x distance < 0 : to the left of beamline
+        # y distance < 0 : on top of beamline
+        self.distance_to_beam_mm = [0, 0]
+        self.size_in_mm = [0, 0]
+
+    def set_distance_to_beam_mm(self, distance):
+        """
+        when item created, set distance to beam in mm
+        help to redraw item when zoom changed
+        """
+        self.distance_to_beam_mm = distance
+    
+    def get_distance_to_beam_mm(self):
+        """
+        when item created, set distance to beam in mm
+        help to redraw item when zoom changed
+        """
+        return self.distance_to_beam_mm
+    
+    def set_item_size_mm(self, size_in_mm):
+        """
+        get item size in mm
+        help to redraw item when zoom changed
+        """
+        self.size_in_mm = size_in_mm
+    
+    def get_item_size_mm(self):
+        """
+        get item size in mm
+        help to redraw item when zoom changed
+        """
+        return self.size_in_mm
+
     def boundingRect(self):
         """Returns adjusted rect
 
@@ -139,6 +174,13 @@ class GraphicsItem(QtImport.QGraphicsItem):
         :return: list with two int
         """
         return self.start_coord
+    
+    def get_end_position(self):
+        """Returns end coordinate of the shape
+
+        :return: list with two int
+        """
+        return self.end_coord
 
     def set_end_position(self, position_x, position_y):
         """Sets the end position of the item
@@ -1911,7 +1953,7 @@ class GraphicsItemText(GraphicsItem):
         """
         self.text = text
 
-class GraphicsSquareROITool(GraphicsItem):
+class GraphicsSquareROI(GraphicsItem):
     """Draws a rectangle"""
     def __init__(self, parent):
         """
