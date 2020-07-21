@@ -1962,9 +1962,32 @@ class GraphicsSquareROI(GraphicsItem):
         """
         GraphicsItem.__init__(self, parent)
 
+        self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
+
         self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
         self.custom_pen.setWidth(2)
         self.custom_pen.setColor(ROI_COLOR)
+
+    def boundingRect(self):
+        """Returns adjusted rect
+
+        :returns: QRect
+        """
+
+        return self.rect
+
+    def set_end_position(self, position_x, position_y):
+
+        if position_x is not None and position_y is not None:
+            self.end_coord = [position_x, position_y]
+        self.rect.adjust(
+                0,
+                0,
+                abs(self.start_coord[0] - self.end_coord[0]),
+                abs(self.start_coord[1] - self.end_coord[1]),
+        )
+        self.scene().update()
+        
 
     def paint(self, painter, option, widget):
         """
@@ -1975,6 +1998,15 @@ class GraphicsSquareROI(GraphicsItem):
         :return:
         """
         painter.setPen(self.custom_pen)
+
+        if self.isSelected():
+            self.custom_pen.setColor(SELECTED_COLOR)
+            self.custom_pen.setWidth(3)
+        else:
+            self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
+            self.custom_pen.setWidth(2)
+            self.custom_pen.setColor(ROI_COLOR)
+
         painter.drawRect(
             min(self.start_coord[0], self.end_coord[0]),
             min(self.start_coord[1], self.end_coord[1]),

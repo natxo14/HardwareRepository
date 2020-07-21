@@ -860,6 +860,7 @@ class QtGraphicsManager(AbstractSampleView):
         elif self.wait_square_drawing_click:
             self.in_square_drawing_state = True
             self.graphics_square_draw_item.set_start_position(pos_x, pos_y)
+            self.graphics_square_draw_item.setPos(pos_x, pos_y)
             self.graphics_square_draw_item.show()
         elif self.wait_measure_distance_click:
             self.start_graphics_item(self.graphics_measure_distance_item)
@@ -894,6 +895,8 @@ class QtGraphicsManager(AbstractSampleView):
             self.diffractometer_hwobj.move_beam_to_clicked_point(pos_x, pos_y)
             self.stop_move_beam_to_clicked_point()
         else:
+            print(f"""############################### QtGraphicsManager
+            mouse_clicked : else""")
             self.emit("pointSelected", None)
             self.emit("infoMsg", "")
             if left_click:
@@ -907,7 +910,13 @@ class QtGraphicsManager(AbstractSampleView):
                     GraphicsLib.GraphicsItemPoint,
                     GraphicsLib.GraphicsItemLine,
                     GraphicsLib.GraphicsItemGrid,
+                    GraphicsLib.GraphicsSquareROI,
                 ]:
+                    print(f"""############################### QtGraphicsManager
+                    mouse_clicked : deselect items
+                    type(graphics_item)
+                    {type(graphics_item)}
+                    """)
                     self.emit("shapeSelected", graphics_item, False)
                     # if isinstance(graphics_item, GraphicsLib.GraphicsItemPoint):
                     #    self.emit("pointSelected", graphics_item)
@@ -932,8 +941,8 @@ class QtGraphicsManager(AbstractSampleView):
         elif self.in_beam_define_state:
             self.stop_beam_define()
         else:
-            print(f"############################### QtGraphicsManager move_to_beam")
-            self.diffractometer_hwobj.move_to_beam(pos_x, pos_y)
+            print(f"############################### QtGraphicsManager move_to_beam DISABLED: TOO DANGEROUS/DISTURBING")
+            #self.diffractometer_hwobj.move_to_beam(pos_x, pos_y)
         self.emit("imageDoubleClicked", pos_x, pos_y)
         print(f"############################### QtGraphicsManager self.emit(imageDoubleClicked")
            
