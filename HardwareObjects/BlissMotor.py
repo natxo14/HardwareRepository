@@ -93,7 +93,7 @@ class BlissMotor(AbstractMotor):
         self.motor_obj = cfg.get(self.actuator_name)
         self.connect(self.motor_obj, "position", self.update_value)
         self.connect(self.motor_obj, "state", self._update_state)
-        self.connect(self.motor_obj, "move_done", self._update_state)
+        self.connect(self.motor_obj, "move_done", self._update_state_move_done)
 
         # init state to match motor's one
         self.update_state(self.get_state())
@@ -155,11 +155,29 @@ class BlissMotor(AbstractMotor):
         return state_list[0]
 
     def _update_state(self, state=None):
-        logging.getLogger().info(f"BLISSMOTOR _update_state {self.actuator_name} - signal from bliss state or move_done - update state to {state} - READY if state else MOVING")
+        logging.getLogger().info(f"BLISSMOTOR _update_state {self.actuator_name} - signal from bliss state {state} - READY if state else MOVING")
         """Check if the state has changed. Emits signal stateChanged.
         Args:
             state (enum AxisState): state from a BLISS motor
         """
+        if isinstance(state, bool):
+            # It seems like the current version of BLISS gives us a boolean
+            # at first and last event, True for ready and False for moving
+            state = "READY" if state else "MOVING"
+        else:
+            # state comming from bliss (with current_states_names attribute)
+            try:
+                state = state.current_states_names[0]
+            except (AttributeError, KeyError):
+                state = "UNKNOWN"
+        _state, self._specific_state = self._state2enum(state)
+        self.update_state(_state)
+    def _update_state_move_done(self, state=None):
+        # TODO : DELETE THIS (and connection with bliss motor signal)
+        # THIS IS A COPY OF _update_state
+        # this function created to tell from move_done and state bliss signals
+        # debugging why takes so much time to update bliss motor status after the movement
+        logging.getLogger().info(f"BLISSMOTOR _update_state_move_done {self.actuator_name} - signal from bliss move_done {state}")
         if isinstance(state, bool):
             # It seems like the current version of BLISS gives us a boolean
             # at first and last event, True for ready and False for moving
