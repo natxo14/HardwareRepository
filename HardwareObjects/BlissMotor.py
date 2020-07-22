@@ -155,7 +155,7 @@ class BlissMotor(AbstractMotor):
         return state_list[0]
 
     def _update_state(self, state=None):
-        logging.getLogger().debug(f"BLISSMOTOR {self.actuator_name} - signal from bliss - update state to {state}")
+        logging.getLogger().info(f"BLISSMOTOR _update_state {self.actuator_name} - signal from bliss state or move_done - update state to {state} - READY if state else MOVING")
         """Check if the state has changed. Emits signal stateChanged.
         Args:
             state (enum AxisState): state from a BLISS motor

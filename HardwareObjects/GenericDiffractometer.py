@@ -371,22 +371,33 @@ class GenericDiffractometer(HardwareObject):
                 self.use_sc = True
 
         try:
+            self.motors_directions = eval(self.getProperty("centring_motors_directions"))
+            logging.getLogger("HWR").info(
+                f"Diffractometer self.motors_directions {self.motors_directions}"
+            )
+        except BaseException:
+            self.motors_directions = {"phi": 1, "phiz": 1, "phiy" : 1, "sampx" : 1, "sampy" : 1, "zoom" : 1}
+            logging.getLogger("HWR").warning(
+                "Diffractometer: " + "centring motors directions not configured. Using default"
+            )
+
+        try:
             self.use_sample_centring = self.getProperty("sample_centring")
             if self.use_sample_centring:
                 self.centring_phi = sample_centring.CentringMotor(
-                    self.motor_hwobj_dict["phi"], direction=-1
+                    self.motor_hwobj_dict["phi"], direction=self.motors_directions["phi"]
                 )
                 self.centring_phiz = sample_centring.CentringMotor(
-                    self.motor_hwobj_dict["phiz"]
+                    self.motor_hwobj_dict["phiz"], direction=self.motors_directions["phiz"]
                 )
                 self.centring_phiy = sample_centring.CentringMotor(
-                    self.motor_hwobj_dict["phiy"], direction=-1
+                    self.motor_hwobj_dict["phiy"], direction=self.motors_directions["phiy"]
                 )
                 self.centring_sampx = sample_centring.CentringMotor(
-                    self.motor_hwobj_dict["sampx"]
+                    self.motor_hwobj_dict["sampx"], direction=self.motors_directions["sampx"]
                 )
                 self.centring_sampy = sample_centring.CentringMotor(
-                    self.motor_hwobj_dict["sampy"]
+                    self.motor_hwobj_dict["sampy"], direction=self.motors_directions["sampy"]
                 )
         except BaseException:
             pass  # used the default value
@@ -404,6 +415,7 @@ class GenericDiffractometer(HardwareObject):
             logging.getLogger("HWR").warning(
                 "Diffractometer: " + "zoom centre not configured"
             )
+        
 
         self.reversing_rotation = self.getProperty("reversing_rotation")
         try:
@@ -537,7 +549,7 @@ class GenericDiffractometer(HardwareObject):
         """
         Detects if device is ready
         """
-        print(f"##################GENERIC Difffractometer wait_device_ready {self.current_state}")
+        logging.getLogger("HWR").info(f"##################GENERIC Difffractometer is_ready {self.current_state}")
         return self.current_state == DiffractometerState.tostring(
             DiffractometerState.Ready
         )
@@ -553,10 +565,11 @@ class GenericDiffractometer(HardwareObject):
         :param timeout: timeout in second
         :type timeout: int
         """
-        print(f"##################GENERIC Difffractometer wait_device_ready")
+        logging.getLogger("HWR").info(f"##################GENERIC Difffractometer wait_device_ready")
         with gevent.Timeout(timeout, Exception("Timeout waiting for device ready")):
+            logging.getLogger("HWR").info(f"##################GENERIC Difffractometer wait_device_ready INSIDE gevent TIMEOUT")
             while not self.is_ready():
-                print(f"##################GENERIC Difffractometer wait_device_ready not self.is_ready()")
+                logging.getLogger("HWR").info(f"##################GENERIC Difffractometer wait_device_ready WHILE not self.is_ready()")
                 time.sleep(0.01)
 
     def execute_server_task(self, method, timeout=30, *args):
@@ -1062,8 +1075,10 @@ class GenericDiffractometer(HardwareObject):
         if not isinstance(motor_positions, dict):
             motor_positions = motor_positions.as_dict()
 
+        logging.getLogger("HWR").info(f"""GENERIC DIFF: MOVE_MOTORS BEFORE FIRST wait_device_ready """)
         self.wait_device_ready(timeout)
-
+        logging.getLogger("HWR").info(f"""GENERIC DIFF: MOVE_MOTORS AFTER FIRST wait_device_ready """)
+        
         for motor in motor_positions.keys():
             position = motor_positions[motor]
             """
@@ -1075,21 +1090,30 @@ class GenericDiffractometer(HardwareObject):
                 )
             """
             if isinstance(motor, (str, unicode)):
+                logging.getLogger("HWR").info(f"move_motors isinstance(motor, (str, unicode)): {motor} BEFORE GET ROLE" )
                 motor_role = motor
                 motor = self.motor_hwobj_dict.get(motor_role)
+                logging.getLogger("HWR").info(f"move_motors isinstance(motor, (str, unicode)): {motor.name()} AFTER GET ROLE" )
                 # del motor_positions[motor_role]
                 if None in (motor, position):
                     continue
                 # motor_positions[motor] = position
+            logging.getLogger("HWR").info(f"move_motors BEFORE move {motor.name()} to position {position}")
             motor.set_value(position)
+            logging.getLogger("HWR").info(f"move_motors AFTER move {motor.name()} to position {position}")
+        logging.getLogger("HWR").info(f"""GENERIC DIFF: MOVE_MOTORS ALL MOTORS MOVED BEFORE SECOND wait_device_ready """)
         self.wait_device_ready(timeout)
+        logging.getLogger("HWR").info(f"""GENERIC DIFF: MOVE_MOTORS AFTER SECOND wait_device_ready """)
+
 
         if self.delay_state_polling is not None and self.delay_state_polling > 0:
             # delay polling for state in the
             # case of controller not reporting MOVING inmediately after cmd
             gevent.sleep(self.delay_state_polling)
 
+        logging.getLogger("HWR").info(f"""GENERIC DIFF: MOVE_MOTORS BEFORE THIRD wait_device_ready """)
         self.wait_device_ready(timeout)
+        logging.getLogger("HWR").info(f"""GENERIC DIFF: MOVE_MOTORS AFTER THIRD wait_device_ready """)
 
     def move_motors_done(self, move_motors_procedure):
         """

@@ -1,5 +1,5 @@
 <equipment class="ESRF.ID1013Diffractometer">
-  <object href="/usrotz" role="phi"/>
+  <!--object href="/usrotz" role="phi"/-->
   <!--object href="/diff-kappa-mockup" role="kappa"/>
   <object href="/diff-kappaphi-mockup" role="kappa_phi"/-->
   
@@ -7,6 +7,7 @@
   <!--object href="/beam-info" role="beam_info"/-->
 
   <!-- Next block added by rhfogh for better representation of move_motor behaviour -->
+  <object href="/mockupMotDummy" role="phi"/>
   <object href="/nnz" role="phiz"/>
   <object href="/nny" role="phiy"/>
   <object href="/nnx" role="phix"/>
@@ -15,6 +16,7 @@
   <object href="/multiple-positionsID13EH3" role="zoom"/>
 
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>
+  <centring_motors_directions>{"phi": 1, "phiz": 1, "phiy" : -1, "sampx" : 1, "sampy" : 1, "zoom" : 1}</centring_motors_directions>
 
   <sample_centring>True</sample_centring>
 
@@ -25,7 +27,6 @@
   <!-- <gridDirection>{"fast": (1, 0), "slow": (0, -1)}</gridDirection>  -->
   <!--sample_mount_mode>sample_changer</sample_mount_mode-->
   <!-- MD3 -->
-  <!--grid_direction>{"fast": (0, 1), "slow": (1, 0), "omega_ref": 0}</grid_direction -->
-
+  <!--grid_direction>{"fast": (0, 1), "slow": (1, 0), "omega_ref": 0}</grid_direction-->
 
 </equipment> 

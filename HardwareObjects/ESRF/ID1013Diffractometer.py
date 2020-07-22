@@ -183,6 +183,11 @@ class ID1013Diffractometer(GenericDiffractometer):
             motors = self.get_centred_point_from_coord(
                 coord_x, coord_y
             )
+            # get rid of centred points that are not moving:
+            motors.pop('phi', None)
+            motors.pop('sampx', None)
+            motors.pop('sampy', None)
+
             print(f"##################ID10Diffractometer move_beam_to_clicked_point - motors - {motors}")
             
             self.move_to_motors_positions(motors)
@@ -308,16 +313,20 @@ class ID1013Diffractometer(GenericDiffractometer):
         if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
             return 0, 0
         
-        print(f"################ ID1013 DIFF get_centred_point_from_coord point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE")
-
         delta_x = (coord_x - beam_pos_x) / self.pixelsPerMmY
         delta_y = (coord_y - beam_pos_y) / self.pixelsPerMmZ
 
-        phi_angle = math.radians(self.centring_phi.get_value())
+        phi_angle_motor = self.centring_phi.get_value()
+        phi_angle = math.radians(phi_angle_motor)
         sampx = self.centring_sampx.get_value()
         sampy = self.centring_sampy.get_value()
         phiy = self.centring_phiy.get_value()
         phiz = self.centring_phiz.get_value()
+
+        print(f"""################ ID1013 DIFF START get_centred_point_from_coord
+        point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE
+        sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz} 
+        """)
 
         rot_matrix = numpy.matrix(
             [
@@ -341,7 +350,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         y_axis_motor_pos = phiz + delta_y
 
         motors_positions = {
-            "phi": self.centring_phi.get_value(),
+            "phi": phi_angle_motor,
             "phiz": float(y_axis_motor_pos),
             "phiy": float(x_axis_motor_pos),
             "sampx": sampx,
@@ -356,13 +365,15 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         Detects if device is ready
         """
-        #print(f" ################ ID1013 DIFF is_ready:")
+        all_ready = True
+        logging.getLogger("HWR").info(f"""################ ID1013 DIFF is_ready: BEFORE FOR MOTOR""")
         for motor in self.motor_hwobj_dict.values():
-            print(f"""################ ID1013 DIFF is_ready: Motor : {motor.name()} state {motor.get_state()}
-            - is READY: {motor.get_state() == HardwareObjectState.READY}""")
-        all_ready = all(motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
+            tmp_state = motor.get_state()
+            all_ready = all_ready and (tmp_state == HardwareObjectState.READY)
+            logging.getLogger("HWR").info(f"""################ ID1013 DIFF is_ready: Motor : {motor.name()} state {tmp_state} - is READY: {tmp_state == HardwareObjectState.READY}""")
+        #all_ready = all(motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
         
-        print(f" ################ ID1013 DIFF is_ready: ALL IS READY {all_ready}")
+        logging.getLogger("HWR").info(f"################ ID1013 DIFF is_ready: ALL IS READY {all_ready}")
         return all_ready
         
         # return self.current_state == DiffractometerState.tostring(
