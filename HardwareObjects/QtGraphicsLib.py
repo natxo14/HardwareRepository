@@ -28,7 +28,7 @@ Graphics item library:
  - GraphicsItemGrid : 2D grid
  - GraphicsItemScale : scale on the bottom left corner
  - GraphicsItemOmegaReference : omega rotation line
- - GraphicsSquareROI : square ROI in image
+ - GraphicsItemSquareROI : square ROI in image
  - GraphicsSelectTool : item selection tool
  - GraphicsItemCentringLine : centring lines for 3 click centring
  - GraphicsItemHistogram: histogram item
@@ -101,9 +101,7 @@ class GraphicsItem(QtImport.QGraphicsItem):
         brush_color.setAlpha(70)
         self.custom_brush.setColor(brush_color)
         self.custom_brush.setStyle(QtImport.Qt.SolidPattern)
-
-        self.setPos(position_x, position_y)
-
+        
         # To redraw when zoom changes
         # distance to start_coord
         # x distance < 0 : to the left of beamline
@@ -482,7 +480,7 @@ class GraphicsItemPoint(GraphicsItem):
         :type position_y: int
         """
 
-        GraphicsItem.__init__(self, position_x, position_y)
+        GraphicsItem.__init__(self, None, position_x, position_y)
 
         self.__full_centring = full_centring
         self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
@@ -1953,7 +1951,7 @@ class GraphicsItemText(GraphicsItem):
         """
         self.text = text
 
-class GraphicsSquareROI(GraphicsItem):
+class GraphicsItemSquareROI(GraphicsItem):
     """Draws a rectangle"""
     def __init__(self, parent):
         """
@@ -1966,7 +1964,7 @@ class GraphicsSquareROI(GraphicsItem):
 
         self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
         self.custom_pen.setWidth(2)
-        self.custom_pen.setColor(ROI_COLOR)
+        #self.custom_pen.setColor(ROI_COLOR)
 
     def boundingRect(self):
         """Returns adjusted rect
@@ -1980,14 +1978,10 @@ class GraphicsSquareROI(GraphicsItem):
 
         if position_x is not None and position_y is not None:
             self.end_coord = [position_x, position_y]
-        self.rect.adjust(
-                0,
-                0,
-                abs(self.start_coord[0] - self.end_coord[0]),
-                abs(self.start_coord[1] - self.end_coord[1]),
-        )
+        print(f"""######################## GraphicsItemSquareROI
+        set_end_position : start_coord {self.start_coord} - end_coord {self.end_coord} 
+        """)
         self.scene().update()
-        
 
     def paint(self, painter, option, widget):
         """
@@ -2005,13 +1999,13 @@ class GraphicsSquareROI(GraphicsItem):
         else:
             self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
             self.custom_pen.setWidth(2)
-            self.custom_pen.setColor(ROI_COLOR)
+            self.custom_pen.setColor(QtImport.Qt.yellow)
 
         painter.drawRect(
-            min(self.start_coord[0], self.end_coord[0]),
-            min(self.start_coord[1], self.end_coord[1]),
-            abs(self.start_coord[0] - self.end_coord[0]),
-            abs(self.start_coord[1] - self.end_coord[1]),
+            0,
+            0,
+            (self.end_coord[0] - self.start_coord[0]),
+            (self.end_coord[1] - self.start_coord[1]),
         )
 
 class GraphicsSelectTool(GraphicsItem):
@@ -2786,6 +2780,7 @@ class GraphicsView(QtImport.QGraphicsView):
         self.graphics_scene.clearSelection()
         self.setMouseTracking(True)
         self.setDragMode(QtImport.QGraphicsView.RubberBandDrag)
+        self.setInteractive(True)
         # self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         # self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setHorizontalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
