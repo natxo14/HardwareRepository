@@ -587,53 +587,55 @@ class QtGraphicsManager(AbstractSampleView):
            If diffractometer not ready then hides all shapes.
         """
         logging.getLogger().debug(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: args (usually state) {args}")
-        if self.diffractometer_hwobj.is_ready() and not self.in_centring_state:
-            for shape in self.get_shapes():
-                if isinstance(shape, GraphicsLib.GraphicsItemPoint):
-                    cpos = shape.get_centred_position()
-                    new_x, new_y = self.diffractometer_hwobj.motor_positions_to_screen(
-                        cpos.as_dict()
-                    )
-                    shape.set_start_position(new_x, new_y)
-                elif isinstance(shape, GraphicsLib.GraphicsItemGrid):
-                    grid_cpos = shape.get_centred_position()
-                    if grid_cpos is not None:
-                        current_cpos = queue_model_objects.CentredPosition(
-                            self.diffractometer_hwobj.get_positions()
+        if not (self.in_centring_state or self.in_move_beam_to_clicked_point):
+            logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: BEFORE CHECKING DIFF STATE")
+            if self.diffractometer_hwobj.is_ready():
+                for shape in self.get_shapes():
+                    if isinstance(shape, GraphicsLib.GraphicsItemPoint):
+                        cpos = shape.get_centred_position()
+                        new_x, new_y = self.diffractometer_hwobj.motor_positions_to_screen(
+                            cpos.as_dict()
                         )
+                        shape.set_start_position(new_x, new_y)
+                    elif isinstance(shape, GraphicsLib.GraphicsItemGrid):
+                        grid_cpos = shape.get_centred_position()
+                        if grid_cpos is not None:
+                            current_cpos = queue_model_objects.CentredPosition(
+                                self.diffractometer_hwobj.get_positions()
+                            )
 
-                        current_cpos.set_motor_pos_delta(0.1)
-                        grid_cpos.set_motor_pos_delta(0.1)
+                            current_cpos.set_motor_pos_delta(0.1)
+                            grid_cpos.set_motor_pos_delta(0.1)
 
-                        if hasattr(grid_cpos, "zoom"):
-                            current_cpos.zoom = grid_cpos.zoom
+                            if hasattr(grid_cpos, "zoom"):
+                                current_cpos.zoom = grid_cpos.zoom
 
-                        center_coord = self.diffractometer_hwobj.motor_positions_to_screen(
-                            grid_cpos.as_dict()
-                        )
-                        if center_coord:
-                            shape.set_center_coord(center_coord)
+                            center_coord = self.diffractometer_hwobj.motor_positions_to_screen(
+                                grid_cpos.as_dict()
+                            )
+                            if center_coord:
+                                shape.set_center_coord(center_coord)
 
-                            corner_coord = []
-                            for motor_pos in shape.get_motor_pos_corner():
-                                corner_coord.append(
-                                    (
-                                        self.diffractometer_hwobj.motor_positions_to_screen(
-                                            motor_pos
+                                corner_coord = []
+                                for motor_pos in shape.get_motor_pos_corner():
+                                    corner_coord.append(
+                                        (
+                                            self.diffractometer_hwobj.motor_positions_to_screen(
+                                                motor_pos
+                                            )
                                         )
                                     )
-                                )
-                            shape.set_corner_coord(corner_coord)
+                                shape.set_corner_coord(corner_coord)
 
-                            if current_cpos == grid_cpos:
-                                shape.set_projection_mode(False)
-                            else:
-                                shape.set_projection_mode(True)
+                                if current_cpos == grid_cpos:
+                                    shape.set_projection_mode(False)
+                                else:
+                                    shape.set_projection_mode(True)
 
-            self.show_all_items()
-            self.graphics_view.graphics_scene.update()
-            # self.update_histogram()
-            self.emit("diffractometerReady", True)
+                self.show_all_items()
+                self.graphics_view.graphics_scene.update()
+                # self.update_histogram()
+                self.emit("diffractometerReady", True)
         else:
             self.hide_all_items()
             self.emit("diffractometerReady", False)
