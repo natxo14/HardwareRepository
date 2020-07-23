@@ -94,4 +94,6 @@
             <beamy>358.0</beamy>
         </position>
     </positions>
+
+    <operational_modes>['visible', 'background', 'signal', 'signal3']</operational_modes>
 </object>
