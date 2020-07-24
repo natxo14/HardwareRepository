@@ -148,18 +148,57 @@ from HardwareRepository.BaseHardwareObjects import Equipment
 from HardwareRepository.BaseHardwareObjects import HardwareObjectState
 import logging
 
+import copy
 
 class MultiplePositions(Equipment):
     """
     CODING NOTES:
-    handling data from xml file:
-    load only ONCE with read_positions
-    Then access to data and modify it with self.positions
-    Is this risky?? Good Practice?? Is better to access self["positions"] data ??
-    Guess that self["positions"] data is created when reading xml file.
+    THIS HWRObject handles access/edition/saving to multiple-positions xml file
+    THis avoids data duplication on all the bricks that need access to that xml file
 
-    TODO: when xml data is edited and saved by user: RELOAD IT. HOW TO DO IT??
+    It will read the file, create self.positions_dict structure, receive edit data signals
+    from bricks, send update data signals to bricks
+
+    Bricks will call methods to:
+    - recover/reload data to display in their guis
+    - save data in xml file
+    - edit the data
+
+    Data will be kept/updated in self.positions_dict structure
+    If data saved, then written in xml file
+    if data cancelled, then data reloaded from last saved xml file
     """
+
+    def __init__(self, *args):
+        """
+        Descrip. :
+        """
+        Equipment.__init__(self, *args)
+
+        self.motor_obj = None
+
+        self.motor_hwobj_dict = {}
+        #{ "motor_name" : motor_hwr_obj }
+        self.positions_dict = {}
+        #{ "position_name" : { "pos_x" : val, int - pixels
+        #                      "pos_y" : val, int - pixels
+        #                      "cal_x" : val, int - nm
+        #                      "cal_y" : val, int - nm
+        #                      "ligth" : val,
+        #                      "zoom" : val,
+        #                     },
+        #}
+
+        self.roles = None
+        self.deltas = None
+        self.roles_positions_dict = None
+        # for motors with a role
+        # { "position_name" : { "role1" : position,
+        #                      "role2" : position ...
+        #                     },
+        
+
+        self.multipos_file_xml_path = None
 
     def init(self):
         try:
@@ -167,23 +206,17 @@ class MultiplePositions(Equipment):
         except AttributeError:
             self.mode = "absolute"
 
-        motors = self["motors"]
-
-        self.motor_hwobj_list = []
-        self.motor_hwobj_dict = {}
-        #print(f"@@@@@@@@@@@@@@@@@@@@@@ motors {motors} {type(motors)} is None - {motors is None} - {motors.objectsNames()}")
-        for mot in motors:
+        
+        # init self.motor_hwobj_dict
+        for mot in self["motors"]:
                 name = mot.getProperty("name")
                 temp_motor_hwobj = self.getObjectByRole(name)
                 if temp_motor_hwobj is not None:
-                    self.motor_hwobj_list.append(temp_motor_hwobj)
                     self.motor_hwobj_dict[name] = temp_motor_hwobj
                 print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
 
-        #self.roles = motors.getRoles()
         self.roles = self.getRoles()
-        tmp = self.getObjectByRole("zoom")
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS tmp {tmp} {type(tmp)}")
+        
         self.deltas = {}
         try:
             # WARNING self.deltas is a LINK to the INTERNAL properties dictionary
@@ -193,9 +226,10 @@ class MultiplePositions(Equipment):
         except BaseException:
             logging.getLogger().error("No deltas.")
 
-        self.roles_positions = {}
+        self.roles_positions_dict = {}
         self.positions = []
-        self.positions_names_list = []
+        
+        #init self.positions_dict and self.roles_positions_dict
         try:
             positions = self["positions"]
             print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS positions {positions} {type(positions)}")
@@ -204,40 +238,47 @@ class MultiplePositions(Equipment):
         else:
             for position in positions:
                 name = position.getProperty("name")
-                #print(f"name {name}")
+                
                 if name is not None:
-                    self.positions_names_list.append(name)
-                    self.roles_positions[name] = {}
-
+                    
                     motpos = position.getProperties()
                     motroles = list(motpos.keys())
                     print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motpos {motpos}")
                     #print(f"motroles {motroles}")
 
+                    pos_x = position.getProperty("beamx", 0)
+                    pos_y = position.getProperty("beamy", 0)
+                    cal_x = position.getProperty("resox", 0)
+                    cal_y = position.getProperty("resoy", 0)
+                    light_val = position.getProperty("light", 0)
+                    zoom_val = position.getProperty("zoom", -1)
+                    
+                    dict_elem = {"pos_x" : pos_x,
+                                "pos_y" : pos_y,
+                                "cal_x" : cal_x,
+                                "cal_y" : cal_y,
+                                "light" : light_val,
+                                "zoom" : zoom_val
+                    }
+
+                    self.positions_dict[name] = dict_elem
+
+                    elem = {}
                     for role in self.roles:
-                        #print(f"role {role}")
-                        self.roles_positions[name][role] = motpos[role]
-                        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.roles_positions[{name}][{role}] - {self.roles_positions[name][role]}")
+                        print(f"role {role} name {name} motpos {motpos}")
+                        elem[role] = motpos[role]
+                    self.roles_positions_dict[name] = elem
+                    print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.roles_positions_dict - {self.roles_positions_dict}")
                 else:
                     logging.getLogger().error("No name for position.")
 
-        self.motors = {}
-        #print(f"@@@@@@@@@@@@@@@@@@@@@@  motors {type(motors)}")
-        ##print(f"@@@@@@@@@@@@@@@@@@@@@@  self.roles {self.roles}")
-        #for mot in self["motors"]:
-        for mot in self.motor_hwobj_list:
-            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_list - name - {mot.name()} mot {id(mot)}")
-            #self.motors[mot.getMotorMnemonic()] = mot
-            # useless ??self.connect(mot, "moveDone", self.checkPosition)
+        for mot in self.motor_hwobj_dict.values():
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_dict - name - {mot.name()} mot {id(mot)}")
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
 
-        #for key, value in self.roles_positions.items():
-            #print(f"key {key} value {value}")
-            #for key2, value2 in value.items():
-        #print(f"$$$$$$$$$$$$$$$ self.roles_positions {self.roles_positions} ")
         self.positions = self.read_positions()
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions {self.positions}")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions {self.positions_dict}")
     
     def get_zoom_hwr_obj(self):
         return self.motor_hwobj_dict.get("zoom", None)
@@ -251,13 +292,9 @@ class MultiplePositions(Equipment):
         }
         """
         zoom_pos_dict = {}
-        positions = self["positions"]
-        try:
-            for position in positions:
-                zoom_pos_dict[position.getProperty("name")] = position.getProperty("zoom")
-        except IndexError:
-            pass
-        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS get_zoom_positions {zoom_pos_dict}")
+        for pos_name in self.positions_dict:
+            zoom_pos_dict[pos_name] = self.positions_dict[pos_name]["zoom"]
+        
         return zoom_pos_dict
    
     def read_positions(self):
@@ -279,20 +316,18 @@ class MultiplePositions(Equipment):
                 )
         except IndexError:
             pass
-        return positions_list 
+        return positions_list
 
     def get_positions_names_list(self):
-        return self.positions_names_list
+        return list(self.positions_dict.keys())
 
     def get_state(self):
         if not self.is_ready():
             return ""
 
         state = HardwareObjectState.READY
-        #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_state in list: - {[mot.name() for mot in self.motor_hwobj_list]}")
             
-        for mot in self.motor_hwobj_list:
-            #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot {mot.name()} - get_state : {mot.get_state()}")
+        for mot in self.motor_hwobj_list.values():
             if mot.get_state() == HardwareObjectState.BUSY:
                 state = HardwareObjectState.BUSY
             if mot.get_state() in {HardwareObjectState.UNKNOWN,
@@ -312,60 +347,50 @@ class MultiplePositions(Equipment):
         move to position with name = name
         """
         #print(f"$$$$$$$$$$$$$$$ move_to_position {name} ")
+        
+        position_props = self.positions_dict.get(name, None)
+        
+        if position_props is None:
+            return
 
-        move_list = []
         for role in self.roles:
-            device = self.getObjectByRole(role)
-            pos = self.roles_positions[name][role]
-            move_list.append((device, pos))
-        #print(f"$$$$$$$$$$$$$$$ move_to_position  move_list {move_list} ")
-        for mot, pos in move_list:
-            if mot is not None:
-                #print(f"$$$$$$$$$$$$$$$ move_to_position  mot.set_value(pos) {mot} {pos} ")
-                mot.set_value(pos)
+            role_position = position_props.get(role, None)
+            
+            if role_position is None:
+                continue
 
+            motor = self.motor_hwobj_dict.get(role, None)
+            if motor is None:
+                continue
+        
+            motor.set_value(role_position)
+            
         if wait:
-            [mot.wait_end_of_move(4) for mot, pos in move_list if mot is not None]
+            [mot.wait_end_of_move(4) for mot in self.motor_hwobj_dict if mot is not None]
         
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - move_to_position - {name} - self {id(self)}")
         self.emit("predefinedPositionChanged", name)
-        """
-        for mne,pos in self.roles_positions[name].items():
-        self.motors[mne].set_value(pos)
-        """
+        
     def get_positions(self):
         """
         return the list of all the positions with all properties
         """
-        return self.positions
+        return self.positions_dict
     
     def get_position(self, pos_name):
         """
         return all properties of position with name pos_name as dict
         """
-        for position in self.positions:
-            if pos_name == position["name"]:
-                return position
-        
-        return None
+        return self.positions_dict.get(pos_name, None)
 
     def get_current_position(self):
         """
         return current position's all properties as dict
         """
         current_position = self.get_value()
-        #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {current_position} - {type(current_position)}")
-        #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position - {self.positions}")
 
-        for position in self.positions:
-            #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - get_current_position loop - {position}")
-
-            if current_position in position.values():
-                #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - found in  - {position}")
-                return position
-        return None
-        #return self.positions.get(current_position)
-
+        return self.positions_dict.get(current_position, None)
+    
     def get_value(self):
         """
         Returns the name of the current position
@@ -374,23 +399,17 @@ class MultiplePositions(Equipment):
         """
         print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value self.roles {self.roles}")
         if not self.is_ready():
-            #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value - not self.is_ready() ")
             return None
 
-        for pos_name, position in self.roles_positions.items():
+        for pos_name, position in self.roles_positions_dict.items():
             find_position = 0
 
             for role in self.roles:
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - role {role} ")
                 pos = position[role]
-                role_str = "\"" + str(role) + "\""
-                mot = self.getObjectByRole(role)
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR mot  - {type(mot)} -")
+                mot = self.motor_hwobj_dict.get(role, None)
                 
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - pos {pos} -")
                 if mot is not None:
                     motpos = mot.get_value()
-                    #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value  - motpos {motpos} -")
                     try:
                         if (
                             motpos < pos + self.deltas[role]
@@ -402,12 +421,9 @@ class MultiplePositions(Equipment):
 
                     if find_position > 0:
                         print(f"$$$$$$$$$$$$$$$MULTIPOSHWR get_value findPosition  - {find_position} - motor name {mot.name()} - position {motpos} - ")                
-            
-
+          
             if find_position == len(self.roles):
-                #print(f"$$$$$$$$$$$$$$$MULTIPOSHWR {find_position} {len(self.roles)} - {pos_name}")                
                 return pos_name
-
         return None
 
     def checkPosition(self, *args):
@@ -435,7 +451,7 @@ class MultiplePositions(Equipment):
             return
 
         for role, pos in list(newPositions.items()):
-            self.roles_positions[name][role] = pos
+            self.roles_positions_dict[name][role] = pos
             position.setProperty(role, pos)
 
         self.checkPosition()
@@ -445,35 +461,99 @@ class MultiplePositions(Equipment):
         position = self.get_position(name)
         return position[key]
         
-        # position = self.__getPositionObject(name)
+    def reload_data_from_xml_file(self):
+        """
+        usefull when, after changing data, cancel changes
+        """
+        """
+        Parse xml file and load dict :
 
-        # if position is None:
-        #     return None
+        { "position_name" : { "pos_x" : val,int - pixels  
+                             "pos_y" : val,int - pixels
+                             "cal_x" : val,int - nm
+                             "cal_y" : val,int - nm
+                             "light" : val,
+                            },
+        }
+        """
+        output_dict = {}
+        xml_file_tree = cElementTree.parse(self.multipos_file_xml_path)
 
-        # return position.getProperty(key)
+        xml_tree = xml_file_tree.getroot()
+        positions = xml_tree.find("positions")
 
-    def save_xml_position_key_value(self, name, key, value):
+        pos_list = positions.findall("position")
+        
+        for pos in pos_list:
+            
+            if pos.find("beamx") is not None:
+                pos_x = self.from_text_to_int(pos.find("beamx").text)
+            else:
+                pos_x = 0
+            if pos.find("beamy") is not None:
+                pos_y = self.from_text_to_int(pos.find("beamy").text)
+            else:
+                pos_y = 0
+            if pos.find("resox") is not None:
+                cal_x = self.from_text_to_int(pos.find("resox").text)
+            else:
+                cal_x = 0
+            if pos.find("resoy") is not None:
+                cal_y = self.from_text_to_int(pos.find("resoy").text)
+            else:
+                cal_y = 0
+            if pos.find("light") is not None:
+                light_val = self.from_text_to_int(pos.find("light").text)
+            else:
+                light_val = 0
+            if pos.find("zoom") is not None:
+                zoom_val = self.from_text_to_int(pos.find("zoom").text)
+            else:
+                zoom_val = -1
+            
+            dict_elem = {"pos_x" : pos_x,
+                        "pos_y" : pos_y,
+                        "cal_x" : cal_x,
+                        "cal_y" : cal_y,
+                        "zoom" : zoom_val,
+                        "light" : light_val,
+            }
+            output_dict[pos.find('name').text] = dict_elem
+            
+        self.positions_dict = copy.deepcopy(output_dict)
 
-        xml_tree = cElementTree.fromstring(self.xml_source())
+    def save_data_to_xml_file(self):
+        
+        #open xml file
+        xml_file_tree = cElementTree.parse(self.xml_source())
+
+        xml_tree = xml_file_tree.getroot()
         positions = xml_tree.find("positions")
         
         pos_list = positions.findall("position")
-        # from PyQt5.QtCore import pyqtRemoveInputHook
-        # pyqtRemoveInputHook()
-        # import pdb
-        # pdb.set_trace()
 
-        # for pos in pos_list:
-        #     if pos.find("name").text == name:
-        #         if pos.find(key) is not None:
-        #             pos.set('beamx', value)
-        
-        # .write(self.xml_source())
+        for pos in pos_list:
+            pos_name = pos.find('name')
+            if pos.find('beamx') is not None:
+                pos.find('beamx').text = str(self.positions_dict[pos_name]['pos_x'])
+            if pos.find('beamy') is not None:
+                pos.find('beamy').text = str(self.positions_dict[pos_name]['pos_y'])
+            if pos.find('resox') is not None:
+                pos.find('resox').text = str(self.positions_dict[pos_name]['cal_x'])
+            if pos.find('resoy') is not None:
+                pos.find('resoy').text = str(self.positions_dict[pos_name]['cal_y'])
+            if pos.find('light') is not None:
+                pos.find('light').text = str(self.positions_dict[pos_name]['light'])
+            if pos.find('zoom') is not None:
+                pos.find('zoom').text = str(self.positions_dict[pos_name]['zoom'])
     
+        xml_file_tree.write(self.multipos_file_xml_path)
+
     def set_position_key_value(self, name, key, value):
-        for position in self.positions:
-            if name in position['name']:
-                position[key] = value
+
+        position = self.positions_dict.get(name, None)
+        if position is not None:
+            position[key] = value
         
     def setPositionKeyValue(self, name, key, value):
         from PyQt5.QtCore import pyqtRemoveInputHook
@@ -543,13 +623,61 @@ class MultiplePositions(Equipment):
     def remField(self, name, key):
         pass
 
+    def load_zoom_positions_dict(self):
+        """
+        Parse xml file and load dict :
 
-"""
-        xml_tree = cElementTree.fromstring(self.xml_source())
-        for elt in xml_tree.findall(".//position"):
-           if elt.find("name").text=="12X":
-             new_elt = cElementTree.Element("bidule")
-             new_elt.text = "HELLO"
-             elt.append(new_elt)
-        self.rewrite_xml(cElementTree.tostring(xml_tree))
-"""
+        { "position_name" : { "pos_x" : val,int - pixels  
+                             "pos_y" : val,int - pixels
+                             "cal_x" : val,int - nm
+                             "cal_y" : val,int - nm
+                             "light" : val,
+                            },
+        }
+        """
+        output_dict = {}
+        xml_file_tree = cElementTree.parse(self.multipos_file_xml_path)
+
+        xml_tree = xml_file_tree.getroot()
+        positions = xml_tree.find("positions")
+
+        pos_list = positions.findall("position")
+        
+        for pos in pos_list:
+            
+            if pos.find("beamx") is not None:
+                pos_x = self.from_text_to_int(pos.find("beamx").text)
+            else:
+                pos_x = 0
+            if pos.find("beamy") is not None:
+                pos_y = self.from_text_to_int(pos.find("beamy").text)
+            else:
+                pos_y = 0
+            if pos.find("resox") is not None:
+                cal_x = self.from_text_to_int(pos.find("resox").text, 1e9)
+            else:
+                cal_x = 0
+            if pos.find("resoy") is not None:
+                cal_y = self.from_text_to_int(pos.find("resoy").text, 1e9)
+            else:
+                cal_y = 0
+            
+            if pos.find("light") is not None:
+                light_val = self.from_text_to_int(pos.find("light").text, 1e9)
+            else:
+                light_val = 0
+            
+            dict_elem = {"pos_x" : pos_x,
+                        "pos_y" : pos_y,
+                        "cal_x" : cal_x,
+                        "cal_y" : cal_y,
+                        "light" : light_val,
+            }
+            output_dict[pos.find('name').text] = dict_elem
+            
+        self.zoom_positions_dict = copy.deepcopy(output_dict)
+    
+    def from_text_to_int(self, input_str, factor=1):
+        if input_str is None:
+            return 0
+        return abs(int(float(input_str) * factor))

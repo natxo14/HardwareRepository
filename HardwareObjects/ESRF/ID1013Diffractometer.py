@@ -119,7 +119,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             print(f"##################ID10Diffractometer update_beam_position HWR.beamline.beam not none - {self.beam_position}")
             HWR.beamline.beam.set_beam_position_on_screen(self.beam_position)
         
-        print(f"##################ID10Diffractometer update_beam_position - {self.beam_position} - {props['name']}")
+        print(f"##################ID10Diffractometer update_beam_position - {self.beam_position}")
         
     def update_zoom_calibration(self):
         """
