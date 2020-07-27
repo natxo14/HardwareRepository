@@ -793,14 +793,14 @@ class QtGraphicsManager(AbstractSampleView):
         """
                 
         if type(pixels_per_mm) in (list, tuple):
-            print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm_changed {pixels_per_mm} - {type(pixels_per_mm[0])}")
+            print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm_changed {pixels_per_mm} - {type(pixels_per_mm[0])} vs self.pixels_per_mm {self.pixels_per_mm}")
             if pixels_per_mm != self.pixels_per_mm:
                 self.pixels_per_mm = pixels_per_mm
-                #print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm != self.pixels_per_mm")
+                print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger pixels_per_mm != self.pixels_per_mm")
                 for item in self.graphics_view.graphics_scene.items():
                     #print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {type(item)}")
                     if isinstance(item, GraphicsLib.GraphicsItem):
-                        #print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger {type(item)}")
+                        print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger diffractometer_pixels_per_mm_changed type {type(item)}")
                         item.set_pixels_per_mm(self.pixels_per_mm)
                 self.graphics_view.graphics_scene.update()
 
@@ -1836,6 +1836,11 @@ class QtGraphicsManager(AbstractSampleView):
         HWR.beamline.beam.set_beam_position_on_screen(
             (self.graphics_move_beam_mark_item.end_coord[0],
             self.graphics_move_beam_mark_item.end_coord[1])
+        )
+        print(f"QtGraphMng stop_move_beam_mark emit beam_position_data_changed")
+        self.emit(
+            "beam_position_data_changed",
+            self.graphics_move_beam_mark_item.end_coord
         )
         self.emit("infoMsg", "")
 

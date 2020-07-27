@@ -110,8 +110,8 @@ class ID1013Diffractometer(GenericDiffractometer):
             print(f"##################ID10Diffractometer update_zoom_calibration zoom motor unkwon position")
             return
                 
-        if "beamx" in props.keys() and "beamy" in props.keys():
-            self.beam_position = (int(props["beamx"]), int(props["beamy"]))
+        if "beam_pos_x" in props.keys() and "beam_pos_y" in props.keys():
+            self.beam_position = (int(props["beam_pos_x"]), int(props["beam_pos_y"]))
         else:
             self.beam_position = (0,0)
 
@@ -140,15 +140,16 @@ class ID1013Diffractometer(GenericDiffractometer):
             return
         print(f"##################ID10Diffractometer zoom_motor props {props} - keys {props.keys()}")
         
-        if "resox" in props.keys() and "resoy" in props.keys():
-            self.pixels_per_mm_x = abs(1.0/float(props["resox"]))/1000.0
-            self.pixels_per_mm_y = abs(1.0/float(props["resoy"]))/1000.0
+        if "cal_x" in props.keys() and "cal_y" in props.keys():
+            # props["cal_x"] and props["cal_y"] are in nm / pixel
+            self.pixels_per_mm_x = abs(1.0/float(props["cal_x"])) * 1e6
+            self.pixels_per_mm_y = abs(1.0/float(props["cal_y"])) * 1e6
         else:
             self.pixels_per_mm_x = 0
             self.pixels_per_mm_y = 0
 
-        if "beamx" in props.keys() and "beamy" in props.keys():
-            self.beam_position = [float(props["beamx"]), float(props["beamy"])]
+        if "beam_pos_x" in props.keys() and "beam_pos_y" in props.keys():
+            self.beam_position = [float(props["beam_pos_x"]), float(props["beam_pos_y"])]
         else:
             self.beam_position = [0, 0]
         
