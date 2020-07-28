@@ -219,10 +219,25 @@ class GraphicsItem(QtImport.QGraphicsItem):
         """
         self.scene().update()
 
+    # def itemChange(self, change, value):
+        """
+        check if item has been selected
+        Ex: through the graphics_select_tool_item
+        """
+        # if self.scene():
+        #     QtImport.QGraphicsItem.itemChange(self, change, value)
+        #     print(f"itemChange {change} - {value}")
+        # if change == QtImport.QGraphicsItem.ItemSelectedChange and self.scene():
+        #     self.scene().itemClickedSignal.emit(self, self.isSelected())
+        # else:
+        #     QtImport.QGraphicsItem.itemChange(self, change, value)
+
     def mousePressEvent(self, event):
         """Emits scene itemClickedSignal to indicate selected item
         """
+        QtImport.QGraphicsItem.mousePressEvent(self, event)
         self.update()
+        print(f"mousePressEvent is selected : {self.isSelected()}")
         self.scene().itemClickedSignal.emit(self, self.isSelected())
 
     def toggle_selected(self):
@@ -1961,10 +1976,17 @@ class GraphicsItemSquareROI(GraphicsItem):
         GraphicsItem.__init__(self, parent)
 
         self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
+        # self.setFlags(QtImport.QGraphicsItem.ItemSendsGeometryChanges)
 
         self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
         self.custom_pen.setWidth(2)
         #self.custom_pen.setColor(ROI_COLOR)
+        self.rectangle = QtImport.QRectF()
+
+        self.secondBrush = QtImport.QBrush(
+            QtImport.Qt.green,
+            QtImport.Qt.DiagCrossPattern,
+        )
 
     def boundingRect(self):
         """Returns adjusted rect
@@ -1972,16 +1994,43 @@ class GraphicsItemSquareROI(GraphicsItem):
         :returns: QRect
         """
 
-        return self.rect
+        #return self.rect
+        width = (self.end_coord[0] - self.start_coord[0])
+        height = (self.end_coord[1] - self.start_coord[1])
+        
+        return QtImport.QRectF(
+            0,
+            0,
+            width,
+            height,
+        )
 
-    def set_end_position(self, position_x, position_y):
+        # return QtImport.QRectF(
+        #     -width/2,
+        #     -height/2,
+        #     width,
+        #     height,
+        # )
+        #return self.rect
 
-        if position_x is not None and position_y is not None:
-            self.end_coord = [position_x, position_y]
-        print(f"""######################## GraphicsItemSquareROI
-        set_end_position : start_coord {self.start_coord} - end_coord {self.end_coord} 
-        """)
-        self.scene().update()
+    # def set_end_position(self, position_x, position_y):
+
+    #     if position_x is not None and position_y is not None:
+    #         self.end_coord = [position_x, position_y]
+    #     print(f"""######################## GraphicsItemSquareROI
+    #     set_end_position : start_coord {self.start_coord} - end_coord {self.end_coord} 
+    #     """)
+    #     self.scene().update()
+
+    # def shape(self):
+    #     painter_path = QtImport.QPainterPath()
+    #     painter_path.addRect(
+    #         0,
+    #         0,
+    #         (self.end_coord[0] - self.start_coord[0]),
+    #         (self.end_coord[1] - self.start_coord[1]),
+    #     )
+    #     return painter_path
 
     def paint(self, painter, option, widget):
         """
@@ -2001,12 +2050,23 @@ class GraphicsItemSquareROI(GraphicsItem):
             self.custom_pen.setWidth(2)
             self.custom_pen.setColor(QtImport.Qt.yellow)
 
+        # self.rectangle.setCoords(
+        #     0,
+        #     0,
+        #     (self.end_coord[0] - self.start_coord[0]),
+        #     (self.end_coord[1] - self.start_coord[1]),
+        # )
         painter.drawRect(
             0,
             0,
             (self.end_coord[0] - self.start_coord[0]),
             (self.end_coord[1] - self.start_coord[1]),
         )
+        # self.custom_pen.setBrush(self.secondBrush)
+        # print(f"paint: boundingrect : {self.boundingRect()}")
+        painter.fillRect(self.boundingRect(), self.secondBrush)
+
+
 
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""

@@ -898,7 +898,7 @@ class QtGraphicsManager(AbstractSampleView):
             self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
         elif self.in_move_beam_to_clicked_point:
             self.diffractometer_hwobj.move_beam_to_clicked_point(pos_x, pos_y)
-            self.stop_move_beam_to_clicked_point()
+            # self.stop_move_beam_to_clicked_point()
         else:
             print(f"""############################### QtGraphicsManager
             mouse_clicked : else""")
@@ -985,7 +985,7 @@ class QtGraphicsManager(AbstractSampleView):
             self.de_select_all()
             # set square distance and size
             start_pos = self.graphics_square_draw_item.get_start_position()
-            end_pos = self.graphics_square_draw_item.get_end_position()
+            end_pos = (pos_x, pos_y) #self.graphics_square_draw_item.get_end_position()
             top_left_corner = (min(start_pos[0], end_pos[0]),
                         min(start_pos[1], end_pos[1]))
             delta_x_to_beam = self.beam_position[0] - top_left_corner[0]
@@ -993,15 +993,15 @@ class QtGraphicsManager(AbstractSampleView):
             
             size_pix = (abs(start_pos[0] - end_pos[0]),
                         abs(start_pos[1] - end_pos[1]))
-            size_mm = (size_pix[0] / self.pixels_per_mm[0], 
-                       size_pix[0] / self.pixels_per_mm[0])
+            size_mm = (size_pix[0] / self.pixels_per_mm[0],
+                       size_pix[1] / self.pixels_per_mm[1])
 
             self.graphics_square_draw_item.set_start_position(*top_left_corner)
             self.graphics_square_draw_item.set_end_position(
-                top_left_corner[0] + size_pix[0],
+                top_left_corner[0] + size_pix[0] + 1,
                 top_left_corner[1] + size_pix[1]
             )
-            
+            self.graphics_square_draw_item.prepareGeometryChange()
             self.graphics_square_draw_item.setPos(*top_left_corner)
 
             self.graphics_square_draw_item.set_distance_to_beam_mm(
@@ -1013,7 +1013,25 @@ class QtGraphicsManager(AbstractSampleView):
             )
             self.emit("shapeCreated", self.graphics_square_draw_item, "Square")
             self.graphics_square_draw_item.setSelected(True)
+            #self.graphics_square_draw_item.setPos(*top_left_corner)
 
+            # self.graphics_square_draw_item.update_item()
+
+            #  self.graphics_square_draw_item.hide()
+
+            # tmp = GraphicsLib.GraphicsItemSquareROI(
+            #     parent=None,
+            # )
+
+            # self.add_shape(tmp)
+
+            # tmp.set_start_position(*top_left_corner)
+            # tmp.set_end_position(
+            #     top_left_corner[0] + size_pix[0] + 1,
+            #     top_left_corner[1] + size_pix[1]
+            # )
+            # tmp.setPos(*top_left_corner)
+            
             print(f"""
             mouse_released : pos_x, pos_y {pos_x}, {pos_y}
             top left corner : {top_left_corner}
@@ -1021,6 +1039,8 @@ class QtGraphicsManager(AbstractSampleView):
             pos Returns the position of the item in parent coordinates {self.graphics_square_draw_item.pos()}
             scene pos {self.graphics_square_draw_item.scenePos()}
             rect {self.graphics_square_draw_item.boundingRect()}
+            start_position {self.graphics_square_draw_item.get_start_position()}
+            end_position {self.graphics_square_draw_item.get_end_position()}
             """)
 
             for shape in self.get_shapes():
@@ -1078,11 +1098,11 @@ class QtGraphicsManager(AbstractSampleView):
                     scene_point.x(), scene_point.y()
                 )
         elif self.in_square_drawing_state:
-            start_pos = self.graphics_square_draw_item.get_start_position()
-            self.graphics_square_draw_item.set_size(
-                abs(start_pos[0] - scene_point.x()),
-                abs(start_pos[1] - scene_point.y()),
-            )
+            # start_pos = self.graphics_square_draw_item.get_start_position()
+            # self.graphics_square_draw_item.set_size(
+            #     abs(start_pos[0] - scene_point.x()),
+            #     abs(start_pos[1] - scene_point.y()),
+            # )
             self.graphics_square_draw_item.set_end_position(
                     scene_point.x(), scene_point.y()
             )
@@ -1207,6 +1227,7 @@ class QtGraphicsManager(AbstractSampleView):
         ]:
             print(f"""######################## QtGraphicsManager
             item_clicked : state {state} - type item {type(item)} 
+            item_clicked item.isSelected() {item.isSelected()} :
             """)
             self.emit("shapeSelected", item, state)
             if isinstance(item, GraphicsLib.GraphicsItemPoint):
@@ -1244,11 +1265,11 @@ class QtGraphicsManager(AbstractSampleView):
         else:
             QtImport.QApplication.setOverrideCursor(self.cursor)
 
-    def set_cursor_target(self, state):
-        print(f"set_cursor_target state : {state}")
+    def set_cursor_icon(self, state, icon_name=""):
+        print(f"set_cursor_icon state : {state} icon {icon_name}")
         if state:
             self.cursor = QtImport.QCursor(
-                QtImport.QPixmap(Icons.load_pixmap("Point"))
+                QtImport.QPixmap(Icons.load_pixmap(icon_name))
             )
         else:
             self.cursor = QtImport.Qt.ArrowCursor
@@ -1391,6 +1412,8 @@ class QtGraphicsManager(AbstractSampleView):
             shape_type = "Line"
         elif isinstance(shape, GraphicsLib.GraphicsItemGrid):
             shape_type = "Grid"
+        elif isinstance(shape, GraphicsLib.GraphicsItemSquareROI):
+            shape_type = "Square"
 
         self.graphics_view.graphics_scene.removeItem(shape)
         self.graphics_view.graphics_scene.update()
@@ -1691,6 +1714,7 @@ class QtGraphicsManager(AbstractSampleView):
         """
         self.in_calibration_state = True
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger start_calibration - {self.in_calibration_state}")
+        self.set_cursor_icon(True,"calibration")
         self.emit("infoMsg", "Click on one point on the image to start calibration")
     
     def stop_calibration(self):
@@ -1698,6 +1722,7 @@ class QtGraphicsManager(AbstractSampleView):
         Start camera calibration
         """
         self.in_calibration_state = False
+        self.set_cursor_icon(False,"")
         self.delete_calibration_points()
         self.graphics_view.graphics_scene.update()
         self.emit("infoMsg", "")
@@ -1926,16 +1951,23 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
     
+    def move_beam_to_clicked_point_clicked(self, button_checked):
+
+        if button_checked:
+            self.start_move_beam_to_clicked_point()
+        else:
+            self.stop_move_beam_to_clicked_point()
+    
     def start_move_beam_to_clicked_point(self):
         # TODO : need to cancel rest of events ??
         self.emit("infoMsg", "Click on the screen to move camera center")
         self.in_move_beam_to_clicked_point = True
-        self.set_cursor_target(True)
+        self.set_cursor_icon(True, "Point")
         
     def stop_move_beam_to_clicked_point(self):
         self.emit("infoMsg", "")
         self.in_move_beam_to_clicked_point = False
-        self.set_cursor_target(False)
+        self.set_cursor_icon(False)
     
     def start_visual_align(self):
         """Starts visual align procedure when two centring points are selected
@@ -2452,6 +2484,10 @@ class QtGraphicsManager(AbstractSampleView):
     def display_beam_size(self, state):
         """Enables or disables displaying the beam size"""
         self.graphics_beam_item.enable_beam_size(state)
+    
+    def display_beam(self, state):
+        """Enables or disables displaying the beam mark"""
+        self.graphics_beam_item.setVisible(state)
 
     def set_magnification_mode(self, mode):
         """Display or hide magnification tool"""
