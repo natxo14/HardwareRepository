@@ -354,8 +354,8 @@ class ID1013Diffractometer(GenericDiffractometer):
             "phi": phi_angle_motor,
             "phiz": float(y_axis_motor_pos),
             "phiy": float(x_axis_motor_pos),
-            "sampx": sampx,
-            "sampy": sampy,
+            "sampx": float(sampx),
+            "sampy": float(sampy),
         }
         
         print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_positions {motors_positions}")
