@@ -390,7 +390,6 @@ class GraphicsItemBeam(GraphicsItem):
         """
         self.detected_beam_info_dict = (pos_x, pos_y)
 
-
 class GraphicsItemInfo(GraphicsItem):
     """Message box for displaying information on the screen
     """
@@ -618,7 +617,20 @@ class GraphicsItemPoint(GraphicsItem):
         """
         self.scene().itemDoubleClickedSignal.emit(self)
         self.update()
-
+    
+    def itemChange(self, change, value):
+        """
+        This should be in GraphicsItem class 
+        but I didn't make it work
+        check if item has been selected
+        Ex: through the graphics_select_tool_item
+        """
+        if change == QtImport.QGraphicsItem.ItemSelectedHasChanged and self.scene():
+            self.scene().itemClickedSignal.emit(self, self.isSelected())
+        
+        return QtImport.QGraphicsItem.itemChange(self, change, value)
+        
+    
 class GraphicsItemCalibrationPoint(GraphicsItemPoint):
     """
     Calibration point: feedback given for calibration
@@ -1976,11 +1988,9 @@ class GraphicsItemSquareROI(GraphicsItem):
         GraphicsItem.__init__(self, parent)
 
         self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
-        # self.setFlags(QtImport.QGraphicsItem.ItemSendsGeometryChanges)
-
+        
         self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
         self.custom_pen.setWidth(2)
-        #self.custom_pen.setColor(ROI_COLOR)
         self.rectangle = QtImport.QRectF()
 
         self.secondBrush = QtImport.QBrush(
@@ -1994,7 +2004,6 @@ class GraphicsItemSquareROI(GraphicsItem):
         :returns: QRect
         """
 
-        #return self.rect
         width = (self.end_coord[0] - self.start_coord[0])
         height = (self.end_coord[1] - self.start_coord[1])
         
@@ -2004,33 +2013,6 @@ class GraphicsItemSquareROI(GraphicsItem):
             width,
             height,
         )
-
-        # return QtImport.QRectF(
-        #     -width/2,
-        #     -height/2,
-        #     width,
-        #     height,
-        # )
-        #return self.rect
-
-    # def set_end_position(self, position_x, position_y):
-
-    #     if position_x is not None and position_y is not None:
-    #         self.end_coord = [position_x, position_y]
-    #     print(f"""######################## GraphicsItemSquareROI
-    #     set_end_position : start_coord {self.start_coord} - end_coord {self.end_coord} 
-    #     """)
-    #     self.scene().update()
-
-    # def shape(self):
-    #     painter_path = QtImport.QPainterPath()
-    #     painter_path.addRect(
-    #         0,
-    #         0,
-    #         (self.end_coord[0] - self.start_coord[0]),
-    #         (self.end_coord[1] - self.start_coord[1]),
-    #     )
-    #     return painter_path
 
     def paint(self, painter, option, widget):
         """
@@ -2050,23 +2032,33 @@ class GraphicsItemSquareROI(GraphicsItem):
             self.custom_pen.setWidth(2)
             self.custom_pen.setColor(QtImport.Qt.yellow)
 
-        # self.rectangle.setCoords(
-        #     0,
-        #     0,
-        #     (self.end_coord[0] - self.start_coord[0]),
-        #     (self.end_coord[1] - self.start_coord[1]),
-        # )
         painter.drawRect(
             0,
             0,
             (self.end_coord[0] - self.start_coord[0]),
             (self.end_coord[1] - self.start_coord[1]),
         )
-        # self.custom_pen.setBrush(self.secondBrush)
-        # print(f"paint: boundingrect : {self.boundingRect()}")
+
         painter.fillRect(self.boundingRect(), self.secondBrush)
 
+    def itemChange(self, change, value):
+        """
+        This should be in GraphicsItem class
+        but I didn't make it work
+        check if item has been selected
+        Ex: through the graphics_select_tool_item
+        """
+        if change == QtImport.QGraphicsItem.ItemSelectedHasChanged and self.scene():
+            self.scene().itemClickedSignal.emit(self, self.isSelected())
+        
+        return QtImport.QGraphicsItem.itemChange(self, change, value)
+    
+    def get_display_name(self):
+        """Returns items display name
 
+        :returns: str
+        """
+        return "Square ROI %d" % self.index
 
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""
