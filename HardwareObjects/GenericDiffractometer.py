@@ -1035,15 +1035,16 @@ class GenericDiffractometer(HardwareObject):
             )
             rot_matrix.shape = (2, 2)
             inv_rot_matrix = numpy.array(rot_matrix.I)
-            dx, dy = (
+            dsx, dsy = (
                 numpy.dot(numpy.array([sampx, sampy]), inv_rot_matrix)
                 * self.pixels_per_mm_x
             )
 
-            x = (phiy * self.pixels_per_mm_x) + self.beam_position[0]
+            x = dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0]
             #y = dy + (phiz * self.pixels_per_mm_y) + self.beam_position[1]
             y = (phiz * self.pixels_per_mm_y) + self.beam_position[1]
 
+            print(f"################ GENERIC DIFF motor_positions_to_screen x,y {x},{y}")
             return x, y
         else:
             raise NotImplementedError
