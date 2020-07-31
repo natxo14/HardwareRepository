@@ -1998,6 +1998,9 @@ class GraphicsItemSquareROI(GraphicsItem):
             QtImport.Qt.DiagCrossPattern,
         )
 
+        self.__start_coord_centred_position = {}
+        self.__end_coord_centred_position = {}
+
     def boundingRect(self):
         """Returns adjusted rect
 
@@ -2060,6 +2063,43 @@ class GraphicsItemSquareROI(GraphicsItem):
         """
         return "Square ROI %d" % self.index
 
+    def get_start_coord_centred_position(self):
+        """Return start coord centered position
+
+        :return: cpos
+        """
+        return self.__start_coord_centred_position
+
+    def get_end_coord_centred_position(self):
+        """Return end coord centered position
+
+        :return: cpos
+        """
+        return self.__end_coord_centred_position
+
+    def set_start_coord_centred_position(self, centred_position):
+        """Sets centred position
+
+        :param centred_position:
+        :return:
+        """
+        self.__start_coord_centred_position = centred_position
+    
+    def set_end_coord_centred_position(self, centred_position):
+        """Sets centred position
+
+        :param centred_position:
+        :return:
+        """
+        self.__end_coord_centred_position = centred_position
+    
+    def get_centred_position(self):
+        """Return centered position
+
+        :return: cpos
+        """
+        return self.__start_coord_centred_position
+    
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""
 

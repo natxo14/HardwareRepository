@@ -113,7 +113,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         if "beam_pos_x" in props.keys() and "beam_pos_y" in props.keys():
             self.beam_position = (int(props["beam_pos_x"]), int(props["beam_pos_y"]))
         else:
-            self.beam_position = (0,0)
+            self.beam_position = (0, 0)
 
         if HWR.beamline.beam is not None:
             print(f"##################ID10Diffractometer update_beam_position HWR.beamline.beam not none - {self.beam_position}")
@@ -429,3 +429,22 @@ class ID1013Diffractometer(GenericDiffractometer):
         
         print(f"##################ID10Diffractometer - calibration_done - {calibration_points}")
         self.emit("new_calibration_done", (calibration_points,))
+    
+    def get_motors_dict(self):
+        """
+        returns a dict of the form:
+        { 
+            "mot0.name": pos0
+            "mot1.name": pos1
+            ...
+        }
+        """
+
+        output = {}
+        for motor_name, motor_hwobj in self.motor_hwobj_dict.items():
+            if motor_hwobj is not None:
+                output[motor_name] = motor_hwobj.get_value()
+            else:
+                output[motor_name] = None
+
+        return output
