@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<object class="MultiplePositions">
+    <username>CDI Back Light</username>
+    <mode>absolute</mode>
+    
+    <motors>
+        <object role="blight" hwrid="/m0-mockup"></object>
+	</motors>
+    
+    <deltas>
+        <blight>4</blight>
+    </deltas>
+	
+    <positions>
+        <position>
+            <name>In</name>
+            <color>#ff0000</color>
+            <blight>17.2</blight>
+        </position>
+        <position>
+            <name>Out</name>
+            <blight>32.5</blight>
+            <color>#ffff00</color>
+        </position>
+    </positions>
+</object>
