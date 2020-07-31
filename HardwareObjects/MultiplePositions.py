@@ -25,7 +25,7 @@ This object manages the movement of several motors to predefined positions.
 </deltas>
 
 <positions>
-    <poisition>
+    <position>
         <name>      : name of a predefined position. Must be unique in the file
         <role1>val1 : position of the motor "role1" for the predefined position
                      "name"
@@ -136,7 +136,7 @@ SIGNAL
     description:    sent when cancelling changes in data:
                     reload data from file and clear data display
 
-TEMPLATE
+TEMPLATE FOR PARTICULAR CASE OF ZOOM POSITIONS CONFIG FILE:
 <equipment class="MultiplePositions">
     <username>VLM Zoom</username>
     <mode>absolute</mode>
@@ -165,14 +165,6 @@ TEMPLATE
             <beamx>100</beamx>
             <beamy>100</beamy>
         </position>
-        <position>
-            <name>12X</name>
-            <zoom>2</zoom>
-            <resox>0.0000004</resox>
-            <resoy>0.0000004</resoy>
-            <beamx>200</beamx>
-            <beamy>200</beamy>
-        </position>
     </positions>
 </equipment>"""
 
@@ -192,19 +184,22 @@ class MultiplePositions(Equipment):
     """
     CODING NOTES:
     THIS HWRObject handles access/edition/saving to multiple-positions xml file
-    THis avoids data duplication on all the bricks that need access to that xml file
 
-    It will read the file, create self.positions_dict structure, receive edit data signals
-    from bricks, send update data signals to bricks
+    In the PARTICULAR CASE that the xml file holds information about ZOOM motor's
+    positions on a diffractometer:
+        This avoids data duplication on all the bricks that need access to that xml file
 
-    Bricks will call methods to:
-    - recover/reload data to display in their guis
-    - save data in xml file
-    - edit the data
+        It will read the file, create self.zoom_positions_dict structure, receive edit data signals
+        from bricks, send update data signals to bricks
 
-    Data will be kept/updated in self.positions_dict structure
-    If data saved, then written in xml file
-    if data cancelled, then data reloaded from last saved xml file
+        Bricks will call methods to:
+        - recover/reload data to display in their guis
+        - save data in xml file
+        - edit the data
+
+        Data will be kept/updated in self.zoom_positions_dict structure
+        If data saved, then written in xml file
+        if data cancelled, then data reloaded from last saved xml file
     """
 
     def __init__(self, *args):
@@ -217,8 +212,17 @@ class MultiplePositions(Equipment):
 
         self.motor_hwobj_dict = {}
         #{ "motor_name" : motor_hwr_obj }
+
         self.positions_dict = {}
-        #{ "position_name" : { "beam_pos_x" : val, int - pixels
+        # generic case:
+        # { "position_name" : { "property0" : val0
+        #                      "property1" : val1
+        
+      
+        self.zoom_positions_dict = {}
+        # FOR PARTICULAR CASE WHEN MULTIPLE POSITIONS OF A ZOOM MOTOR
+        # if "zoom" in self.roles_positions_dict:
+        # { "position_name" : { "beam_pos_x" : val, int - pixels
         #                      "beam_pos_y" : val, int - pixels
         #                      "cal_x" : val, int - nm / pixel
         #                      "cal_y" : val, int - nm / pixel
@@ -229,11 +233,6 @@ class MultiplePositions(Equipment):
 
         self.roles = None
         self.deltas = None
-        self.roles_positions_dict = None
-        # for motors with a role
-        # { "position_name" : { "role1" : position,
-        #                      "role2" : position ...
-        #                     },
         
 
         self.multipos_file_xml_path = None
@@ -245,14 +244,16 @@ class MultiplePositions(Equipment):
             self.mode = "absolute"
         
         # init self.motor_hwobj_dict
-        for mot in self["motors"]:
-                name = mot.getProperty("name")
-                temp_motor_hwobj = self.getObjectByRole(name)
-                if temp_motor_hwobj is not None:
-                    self.motor_hwobj_dict[name] = temp_motor_hwobj
-                print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
+        # for mot in self["motors"]:
+        #     name = mot.getProperty("name")
+        #     temp_motor_hwobj = self.getObjectByRole(name)
+        #     if temp_motor_hwobj is not None:
+        #         self.motor_hwobj_dict[name] = temp_motor_hwobj
+        #     print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  name {name} motor {type(temp_motor_hwobj)} - {id(temp_motor_hwobj)}")
 
         self.roles = self.getRoles()
+        for role in self.roles:
+            print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motors  role in self.roles {role} type {type(role)}")
         
         self.deltas = {}
         try:
@@ -262,11 +263,12 @@ class MultiplePositions(Equipment):
             self.deltas = self["deltas"].getProperties()
         except BaseException:
             logging.getLogger().error("No deltas.")
+        print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.deltas {self.deltas} type {type(self.deltas)}")
 
-        self.roles_positions_dict = {}
+        #self.roles_positions_dict = {}
         # self.positions = []
         
-        #init self.positions_dict and self.roles_positions_dict
+        #init self.zoom_positions_dict and self.roles_positions_dict
         try:
             positions = self["positions"]
             print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS positions {positions} {type(positions)}")
@@ -275,37 +277,51 @@ class MultiplePositions(Equipment):
         else:
             for position in positions:
                 name = position.getProperty("name")
-                
                 if name is not None:
                     
                     motpos = position.getProperties()
-                    motroles = list(motpos.keys())
                     print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS motpos {motpos}")
-                    #print(f"motroles {motroles}")
-
-                    pos_x = int(position.getProperty("beamx", 0))
-                    pos_y = int(position.getProperty("beamy", 0))
-                    cal_x = abs(float(position.getProperty("resox", 0)) * 1e9)
-                    cal_y = abs(float(position.getProperty("resoy", 0)) * 1e9)
-                    light_val = int(position.getProperty("light", 0))
-                    zoom_val = int(position.getProperty("zoom", -1))
                     
-                    dict_elem = {"beam_pos_x" : pos_x,
-                                "beam_pos_y" : pos_y,
-                                "cal_x" : cal_x,
-                                "cal_y" : cal_y,
-                                "light" : light_val,
-                                "zoom" : zoom_val
-                    }
-
-                    self.positions_dict[name] = dict_elem
-
-                    elem = {}
+                    # check if "zoom" exist: PARTICULAR CASE
+                    zoom_val = position.getProperty("zoom")
+                    if zoom_val is not None:
+                        #create zoom position dict
+                        pos_x = int(position.getProperty("beamx", 0))
+                        pos_y = int(position.getProperty("beamy", 0))
+                        cal_x = abs(float(position.getProperty("resox", 0)) * 1e9)
+                        cal_y = abs(float(position.getProperty("resoy", 0)) * 1e9)
+                        light_val = int(position.getProperty("light", 0))
+                        zoom_val = int(position.getProperty("zoom", -1))
+                        
+                        dict_elem = {"beam_pos_x" : pos_x,
+                                    "beam_pos_y" : pos_y,
+                                    "cal_x" : cal_x,
+                                    "cal_y" : cal_y,
+                                    "light" : light_val,
+                                    "zoom" : zoom_val
+                        }
+                        self.zoom_positions_dict[name] = dict_elem
+                    
+                    
+                    # general case
+                    self.positions_dict[name] = {}
+                    # consider
+                    motor_pos = position.getProperties()
+                    
                     for role in self.roles:
-                        print(f"role {role} name {name} motpos {motpos}")
-                        elem[role] = motpos[role]
-                    self.roles_positions_dict[name] = elem
-                    print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.roles_positions_dict - {self.roles_positions_dict}")
+                        self.positions_dict[name][role] = motor_pos[role]
+
+                    for role in self.roles:
+                        temp_motor_hwobj = self.getObjectByRole(role)
+                        if temp_motor_hwobj is not None:
+                            self.motor_hwobj_dict[role] = temp_motor_hwobj
+                    
+                    # elem = {}
+                    # for role in self.roles:
+                    #     print(f"role {role} name {name} motpos {motpos}")
+                    #     elem[role] = motpos[role]
+                    #self.roles_positions_dict[name] = elem
+                    #print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.roles_positions_dict - {self.roles_positions_dict}")
                 else:
                     logging.getLogger().error("No name for position.")
 
@@ -316,7 +332,7 @@ class MultiplePositions(Equipment):
 
         if HWR.beamline.sample_view is not None:
             print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS update_beam_position HWR.beamline.beam not none")
-            self.connect(HWR.beamline.beam.sample_view,
+            self.connect(HWR.beamline.sample_view,
                         "beam_position_data_changed",
                         self.beam_position_data_changed
             )
@@ -339,31 +355,11 @@ class MultiplePositions(Equipment):
         }
         """
         zoom_pos_dict = {}
-        for pos_name in self.positions_dict:
-            zoom_pos_dict[pos_name] = self.positions_dict[pos_name]["zoom"]
+        for pos_name in self.zoom_positions_dict:
+            zoom_pos_dict[pos_name] = self.zoom_positions_dict[pos_name]["zoom"]
         
         return zoom_pos_dict
    
-    # def read_positions(self):
-    #     positions_list = []
-    #     positions = self["positions"]
-    #     try:
-    #         for position in positions:
-    #             positions_list.append(
-    #                 {
-    #                     "name": position.getProperty("name"),
-    #                     "zoom": position.getProperty("zoom"),
-    #                     "beamx": position.getProperty("beamx"),
-    #                     "beamy": position.getProperty("beamy"),
-    #                     "resox": position.getProperty("resox"),
-    #                     "resoy": position.getProperty("resoy"),
-    #                     "resox": position.getProperty("resox"),
-    #                     "resoy": position.getProperty("resoy"),
-    #                 }
-    #             )
-    #     except IndexError:
-    #         pass
-    #     return positions_list
     def beam_position_data_changed(self, new_beam_pos_data):
         """
         Slot when beam position data is edited through camera brick / QtGraphicsManager
@@ -372,11 +368,11 @@ class MultiplePositions(Equipment):
         
         current_pos_name = self.get_value()
         if current_pos_name is not None:
-            dict_elem = self.positions_dict[current_pos_name]
+            dict_elem = self.zoom_positions_dict[current_pos_name]
             dict_elem["beam_pos_x"] = new_beam_pos_data[0]
             dict_elem["beam_pos_x"] = new_beam_pos_data[1]
         
-        self.positions_dict[current_pos_name] = dict_elem
+        self.zoom_positions_dict[current_pos_name] = dict_elem
 
         self.emit(
             "beam_pos_cal_data_changed",
@@ -389,11 +385,11 @@ class MultiplePositions(Equipment):
         """
         current_pos_name = self.get_value()
         if current_pos_name is not None:
-            dict_elem = self.positions_dict[current_pos_name]
+            dict_elem = self.zoom_positions_dict[current_pos_name]
             dict_elem["cal_x"] = new_calibration_data[0]
             dict_elem["cal_y"] = new_calibration_data[1]
         
-        self.positions_dict[current_pos_name] = dict_elem
+        self.zoom_positions_dict[current_pos_name] = dict_elem
 
         self.emit(
             "beam_pos_cal_data_changed",
@@ -410,7 +406,7 @@ class MultiplePositions(Equipment):
         if data_key is None:
             return
 
-        self.positions_dict[data_key] = edited_data_elem
+        self.zoom_positions_dict[data_key] = edited_data_elem
 
         self.emit(
             "beam_pos_cal_data_changed",
@@ -456,7 +452,6 @@ class MultiplePositions(Equipment):
             role_position = position_props.get(role, None)
             
             if role_position is None:
-
                 continue
 
             motor = self.motor_hwobj_dict.get(role, None)
@@ -475,13 +470,13 @@ class MultiplePositions(Equipment):
         """
         return the dict of all the positions with all properties
         """
-        return copy.deepcopy(self.positions_dict)
+        return copy.deepcopy(self.zoom_positions_dict)
     
     def get_position(self, pos_name):
         """
         return all properties of position with name pos_name as dict
         """
-        return self.positions_dict.get(pos_name, None)
+        return self.zoom_positions_dict.get(pos_name, None)
 
     def get_current_position(self):
         """
@@ -489,7 +484,7 @@ class MultiplePositions(Equipment):
         """
         current_position = self.get_value()
 
-        return self.positions_dict.get(current_position, None)
+        return self.zoom_positions_dict.get(current_position, None)
     
     def get_value(self):
         """
@@ -501,7 +496,7 @@ class MultiplePositions(Equipment):
         if not self.is_ready():
             return None
 
-        for pos_name, position in self.roles_positions_dict.items():
+        for pos_name, position in self.positions_dict.items():
             find_position = 0
 
             for role in self.roles:
@@ -551,7 +546,7 @@ class MultiplePositions(Equipment):
             return
 
         for role, pos in list(newPositions.items()):
-            self.roles_positions_dict[name][role] = pos
+            self.positions_dict[name][role] = pos
             position.setProperty(role, pos)
 
         self.checkPosition()
@@ -624,7 +619,7 @@ class MultiplePositions(Equipment):
             }
             output_dict[pos.find('name').text] = dict_elem
             
-        self.positions_dict = copy.deepcopy(output_dict)
+        self.zoom_positions_dict = copy.deepcopy(output_dict)
 
     def save_data_to_file(self, path):
         
@@ -636,23 +631,23 @@ class MultiplePositions(Equipment):
         
         pos_list = positions.findall("position")
 
-        print(f"save_data_to_file positions_dict {self.positions_dict} ")
+        print(f"save_data_to_file positions_dict {self.zoom_positions_dict} ")
             
         for pos in pos_list:
             pos_name = pos.find('name').text
             print(f"save_data_to_file pos_name {pos_name} ")
             if pos.find('beamx') is not None:
-                pos.find('beamx').text = str(self.positions_dict[pos_name]["beam_pos_x"])
+                pos.find('beamx').text = str(self.zoom_positions_dict[pos_name]["beam_pos_x"])
             if pos.find('beamy') is not None:
-                pos.find('beamy').text = str(self.positions_dict[pos_name]["beam_pos_y"])
+                pos.find('beamy').text = str(self.zoom_positions_dict[pos_name]["beam_pos_y"])
             if pos.find('resox') is not None:
-                pos.find('resox').text = str(self.positions_dict[pos_name]['cal_x'] * 1e-9)
+                pos.find('resox').text = str(self.zoom_positions_dict[pos_name]['cal_x'] * 1e-9)
             if pos.find('resoy') is not None:
-                pos.find('resoy').text = str(self.positions_dict[pos_name]['cal_y'] * 1e-9)
+                pos.find('resoy').text = str(self.zoom_positions_dict[pos_name]['cal_y'] * 1e-9)
             if pos.find('light') is not None:
-                pos.find('light').text = str(self.positions_dict[pos_name]['light'])
+                pos.find('light').text = str(self.zoom_positions_dict[pos_name]['light'])
             if pos.find('zoom') is not None:
-                pos.find('zoom').text = str(self.positions_dict[pos_name]['zoom'])
+                pos.find('zoom').text = str(self.zoom_positions_dict[pos_name]['zoom'])
     
         xml_file_tree.write(path)
 
@@ -660,15 +655,15 @@ class MultiplePositions(Equipment):
 
     def set_position_key_value(self, name, key, value):
 
-        position = self.positions_dict.get(name, None)
+        position = self.zoom_positions_dict.get(name, None)
         if position is not None:
             position[key] = value
         
     def setPositionKeyValue(self, name, key, value):
-        from PyQt5.QtCore import pyqtRemoveInputHook
-        pyqtRemoveInputHook()
-        import pdb
-        pdb.set_trace()
+        # from PyQt5.QtCore import pyqtRemoveInputHook
+        # pyqtRemoveInputHook()
+        # import pdb
+        # pdb.set_trace()
 
         xml_tree = cElementTree.fromstring(self.xml_source())
         positions = xml_tree.find("positions")
@@ -731,60 +726,6 @@ class MultiplePositions(Equipment):
 
     def remField(self, name, key):
         pass
-
-    # def load_zoom_positions_dict(self):
-    #     """
-    #     Parse xml file and load dict :
-
-    #     { "position_name" : { "beam_pos_x" : val,int - pixels  
-    #                          "beam_pos_y" : val,int - pixels
-    #                          "cal_x" : val,int - nm
-    #                          "cal_y" : val,int - nm
-    #                          "light" : val,
-    #                         },
-    #     }
-    #     """
-    #     output_dict = {}
-    #     xml_file_tree = cElementTree.parse(self.multipos_file_xml_path)
-
-    #     xml_tree = xml_file_tree.getroot()
-    #     positions = xml_tree.find("positions")
-
-    #     pos_list = positions.findall("position")
-        
-    #     for pos in pos_list:
-            
-    #         if pos.find("beamx") is not None:
-    #             pos_x = self.from_text_to_int(pos.find("beamx").text)
-    #         else:
-    #             pos_x = 0
-    #         if pos.find("beamy") is not None:
-    #             pos_y = self.from_text_to_int(pos.find("beamy").text)
-    #         else:
-    #             pos_y = 0
-    #         if pos.find("resox") is not None:
-    #             cal_x = self.from_text_to_int(pos.find("resox").text, 1e9)
-    #         else:
-    #             cal_x = 0
-    #         if pos.find("resoy") is not None:
-    #             cal_y = self.from_text_to_int(pos.find("resoy").text, 1e9)
-    #         else:
-    #             cal_y = 0
-            
-    #         if pos.find("light") is not None:
-    #             light_val = self.from_text_to_int(pos.find("light").text, 1e9)
-    #         else:
-    #             light_val = 0
-            
-    #         dict_elem = {"beam_pos_x" : pos_x,
-    #                     "beam_pos_y" : pos_y,
-    #                     "cal_x" : cal_x,
-    #                     "cal_y" : cal_y,
-    #                     "light" : light_val,
-    #         }
-    #         output_dict[pos.find('name').text] = dict_elem
-            
-    #     self.zoom_positions_dict = copy.deepcopy(output_dict)
     
     def from_text_to_int(self, input_str, factor=1):
         if input_str is None:
