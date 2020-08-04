@@ -115,21 +115,21 @@ class QtTangoLimaVideo(AbstractVideoDevice):
         return raw_buffer, width, height
 
     def get_gain(self):
-        if self.get_cam_type() == "basler":
+        if self.get_cam_type() in ("basler", "prosilica"):
             value = self.device.video_gain
             return value
 
     def set_gain(self, gain_value):
-        if self.get_cam_type() == "basler":
+        if self.get_cam_type() in ("basler", "prosilica"):
             self.device.video_gain = gain_value
             return
 
     def get_exposure_time(self):
-        if self.get_cam_type() == "basler":
+        if self.get_cam_type() in ("basler", "prosilica"):
             return self.device.video_exposure
 
     def set_exposure_time(self, exposure_time_value):
-        if self.get_cam_type() == "basler":
+        if self.get_cam_type() in ("basler", "prosilica"):
             self.device.video_exposure = exposure_time_value
 
     def get_video_live(self):

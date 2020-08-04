@@ -1,6 +1,5 @@
 <device class="QtTangoLimaVideo">
-  <!--type>prosilica</type -->
-  <type>bayer</type>
+  <type>prosilica</type>
   <encoding>bayer_rg16</encoding>
   <tangoname>id10/LimaCCDs/cdi_camera</tangoname>
   <interval>300</interval>
