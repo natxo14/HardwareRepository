@@ -1185,8 +1185,13 @@ class QtGraphicsManager(AbstractSampleView):
                 self.stop_beam_define()
             if self.in_magnification_mode:
                 self.set_magnification_mode(False)
+            if self.in_centring_state:
+                self.self.diffractometer_hwobj.cancel_centring_method(
+                    reject=True
+                )
             self.in_move_beam_mark_state = False
             self.graphics_move_beam_mark_item.hide()
+            self.emit("escape_pressed", ())
             # self.graphics_beam_item.set_detected_beam_position(None, None)
 
         # elif key_event == "Up":
