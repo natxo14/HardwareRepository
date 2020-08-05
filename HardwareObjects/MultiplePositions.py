@@ -393,7 +393,7 @@ class MultiplePositions(Equipment):
 
         self.emit(
             "beam_pos_cal_data_changed",
-            1
+            1,
         )
 
     def edit_data(self, edited_data_elem, data_key=None, who_changed=0):
