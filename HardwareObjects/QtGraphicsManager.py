@@ -1967,7 +1967,7 @@ class QtGraphicsManager(AbstractSampleView):
         # TODO : need to cancel rest of events ??
         self.emit("infoMsg", "Click on the screen to move camera center")
         self.in_move_beam_to_clicked_point = True
-        self.set_cursor_icon(True, "Point")
+        self.set_cursor_icon(True, "calibration_point")
         
     def stop_move_beam_to_clicked_point(self):
         self.emit("infoMsg", "")
