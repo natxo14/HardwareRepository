@@ -26,7 +26,7 @@
             <exposure>0.1</exposure>
             <resox>3.378e-06</resox>
             <resoy>3.875e-06</resoy>
-            <beamx>169</beamx>
+            <beamx>200</beamx>
             <beamy>207</beamy>
         </position>
         <position>
@@ -56,9 +56,9 @@
             <zoom>3</zoom>
             <gain>10</gain>
             <exposure>0.1</exposure>
-            <resox>7.46268656716418e-07</resox>
-            <resoy>2.6315789473684215e-06</resoy>
-            <beamx>247.0</beamx>
+            <resox>7.462686567164181e-07</resox>
+            <resoy>2.631578947368422e-06</resoy>
+            <beamx>247</beamx>
             <beamy>440</beamy>
         </position>
         <position>
@@ -66,9 +66,9 @@
             <zoom>2</zoom>
             <gain>13</gain>
             <exposure>0.1</exposure>
-            <resox>6.94e-07</resox>
-            <resoy>8.060000000000006e-07</resoy>
-            <beamx>400</beamx>
+            <resox>6.890000000000001e-07</resox>
+            <resoy>1.25e-05</resoy>
+            <beamx>200</beamx>
             <beamy>340</beamy>
         </position>
         <position>
@@ -95,5 +95,5 @@
         </position>
     </positions>
 
-    <operational_modes>['visible', 'background', 'signal', 'signal3']</operational_modes>
+    <operational_modes>['visible', 'background', 'signal']</operational_modes>
 </object>

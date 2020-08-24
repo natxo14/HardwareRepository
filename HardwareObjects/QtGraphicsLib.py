@@ -2042,7 +2042,7 @@ class GraphicsItemSquareROI(GraphicsItem):
             (self.end_coord[1] - self.start_coord[1]),
         )
 
-        painter.fillRect(self.boundingRect(), self.secondBrush)
+        #painter.fillRect(self.boundingRect(), self.secondBrush)
 
     def itemChange(self, change, value):
         """
@@ -2061,7 +2061,7 @@ class GraphicsItemSquareROI(GraphicsItem):
 
         :returns: str
         """
-        return "Square ROI %d" % self.index
+        return "SquareROI %d" % self.index
 
     def get_start_coord_centred_position(self):
         """Return start coord centered position
@@ -2100,6 +2100,24 @@ class GraphicsItemSquareROI(GraphicsItem):
         """
         return self.__start_coord_centred_position
     
+    def get_centred_positions(self):
+        """Returns centered positions associated to the starting and
+           ending points of the square
+        """
+        return (
+            self.__cp_start.get_centred_position(),
+            self.__cp_end.get_centred_position(),
+        )
+    
+    def get_graphical_points(self):
+        """Returns start and end points of the line"""
+        return (self.__cp_start, self.__cp_end)
+
+    def set_graphical_points(self, cp_start, cp_end):
+        """Sets the starting and ending points of the line"""
+        self.__cp_start = cp_start
+        self.__cp_end = cp_end
+        self.update_item()
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""
 
