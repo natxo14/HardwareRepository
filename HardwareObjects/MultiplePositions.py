@@ -370,7 +370,7 @@ class MultiplePositions(Equipment):
         if current_pos_name is not None:
             dict_elem = self.zoom_positions_dict[current_pos_name]
             dict_elem["beam_pos_x"] = new_beam_pos_data[0]
-            dict_elem["beam_pos_x"] = new_beam_pos_data[1]
+            dict_elem["beam_pos_y"] = new_beam_pos_data[1]
         
         self.zoom_positions_dict[current_pos_name] = dict_elem
 
