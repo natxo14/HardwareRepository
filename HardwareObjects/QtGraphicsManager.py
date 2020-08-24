@@ -1413,17 +1413,13 @@ class QtGraphicsManager(AbstractSampleView):
         shape_type = ""
         if isinstance(shape, GraphicsLib.GraphicsItemPoint):
             shape_type = "Point"
-            self.point_count -= 1
         elif isinstance(shape, GraphicsLib.GraphicsItemLine):
             shape_type = "Line"
-            self.line_count -= 1
         elif isinstance(shape, GraphicsLib.GraphicsItemGrid):
             shape_type = "Grid"
-            self.grid_count -= 1
         elif isinstance(shape, GraphicsLib.GraphicsItemSquareROI):
             shape_type = "Square"
-            self.square_roi_count -= 1
-
+        
         self.graphics_view.graphics_scene.removeItem(shape)
         self.graphics_view.graphics_scene.update()
         self.emit("shapeDeleted", shape, shape_type)
