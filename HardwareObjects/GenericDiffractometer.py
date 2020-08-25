@@ -1454,3 +1454,19 @@ class GenericDiffractometer(HardwareObject):
 
     def save_centring_positions(self):
         pass
+
+    def get_diffractometer_status(self):
+        """
+        return dict with key/values:
+        {
+            "beam_pos_x" : val, int - pixels
+            "beam_pos_y" : val, int - pixels
+            "cal_x" : val, int - nm / pixel
+            "cal_y" : val, int - nm / pixel
+            "light" : val,
+            "zoom" : val,
+        }
+        """
+        zoom_motor = self.motor_hwobj_dict["zoom"]
+        return zoom_motor.get_current_position()
+        
