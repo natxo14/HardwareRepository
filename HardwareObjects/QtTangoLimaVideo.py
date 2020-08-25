@@ -132,6 +132,18 @@ class QtTangoLimaVideo(AbstractVideoDevice):
         if self.get_cam_type() in ("basler", "prosilica"):
             self.device.video_exposure = exposure_time_value
 
+    def get_exposure_limits(self):
+        """
+        return list with min, max expo time
+        """
+        if self.get_cam_type() in ("basler", "prosilica"):
+            limits_list = (self.device.valid_ranges)
+            #valid_ranges return list of 4 elems
+            # min_exposure, max_exposure, min_latency, max_latency
+            return limits_list[0:1]
+        else:
+            return [0, 0]
+
     def get_video_live(self):
         return self.device.video_live
 
