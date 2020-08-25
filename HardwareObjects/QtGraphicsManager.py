@@ -857,16 +857,16 @@ class QtGraphicsManager(AbstractSampleView):
             self.graphics_grid_draw_item.set_draw_mode(True)
             self.graphics_grid_draw_item.set_start_position(pos_x, pos_y)
             self.graphics_grid_draw_item.show()
-        elif self.wait_square_drawing_click:
-            print(f"""@@@@@@@@@@@@@@@@ QtGraphicsMananger wait_square_drawing_click
-            - {self.in_one_click_centering}
-            - pos_x, pos_y {pos_x} - {pos_y} """)
+        # elif self.wait_square_drawing_click:
+        #     print(f"""@@@@@@@@@@@@@@@@ QtGraphicsMananger wait_square_drawing_click
+        #     - {self.in_one_click_centering}
+        #     - pos_x, pos_y {pos_x} - {pos_y} """)
 
-            self.in_square_drawing_state = True
-            self.graphics_square_draw_item.setPos(pos_x, pos_y)
-            self.graphics_square_draw_item.set_start_position(pos_x, pos_y)
-            self.graphics_square_draw_item.set_end_position(pos_x, pos_y)
-            self.graphics_square_draw_item.show()
+        #     self.in_square_drawing_state = True
+        #     self.graphics_square_draw_item.setPos(pos_x, pos_y)
+        #     self.graphics_square_draw_item.set_start_position(pos_x, pos_y)
+        #     self.graphics_square_draw_item.set_end_position(pos_x, pos_y)
+        #     self.graphics_square_draw_item.show()
         elif self.wait_measure_distance_click:
             self.start_graphics_item(self.graphics_measure_distance_item)
             self.in_measure_distance_state = True
@@ -978,80 +978,80 @@ class QtGraphicsManager(AbstractSampleView):
             self.shape_dict[
                 self.graphics_grid_draw_item.get_display_name()
             ] = self.graphics_grid_draw_item
-        elif self.in_square_drawing_state:
-            self.set_cursor_busy(False)
-            self.wait_square_drawing_click = False
-            self.in_square_drawing_state = False
-            self.de_select_all()
-            # set square distance and size
-            start_pos = self.graphics_square_draw_item.get_start_position()
-            end_pos = (pos_x, pos_y) #self.graphics_square_draw_item.get_end_position()
-            top_left_corner = (min(start_pos[0], end_pos[0]),
-                        min(start_pos[1], end_pos[1]))
-            delta_x_to_beam = self.beam_position[0] - top_left_corner[0]
-            delta_y_to_beam = self.beam_position[1] - top_left_corner[1]
+        # elif self.in_square_drawing_state:
+        #     self.set_cursor_busy(False)
+        #     self.wait_square_drawing_click = False
+        #     self.in_square_drawing_state = False
+        #     self.de_select_all()
+        #     # set square distance and size
+        #     start_pos = self.graphics_square_draw_item.get_start_position()
+        #     end_pos = (pos_x, pos_y) #self.graphics_square_draw_item.get_end_position()
+        #     top_left_corner = (min(start_pos[0], end_pos[0]),
+        #                 min(start_pos[1], end_pos[1]))
+        #     delta_x_to_beam = self.beam_position[0] - top_left_corner[0]
+        #     delta_y_to_beam = self.beam_position[1] - top_left_corner[1]
             
-            size_pix = (abs(start_pos[0] - end_pos[0]),
-                        abs(start_pos[1] - end_pos[1]))
-            size_mm = (size_pix[0] / self.pixels_per_mm[0],
-                       size_pix[1] / self.pixels_per_mm[1])
+        #     size_pix = (abs(start_pos[0] - end_pos[0]),
+        #                 abs(start_pos[1] - end_pos[1]))
+        #     size_mm = (size_pix[0] / self.pixels_per_mm[0],
+        #                size_pix[1] / self.pixels_per_mm[1])
 
-            self.graphics_square_draw_item.set_start_position(*top_left_corner)
-            self.graphics_square_draw_item.set_end_position(
-                top_left_corner[0] + size_pix[0] + 1,
-                top_left_corner[1] + size_pix[1]
-            )
-            self.graphics_square_draw_item.prepareGeometryChange()
-            self.graphics_square_draw_item.setPos(*top_left_corner)
+        #     self.graphics_square_draw_item.set_start_position(*top_left_corner)
+        #     self.graphics_square_draw_item.set_end_position(
+        #         top_left_corner[0] + size_pix[0] + 1,
+        #         top_left_corner[1] + size_pix[1]
+        #     )
+        #     self.graphics_square_draw_item.prepareGeometryChange()
+        #     self.graphics_square_draw_item.setPos(*top_left_corner)
 
-            self.graphics_square_draw_item.set_distance_to_beam_mm(
-                (delta_x_to_beam, delta_y_to_beam),
-            )
+        #     self.graphics_square_draw_item.set_distance_to_beam_mm(
+        #         (delta_x_to_beam, delta_y_to_beam),
+        #     )
             
-            self.graphics_square_draw_item.set_item_size_mm(
-                size_mm
-            )
-            self.emit("shapeCreated", self.graphics_square_draw_item, "Square")
-            self.graphics_square_draw_item.setSelected(True)
-            #self.graphics_square_draw_item.setPos(*top_left_corner)
+        #     self.graphics_square_draw_item.set_item_size_mm(
+        #         size_mm
+        #     )
+        #     self.emit("shapeCreated", self.graphics_square_draw_item, "Square")
+        #     self.graphics_square_draw_item.setSelected(True)
+        #     #self.graphics_square_draw_item.setPos(*top_left_corner)
 
-            # self.graphics_square_draw_item.update_item()
+        #     # self.graphics_square_draw_item.update_item()
 
-            #  self.graphics_square_draw_item.hide()
+        #     #  self.graphics_square_draw_item.hide()
 
-            # tmp = GraphicsLib.GraphicsItemSquareROI(
-            #     parent=None,
-            # )
+        #     # tmp = GraphicsLib.GraphicsItemSquareROI(
+        #     #     parent=None,
+        #     # )
 
-            # self.add_shape(tmp)
+        #     # self.add_shape(tmp)
 
-            # tmp.set_start_position(*top_left_corner)
-            # tmp.set_end_position(
-            #     top_left_corner[0] + size_pix[0] + 1,
-            #     top_left_corner[1] + size_pix[1]
-            # )
-            # tmp.setPos(*top_left_corner)
+        #     # tmp.set_start_position(*top_left_corner)
+        #     # tmp.set_end_position(
+        #     #     top_left_corner[0] + size_pix[0] + 1,
+        #     #     top_left_corner[1] + size_pix[1]
+        #     # )
+        #     # tmp.setPos(*top_left_corner)
             
-            print(f"""
-            mouse_released : pos_x, pos_y {pos_x}, {pos_y}
-            top left corner : {top_left_corner}
-            in_square_drawing_state 
-            pos Returns the position of the item in parent coordinates {self.graphics_square_draw_item.pos()}
-            scene pos {self.graphics_square_draw_item.scenePos()}
-            rect {self.graphics_square_draw_item.boundingRect()}
-            start_position {self.graphics_square_draw_item.get_start_position()}
-            end_position {self.graphics_square_draw_item.get_end_position()}
-            """)
+        #     print(f"""
+        #     mouse_released : pos_x, pos_y {pos_x}, {pos_y}
+        #     top left corner : {top_left_corner}
+        #     in_square_drawing_state 
+        #     pos Returns the position of the item in parent coordinates {self.graphics_square_draw_item.pos()}
+        #     scene pos {self.graphics_square_draw_item.scenePos()}
+        #     rect {self.graphics_square_draw_item.boundingRect()}
+        #     start_position {self.graphics_square_draw_item.get_start_position()}
+        #     end_position {self.graphics_square_draw_item.get_end_position()}
+        #     """)
 
-            for shape in self.get_shapes():
-                print(f"""
-                type(shape) {type(shape)}
-                scene {shape.scene()} - type parent {type(shape.scene())}
-                point : pos() {shape.pos()}
-                scene pos {shape.scenePos()}
-                rect {shape.boundingRect()}
-                get_start_position {shape.get_start_position()}
-                """)
+        #     for shape in self.get_shapes():
+        #         print(f"""
+        #         type(shape) {type(shape)}
+        #         scene {shape.scene()} - type parent {type(shape.scene())}
+        #         point : pos() {shape.pos()}
+        #         scene pos {shape.scenePos()}
+        #         rect {shape.boundingRect()}
+        #         get_start_position {shape.get_start_position()}
+        #         """)
             
         elif self.in_beam_define_state:
             self.stop_beam_define()
@@ -1097,15 +1097,15 @@ class QtGraphicsManager(AbstractSampleView):
                 self.graphics_grid_draw_item.set_end_position(
                     scene_point.x(), scene_point.y()
                 )
-        elif self.in_square_drawing_state:
-            # start_pos = self.graphics_square_draw_item.get_start_position()
-            # self.graphics_square_draw_item.set_size(
-            #     abs(start_pos[0] - scene_point.x()),
-            #     abs(start_pos[1] - scene_point.y()),
-            # )
-            self.graphics_square_draw_item.set_end_position(
-                    scene_point.x(), scene_point.y()
-            )
+        # elif self.in_square_drawing_state:
+        #     # start_pos = self.graphics_square_draw_item.get_start_position()
+        #     # self.graphics_square_draw_item.set_size(
+        #     #     abs(start_pos[0] - scene_point.x()),
+        #     #     abs(start_pos[1] - scene_point.y()),
+        #     # )
+        #     self.graphics_square_draw_item.set_end_position(
+        #             scene_point.x(), scene_point.y()
+        #     )
 
         elif self.in_measure_distance_state:
             self.graphics_measure_distance_item.set_coord(self.mouse_position)
@@ -1392,6 +1392,10 @@ class QtGraphicsManager(AbstractSampleView):
             if emit:
                 self.emit("shapeCreated", shape, "Line")
             self.emit("infoMsg", "%s created" % shape.get_full_name())
+        elif isinstance(shape, GraphicsLib.GraphicsItemSquareROI):
+            if emit:
+                self.emit("shapeCreated", shape, "Square")
+            self.emit("infoMsg", "%s created" % shape.get_full_name())
 
         shape.set_tool_tip()
         shape.setSelected(True)
@@ -1410,6 +1414,12 @@ class QtGraphicsManager(AbstractSampleView):
                     if shape in s.get_graphical_points():
                         self.delete_shape(s)
                         break
+
+                if isinstance(s, GraphicsLib.GraphicsItemSquareROI):
+                    if shape in s.get_graphical_points():
+                        self.delete_shape(s)
+                        break
+
         shape_type = ""
         if isinstance(shape, GraphicsLib.GraphicsItemPoint):
             shape_type = "Point"
@@ -2010,6 +2020,25 @@ class QtGraphicsManager(AbstractSampleView):
             )
             logging.getLogger("GUI").error(msg)
         return line
+
+    def create_square(self, start_point=None, end_point=None, emit=True):
+        """Creates square zone if two centring points selected
+        """
+        square = None
+        selected_points = (start_point, end_point)
+
+        if None in selected_points:
+            selected_points = self.get_selected_points()
+        if len(selected_points) > 1:
+            square = GraphicsLib.GraphicsItemSquareROI(selected_points[0], selected_points[1])
+            self.add_shape(square, emit)
+        else:
+            msg = (
+                "Please select two points (with same kappa and phi) "
+                + "to create a square zone"
+            )
+            logging.getLogger("GUI").error(msg)
+        return square
 
     def create_auto_line(self, cpos=None):
         """Creates a automatic helical line

@@ -1980,26 +1980,93 @@ class GraphicsItemText(GraphicsItem):
 
 class GraphicsItemSquareROI(GraphicsItem):
     """Draws a rectangle"""
-    def __init__(self, parent):
+    # def __init__(self, parent):
+    #     """
+    #     Init
+    #     :param parent:
+    #     """
+    #     GraphicsItem.__init__(self, parent)
+
+    #     self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
+        
+    #     self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
+    #     self.custom_pen.setWidth(2)
+    #     self.rectangle = QtImport.QRectF()
+
+    #     self.secondBrush = QtImport.QBrush(
+    #         QtImport.Qt.green,
+    #         QtImport.Qt.DiagCrossPattern,
+    #     )
+
+    #     self.__start_coord_centred_position = {}
+    #     self.__end_coord_centred_position = {}
+
+    def __init__(self, cp_start, cp_end):
         """
         Init
-        :param parent:
+        :param cp_start: start graphical point
+        :param cp_end: end graphical point
         """
-        GraphicsItem.__init__(self, parent)
+        GraphicsItem.__init__(self)
 
         self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
-        
-        self.custom_pen = QtImport.QPen(DASH_DOT_LINE_STYLE)
-        self.custom_pen.setWidth(2)
-        self.rectangle = QtImport.QRectF()
+        self.__cp_start = cp_start
+        self.__cp_end = cp_end
+        self.__num_images = 0
+        self.__display_overlay = False
+        self.__fill_alpha = 120
 
-        self.secondBrush = QtImport.QBrush(
-            QtImport.Qt.green,
-            QtImport.Qt.DiagCrossPattern,
+        brush_color = QtImport.QColor(70, 70, 165)
+        brush_color.setAlpha(5)
+        self.custom_brush.setColor(brush_color)
+
+        self.setToolTip(self.get_full_name())
+
+        # calculate graphics positions
+
+        (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
+        (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
+        self.mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
+        self.mid_y = min(start_cp_y, end_cp_y) + abs((start_cp_y - end_cp_y) / 2.0)
+       
+        self.start_coord[0] = min(start_cp_x, end_cp_x)
+        self.start_coord[1] = min(start_cp_y, end_cp_y)
+
+        self.end_coord[0] = self.start_coord[0] + abs(start_cp_x - end_cp_x)
+        self.end_coord[1] = min(start_cp_y, end_cp_y) + abs(start_cp_y - end_cp_y)
+
+        print(f"self.start_coord {self.start_coord}, self.end_coord {self.end_coord} ")
+
+    def set_fill_alpha(self, value):
+        """Sets the transparency level"""
+        self.__fill_alpha = value
+        brush_color = QtImport.QColor(70, 70, 165, self.__fill_alpha)
+        self.custom_brush.setColor(brush_color)
+    
+    def set_display_overlay(self, state):
+        """Enables overlay"""
+        self.__display_overlay = state
+    
+    def get_display_name(self):
+        """Returns square name displayed on the screen"""
+        return "Square %d" % self.index
+    
+    def get_full_name(self):
+        """Returns square name displayed in the square listwidget"""
+        start_cpos = self.__cp_start.get_centred_position()
+        end_cpos = self.__cp_end.get_centred_position()
+        full_name = "Square (points: %d, %d)" % (
+            self.__cp_start.index,
+            self.__cp_end.index,
         )
-
-        self.__start_coord_centred_position = {}
-        self.__end_coord_centred_position = {}
+        try:
+            full_name += "kappa: %.2f phi: %.2f" % (
+                start_cpos.kappa,
+                start_cpos.kappa_phi,
+            )
+        except BaseException:
+            pass
+        return full_name
 
     def boundingRect(self):
         """Returns adjusted rect
@@ -2035,12 +2102,26 @@ class GraphicsItemSquareROI(GraphicsItem):
             self.custom_pen.setWidth(2)
             self.custom_pen.setColor(QtImport.Qt.yellow)
 
+        # painter.drawRect(
+        #     0,
+        #     0,
+        #     (self.end_coord[0] - self.start_coord[0]),
+        #     (self.end_coord[1] - self.start_coord[1]),
+        # )
+
         painter.drawRect(
-            0,
-            0,
+            self.start_coord[0],
+            self.start_coord[1],
             (self.end_coord[0] - self.start_coord[0]),
             (self.end_coord[1] - self.start_coord[1]),
         )
+
+        info_txt = "Square %d (%d->%d)" % (
+            self.index,
+            self.__cp_start.index,
+            self.__cp_end.index,
+        )
+        painter.drawText(self.mid_x, self.mid_y, info_txt)
 
         #painter.fillRect(self.boundingRect(), self.secondBrush)
 
@@ -2055,50 +2136,43 @@ class GraphicsItemSquareROI(GraphicsItem):
             self.scene().itemClickedSignal.emit(self, self.isSelected())
         
         return QtImport.QGraphicsItem.itemChange(self, change, value)
+
+    # def get_start_coord_centred_position(self):
+    #     """Return start coord centered position
+
+    #     :return: cpos
+    #     """
+    #     return self.__start_coord_centred_position
+
+    # def get_end_coord_centred_position(self):
+    #     """Return end coord centered position
+
+    #     :return: cpos
+    #     """
+    #     return self.__end_coord_centred_position
+
+    # def set_start_coord_centred_position(self, centred_position):
+    #     """Sets centred position
+
+    #     :param centred_position:
+    #     :return:
+    #     """
+    #     self.__start_coord_centred_position = centred_position
     
-    def get_display_name(self):
-        """Returns items display name
+    # def set_end_coord_centred_position(self, centred_position):
+    #     """Sets centred position
 
-        :returns: str
-        """
-        return "SquareROI %d" % self.index
-
-    def get_start_coord_centred_position(self):
-        """Return start coord centered position
-
-        :return: cpos
-        """
-        return self.__start_coord_centred_position
-
-    def get_end_coord_centred_position(self):
-        """Return end coord centered position
-
-        :return: cpos
-        """
-        return self.__end_coord_centred_position
-
-    def set_start_coord_centred_position(self, centred_position):
-        """Sets centred position
-
-        :param centred_position:
-        :return:
-        """
-        self.__start_coord_centred_position = centred_position
+    #     :param centred_position:
+    #     :return:
+    #     """
+    #     self.__end_coord_centred_position = centred_position
     
-    def set_end_coord_centred_position(self, centred_position):
-        """Sets centred position
+    # def get_centred_position(self):
+    #     """Return centered position
 
-        :param centred_position:
-        :return:
-        """
-        self.__end_coord_centred_position = centred_position
-    
-    def get_centred_position(self):
-        """Return centered position
-
-        :return: cpos
-        """
-        return self.__start_coord_centred_position
+    #     :return: cpos
+    #     """
+    #     return self.__start_coord_centred_position
     
     def get_centred_positions(self):
         """Returns centered positions associated to the starting and
@@ -2118,6 +2192,7 @@ class GraphicsItemSquareROI(GraphicsItem):
         self.__cp_start = cp_start
         self.__cp_end = cp_end
         self.update_item()
+
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""
 
