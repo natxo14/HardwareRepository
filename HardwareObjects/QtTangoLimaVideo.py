@@ -130,8 +130,12 @@ class QtTangoLimaVideo(AbstractVideoDevice):
 
     def set_exposure_time(self, exposure_time_value):
         if self.get_cam_type() in ("basler", "prosilica"):
+            self.device.video_live = False
+            print(f"QTTANGOLIMAVIDEO ^^^^^^^^^^^^^^^^^^^^^^^^ set_exposure_time ; {exposure_time_value}")
             self.device.video_exposure = exposure_time_value
-
+            self.device.video_live = True
+            print(f"QTTANGOLIMAVIDEO ^^^^^^^^^^^^^^^^^^^^^^^^ set_exposure_time ; {exposure_time_value}")
+            
     def get_exposure_limits(self):
         """
         return list with min, max expo time
@@ -140,7 +144,8 @@ class QtTangoLimaVideo(AbstractVideoDevice):
             limits_list = (self.device.valid_ranges)
             #valid_ranges return list of 4 elems
             # min_exposure, max_exposure, min_latency, max_latency
-            return limits_list[0:1]
+            print(f"QTTANGOLIMAVIDEO ^^^^^^^^^^^^^^^^^^^^^^^^ limits ; {limits_list}")
+            return limits_list[0:2]
         else:
             return [0, 0]
 
