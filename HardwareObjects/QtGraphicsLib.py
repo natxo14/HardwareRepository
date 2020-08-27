@@ -88,6 +88,7 @@ class GraphicsItem(QtImport.QGraphicsItem):
         self.beam_is_rectangle = False
         self.rect = QtImport.QRectF(0, 0, 0, 0)
         self.display_beam_shape = None
+        self.operational_mode = None
 
         self.setPos(position_x, position_y)
 
@@ -286,6 +287,11 @@ class GraphicsItem(QtImport.QGraphicsItem):
         """Defines custom pen color"""
         self.custom_pen_color = color
 
+    def set_operation_mode(self, op_mode):
+        self.operational_mode = op_mode
+
+    def get_operation_mode(self):
+        return self.operational_mode
 
 class GraphicsItemBeam(GraphicsItem):
     """Beam base class
@@ -693,6 +699,10 @@ class GraphicsItemLine(GraphicsItem):
         self.__num_images = 0
         self.__display_overlay = False
         self.__fill_alpha = 120
+        self.top_left_corner = [0, 0]
+        self.bottom_right_corner = [0, 0]
+        self.start_drawing_coord = [0, 0]
+        self.end_drawing_coord = [0, 0]
 
         brush_color = QtImport.QColor(70, 70, 165)
         brush_color.setAlpha(5)
@@ -700,6 +710,31 @@ class GraphicsItemLine(GraphicsItem):
 
         self.setToolTip(self.get_full_name())
 
+        (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
+        (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
+
+        self.top_left_corner[0] = min(start_cp_x, end_cp_x)
+        self.top_left_corner[1] = min(start_cp_y, end_cp_y)
+
+        self.bottom_right_corner[0] = self.top_left_corner[0] + abs(start_cp_x - end_cp_x)
+        self.bottom_right_corner[1] = self.top_left_corner[1] + abs(start_cp_y - end_cp_y)
+
+        self.mid_x = abs((start_cp_x - end_cp_x) / 2.0)
+        self.mid_y = abs((start_cp_y - end_cp_y) / 2.0)
+
+        self.setPos(self.top_left_corner[0], self.top_left_corner[1])
+
+        self.start_drawing_coord[0] = self.top_left_corner[0]
+        self.end_drawing_coord[0] = self.bottom_right_corner[0]
+
+        if start_cp_x <= end_cp_x:
+            self.start_drawing_coord[1] = start_cp_y - self.top_left_corner[1]
+            self.end_drawing_coord[1] = end_cp_y - self.top_left_corner[1]
+        else:
+            self.start_drawing_coord[1] = end_cp_y - self.top_left_corner[1]
+            self.end_drawing_coord[1] = start_cp_y - self.top_left_corner[1]
+
+        
     def set_fill_alpha(self, value):
         """Sets the transparency level"""
         self.__fill_alpha = value
@@ -736,8 +771,9 @@ class GraphicsItemLine(GraphicsItem):
         painter.setBrush(self.custom_brush)
         (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
         (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
-        mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
-        mid_y = min(start_cp_y, end_cp_y) + abs((start_cp_y - end_cp_y) / 2.0)
+
+        # mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
+        # mid_y = min(start_cp_y, end_cp_y) + abs((start_cp_y - end_cp_y) / 2.0)
 
         if self.isSelected() and self.__num_images and self.__display_overlay:
             painter.setPen(QtImport.Qt.NoPen)
@@ -764,7 +800,7 @@ class GraphicsItemLine(GraphicsItem):
         if self.isSelected():
             self.custom_pen.setColor(SELECTED_COLOR)
             info_txt += " selected"
-            painter.drawText(mid_x + 5, mid_y, info_txt)
+            painter.drawText(self.mid_x + 5, self.mid_y, info_txt)
             if self.__num_images:
                 info_txt += " (%d images)" % self.__num_images
         else:
@@ -773,8 +809,14 @@ class GraphicsItemLine(GraphicsItem):
         self.custom_pen.setWidth(2)
         painter.setPen(self.custom_pen)
 
-        painter.drawLine(start_cp_x, start_cp_y, end_cp_x, end_cp_y)
-        painter.drawText(mid_x + 5, mid_y, info_txt)
+        # painter.drawLine(start_cp_x, start_cp_y, end_cp_x, end_cp_y)
+        painter.drawLine(
+            0,
+            self.start_drawing_coord[1],
+            abs(start_cp_x - end_cp_x),
+            self.end_drawing_coord[1],
+        )
+        painter.drawText(self.mid_x + 5, self.mid_y, info_txt)
 
     def set_num_images(self, num_images):
         """Sets the number of collection frames"""
@@ -2026,15 +2068,18 @@ class GraphicsItemSquareROI(GraphicsItem):
 
         (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
         (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
-        self.mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
-        self.mid_y = min(start_cp_y, end_cp_y) + abs((start_cp_y - end_cp_y) / 2.0)
-       
+        # self.mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
+        # self.mid_y = min(start_cp_y, end_cp_y) + abs((start_cp_y - end_cp_y) / 2.0)
+        self.mid_x = abs((start_cp_x - end_cp_x) / 2.0)
+        self.mid_y = abs((start_cp_y - end_cp_y) / 2.0)
+        
         self.start_coord[0] = min(start_cp_x, end_cp_x)
         self.start_coord[1] = min(start_cp_y, end_cp_y)
 
         self.end_coord[0] = self.start_coord[0] + abs(start_cp_x - end_cp_x)
         self.end_coord[1] = min(start_cp_y, end_cp_y) + abs(start_cp_y - end_cp_y)
 
+        self.setPos(self.start_coord[0], self.start_coord[1])
         print(f"self.start_coord {self.start_coord}, self.end_coord {self.end_coord} ")
 
     def set_fill_alpha(self, value):
@@ -2102,19 +2147,19 @@ class GraphicsItemSquareROI(GraphicsItem):
             self.custom_pen.setWidth(2)
             self.custom_pen.setColor(QtImport.Qt.yellow)
 
-        # painter.drawRect(
-        #     0,
-        #     0,
-        #     (self.end_coord[0] - self.start_coord[0]),
-        #     (self.end_coord[1] - self.start_coord[1]),
-        # )
-
         painter.drawRect(
-            self.start_coord[0],
-            self.start_coord[1],
+            0,
+            0,
             (self.end_coord[0] - self.start_coord[0]),
             (self.end_coord[1] - self.start_coord[1]),
         )
+
+        # painter.drawRect(
+        #     self.start_coord[0],
+        #     self.start_coord[1],
+        #     (self.end_coord[0] - self.start_coord[0]),
+        #     (self.end_coord[1] - self.start_coord[1]),
+        # )
 
         info_txt = "Square %d (%d->%d)" % (
             self.index,
