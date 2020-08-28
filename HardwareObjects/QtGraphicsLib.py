@@ -77,6 +77,7 @@ class GraphicsItem(QtImport.QGraphicsItem):
 
         QtImport.QGraphicsItem.__init__(self)
         self.index = None
+        self.global_index = None
         self.base_color = None
         self.used_count = 0
         self.pixels_per_mm = [0, 0]
@@ -766,6 +767,20 @@ class GraphicsItemLine(GraphicsItem):
             pass
         return full_name
 
+    def boundingRect(self):
+        """Returns adjusted rect
+        :returns: QRect
+        """
+        width = (self.bottom_right_corner[0] - self.top_left_corner[0])
+        height = (self.bottom_right_corner[1] - self.top_left_corner[1])
+        
+        return QtImport.QRectF(
+            0,
+            0,
+            width,
+            height,
+        )
+
     def paint(self, painter, option, widget):
         """Main paint method"""
         painter.setBrush(self.custom_brush)
@@ -846,6 +861,26 @@ class GraphicsItemLine(GraphicsItem):
             self.__cp_end.get_centred_position(),
         )
 
+    def get_pixels_positions(self):
+        """Returns pixel positions in scene associated to the starting and
+           ending points of the line
+        """
+        return (
+            self.__cp_start.get_start_position(),
+            self.__cp_end.get_start_position(),
+        )
+
+    def itemChange(self, change, value):
+        """
+        This should be in GraphicsItem class
+        but I didn't make it work
+        check if item has been selected
+        Ex: through the graphics_select_tool_item
+        """
+        if change == QtImport.QGraphicsItem.ItemSelectedHasChanged and self.scene():
+            self.scene().itemClickedSignal.emit(self, self.isSelected())
+        
+        return QtImport.QGraphicsItem.itemChange(self, change, value)
 
 class GraphicsItemGrid(GraphicsItem):
 
@@ -2181,43 +2216,6 @@ class GraphicsItemSquareROI(GraphicsItem):
             self.scene().itemClickedSignal.emit(self, self.isSelected())
         
         return QtImport.QGraphicsItem.itemChange(self, change, value)
-
-    # def get_start_coord_centred_position(self):
-    #     """Return start coord centered position
-
-    #     :return: cpos
-    #     """
-    #     return self.__start_coord_centred_position
-
-    # def get_end_coord_centred_position(self):
-    #     """Return end coord centered position
-
-    #     :return: cpos
-    #     """
-    #     return self.__end_coord_centred_position
-
-    # def set_start_coord_centred_position(self, centred_position):
-    #     """Sets centred position
-
-    #     :param centred_position:
-    #     :return:
-    #     """
-    #     self.__start_coord_centred_position = centred_position
-    
-    # def set_end_coord_centred_position(self, centred_position):
-    #     """Sets centred position
-
-    #     :param centred_position:
-    #     :return:
-    #     """
-    #     self.__end_coord_centred_position = centred_position
-    
-    # def get_centred_position(self):
-    #     """Return centered position
-
-    #     :return: cpos
-    #     """
-    #     return self.__start_coord_centred_position
     
     def get_centred_positions(self):
         """Returns centered positions associated to the starting and
@@ -2226,6 +2224,15 @@ class GraphicsItemSquareROI(GraphicsItem):
         return (
             self.__cp_start.get_centred_position(),
             self.__cp_end.get_centred_position(),
+        )
+    
+    def get_pixels_positions(self):
+        """Returns pixel positions in scene associated to the starting and
+           ending points of the line
+        """
+        return (
+            self.__cp_start.get_start_position(),
+            self.__cp_end.get_start_position(),
         )
     
     def get_graphical_points(self):
