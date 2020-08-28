@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
 <object class="MultiplePositions">
     <username>Optic Zoom</username>
     <amplitude>60</amplitude>
@@ -6,13 +7,13 @@
         <motor>
             <name>zoom</name>
         </motor>
-        
+        <!--motor>
+            <name>light</name>
+        </motor-->
     </motors>
 	
     <object href="/turretID13EH3" role="zoom" />
     
-    
-
 	<deltas>
         <zoom>0.1</zoom>
         <light>2000</light>
@@ -72,6 +73,6 @@
             <resoy>5.25581395349e-06</resoy>
         </position>
     </positions>
-<operational_modes>['toto', 'bgk']</operational_modes>
+<operational_modes>['signal', 'background', 'test']</operational_modes>
 
 </object>

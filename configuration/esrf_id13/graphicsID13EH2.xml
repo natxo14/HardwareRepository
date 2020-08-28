@@ -1,7 +1,7 @@
 <object class="QtGraphicsManager">
-   <object href="/id13-diffractometer" role="diffractometer"/>
+   <object href="/diffractometerID13EH2" role="diffractometer"/>
    <object href="/beam-info" role="beam_info"/>
-   <object href="/id13Camera" role="camera"/>
+   <object href="/cameraID13EH2" role="camera"/>
 
    <!-- Enable move sample buttons 
         TODO: implement this feature

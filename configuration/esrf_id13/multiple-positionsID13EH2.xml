@@ -13,8 +13,6 @@
     </motors>
 	
     <object href="/turret" role="zoom"/>
-    <!--object role="light" href="/volpi"></object-->
-    <!--object role="exposure" href="/proexp"></object-->
 
 	<deltas>
         <zoom>0.1</zoom>
@@ -75,5 +73,6 @@
             <resoy>5.25581395349e-06</resoy>
         </position>
     </positions>
+<operational_modes>['signal', 'background', 'test']</operational_modes>
 
 </object>
