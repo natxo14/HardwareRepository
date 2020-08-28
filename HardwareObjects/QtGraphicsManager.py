@@ -123,6 +123,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.line_count = 0
         self.grid_count = 0
         self.square_roi_count = 0
+        self.global_graphic_item_count = 0
         self.shape_dict = {}
         self.temp_animation_dir = None
         self.omega_move_delta = None
@@ -1379,6 +1380,9 @@ class QtGraphicsManager(AbstractSampleView):
             self.square_roi_count += 1
             shape.index = self.square_roi_count
 
+        self.global_graphic_item_count += 1
+        shape.global_index = self.global_graphic_item_count
+
         self.shape_dict[shape.get_display_name()] = shape
         #self._shapes.add_shape(shape.get_display_name(), shape)
         self.graphics_view.graphics_scene.addItem(shape)
@@ -1451,6 +1455,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.line_count = 0
         self.grid_count = 0
         self.square_roi_count = 0
+        self.global_graphic_item_count = 0
         for shape in self.get_shapes():
             if shape == self.auto_grid:
                 shape.hide()
@@ -1603,6 +1608,29 @@ class QtGraphicsManager(AbstractSampleView):
             logging.getLogger("user_level_log").error(
                 "Unable to save snapshot: %s" % filename
             )
+    def save_raw_scene_snapshot(self, filename):
+        """Method to save a 'raw' snapshot : graphics items hided
+        :param file_name: file name with extension
+        """
+
+        # hide all visible graphic items
+        visible_shapes_list = []
+        for shape in self.graphics_view.graphics_scene.items():
+            if type(shape) in (
+                GraphicsLib.GraphicsItemPoint,
+                GraphicsLib.GraphicsItemLine,
+                GraphicsLib.GraphicsItemGrid,
+                GraphicsLib.GraphicsItemSquareROI,
+            ):
+                if shape.isVisible():
+                    visible_shapes_list.append(shape)
+                    shape.hide()
+        # take snapshot
+        self.save_scene_snapshot(filename)
+
+        # show graphic items 
+        for shape in visible_shapes_list:
+            shape.show()
 
     def save_scene_animation(self, filename, duration_sec=1):
         """Saves animated gif of a rotating sample"""
@@ -1978,7 +2006,7 @@ class QtGraphicsManager(AbstractSampleView):
         # TODO : need to cancel rest of events ??
         self.emit("infoMsg", "Click on the screen to move camera center")
         self.in_move_beam_to_clicked_point = True
-        self.set_cursor_icon(True, "beam2")
+        self.set_cursor_icon(True, "cross_target")
         
     def stop_move_beam_to_clicked_point(self):
         self.emit("infoMsg", "")
