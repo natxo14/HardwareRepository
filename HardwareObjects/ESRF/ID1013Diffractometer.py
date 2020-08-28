@@ -433,17 +433,17 @@ class ID1013Diffractometer(GenericDiffractometer):
     def get_motors_dict(self):
         """
         returns a dict of the form:
+        keys are motors' <actuators_name> in xml file
         { 
             "mot0.name": pos0
             "mot1.name": pos1
             ...
         }
         """
-
         output = {}
         for motor_name, motor_hwobj in self.motor_hwobj_dict.items():
             if motor_hwobj is not None:
-                output[motor_name] = motor_hwobj.get_value()
+                output[motor_hwobj.name()] = motor_hwobj.get_value()
             else:
                 output[motor_name] = None
 
@@ -459,6 +459,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             "cal_y" : val, int - nm / pixel
             "light" : val,
             "zoom" : val,
+            "zoom_tag" : tag_val (str)
         }
         """
         zoom_motor = self.motor_hwobj_dict["zoom"]

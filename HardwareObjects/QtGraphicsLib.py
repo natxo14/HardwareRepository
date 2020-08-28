@@ -637,7 +637,16 @@ class GraphicsItemPoint(GraphicsItem):
         
         return QtImport.QGraphicsItem.itemChange(self, change, value)
         
-    
+    def get_point_info(self):
+        output = {}
+        tmp = {}
+        output["index_global"] = self.global_index
+        output["pixel_x"] = round(self.start_coord[0])
+        output["pixel_y"] = round(self.start_coord[1])
+
+        output[self.get_display_name().replace(" ", "_")] = tmp
+        
+        return(output)
 class GraphicsItemCalibrationPoint(GraphicsItemPoint):
     """
     Calibration point: feedback given for calibration
@@ -866,8 +875,8 @@ class GraphicsItemLine(GraphicsItem):
            ending points of the line
         """
         return (
-            self.__cp_start.get_start_position(),
-            self.__cp_end.get_start_position(),
+            round(self.__cp_start.get_start_position()),
+            round(self.__cp_end.get_start_position()),
         )
 
     def itemChange(self, change, value):
@@ -881,6 +890,35 @@ class GraphicsItemLine(GraphicsItem):
             self.scene().itemClickedSignal.emit(self, self.isSelected())
         
         return QtImport.QGraphicsItem.itemChange(self, change, value)
+
+    def get_start_point_info(self):
+        """
+        return a dict with information concerning start point
+        """
+        output = {}
+        output["index_global"] = self.__cp_start.global_index
+        output["pixel_x"] = round(self.__cp_start.get_start_position()[0])
+        output["pixel_y"] = round(self.__cp_start.get_start_position()[1])
+
+        return(output)
+
+    def get_end_point_info(self):
+        """
+        return a dict with information concerning end point
+        """
+        output = {}
+        output["index_global"] = self.__cp_end.global_index
+        output["pixel_x"] = round(self.__cp_end.get_start_position()[0])
+        output["pixel_y"] = round(self.__cp_end.get_start_position()[1])
+        
+        return(output)
+
+    def get_points_info(self):
+        output = {}
+        output[self.__cp_start.get_display_name().replace(" ", "_")] = self.get_start_point_info()
+        output[self.__cp_end.get_display_name().replace(" ", "_")] = self.get_end_point_info()
+
+        return(output)
 
 class GraphicsItemGrid(GraphicsItem):
 
@@ -2244,6 +2282,35 @@ class GraphicsItemSquareROI(GraphicsItem):
         self.__cp_start = cp_start
         self.__cp_end = cp_end
         self.update_item()
+
+    def get_start_point_info(self):
+        """
+        return a dict with information concerning start point
+        """
+        output = {}
+        output["index_global"] = self.__cp_start.global_index
+        output["pixel_x"] = self.__cp_start.get_start_position()[0]
+        output["pixel_y"] = self.__cp_start.get_start_position()[1]
+
+        return(output)
+
+    def get_end_point_info(self):
+        """
+        return a dict with information concerning end point
+        """
+        output = {}
+        output["index_global"] = self.__cp_end.global_index
+        output["pixel_x"] = self.__cp_end.get_start_position()[0]
+        output["pixel_y"] = self.__cp_end.get_start_position()[1]
+
+        return(output)
+
+    def get_points_info(self):
+        output = {}
+        output[self.__cp_start.get_display_name().replace(" ", "_")] = self.get_start_point_info()
+        output[self.__cp_end.get_display_name().replace(" ", "_")] = self.get_end_point_info()
+
+        return(output)
 
 class GraphicsSelectTool(GraphicsItem):
     """Draws a rectangle and selects centring points"""

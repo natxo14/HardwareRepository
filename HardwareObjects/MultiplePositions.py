@@ -228,6 +228,7 @@ class MultiplePositions(Equipment):
         #                      "cal_y" : val, int - nm / pixel
         #                      "light" : val,
         #                      "zoom" : val,
+        #                      "zoom_tag" : position_name
         #                     },
         #}
 
@@ -298,7 +299,8 @@ class MultiplePositions(Equipment):
                                     "cal_x" : cal_x,
                                     "cal_y" : cal_y,
                                     "light" : light_val,
-                                    "zoom" : zoom_val
+                                    "zoom" : zoom_val,
+                                    "zoom_tag" : name
                         }
                         self.zoom_positions_dict[name] = dict_elem
                     

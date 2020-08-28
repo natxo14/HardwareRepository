@@ -556,6 +556,11 @@ class QtGraphicsManager(AbstractSampleView):
         else:
             self.display_info_msg(msg, 10, 500, False)
             
+    def get_image_size(self):
+        return (
+            self.graphics_camera_frame.pixmap().size().width(),
+            self.graphics_camera_frame.pixmap().size().height()
+        )
 
     def beam_position_changed(self, position):
         """Method called when beam position on the screen changed.
