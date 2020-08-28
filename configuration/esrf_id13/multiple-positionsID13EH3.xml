@@ -72,5 +72,6 @@
             <resoy>5.25581395349e-06</resoy>
         </position>
     </positions>
+<operational_modes>['toto', 'bgk']</operational_modes>
 
 </object>
