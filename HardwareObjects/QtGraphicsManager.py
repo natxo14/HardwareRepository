@@ -1821,7 +1821,7 @@ class QtGraphicsManager(AbstractSampleView):
 
         :emits: infoMsg as str
         """
-        self.set_cursor_busy(True)
+        # self.set_cursor_busy(True)
         self.emit("infoMsg", "Move beam mark")
         self.in_move_beam_mark_state = True
         self.start_graphics_item(
@@ -1903,7 +1903,7 @@ class QtGraphicsManager(AbstractSampleView):
 
         :emits: infoMsg as str
         """
-        self.set_cursor_busy(False)
+        # self.set_cursor_busy(False)
         self.in_move_beam_mark_state = False
         self.graphics_move_beam_mark_item.hide()
         self.graphics_view.graphics_scene.update()
@@ -1989,13 +1989,13 @@ class QtGraphicsManager(AbstractSampleView):
 
     def start_one_click_centring(self):
         print(f"QtGraphicsManager start_one_click_centring(self):")
-        self.set_cursor_busy(True)
+        #self.set_cursor_busy(True)
         self.emit("infoMsg", "Click on the screen to create centring points")
         self.in_one_click_centering = True
         self.graphics_centring_lines_item.setVisible(True)
         
     def stop_one_click_centring(self):
-        self.set_cursor_busy(False)
+        #self.set_cursor_busy(False)
         self.emit("infoMsg", "")
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
@@ -2011,7 +2011,7 @@ class QtGraphicsManager(AbstractSampleView):
         # TODO : need to cancel rest of events ??
         self.emit("infoMsg", "Click on the screen to move camera center")
         self.in_move_beam_to_clicked_point = True
-        self.set_cursor_icon(True, "cross_target")
+        # self.set_cursor_icon(True, "cross_target")
         
     def stop_move_beam_to_clicked_point(self):
         self.emit("infoMsg", "")
