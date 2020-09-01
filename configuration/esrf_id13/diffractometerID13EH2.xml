@@ -12,7 +12,7 @@
   <object href="/ustrx" role="phix"/>
   <object href="/umcenx" role="sampx"/>
   <object href="/umceny" role="sampy"/>
-  <object href="/multiple-positions" role="zoom"/>
+  <object href="/multiple-positionsID13EH2" role="zoom"/>
 
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>
 
