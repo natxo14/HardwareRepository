@@ -144,7 +144,7 @@ class QtTangoLimaVideo(AbstractVideoDevice):
             limits_list = (self.device.valid_ranges)
             #valid_ranges return list of 4 elems
             # min_exposure, max_exposure, min_latency, max_latency
-            print(f"QTTANGOLIMAVIDEO ^^^^^^^^^^^^^^^^^^^^^^^^ limits ; {limits_list}")
+            print(f"QTTANGOLIMAVIDEO ^^^^^^^^^^^^^^^^^^^^^^^^get_exposure_limits :  limits : min_exposure, max_exposure, min_latency, max_latency; {limits_list}")
             return limits_list[0:2]
         else:
             return [0, 0]

@@ -301,7 +301,7 @@ class ID1013Diffractometer(GenericDiffractometer):
 
     def get_centred_point_from_coord(self, coord_x, coord_y, return_by_names=False,):
         """
-        Returns a dictionary with motors name ans positions centred.
+        Returns a dictionary with motors name and absolute positions centred.
         It is expected in start_move_to_beam and move_to_beam methods in
         GenericDIffractometer HwObj.
 
