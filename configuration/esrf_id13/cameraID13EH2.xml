@@ -4,6 +4,6 @@
    <tangoname>//id13:20000/id13/limaccds/uvlm1</tangoname>
    <!-- gain>0.5</gain -->
    <exposure>0.01</exposure>
-   <mirror>(False, False)</mirror>
+   <mirror>(True, True)</mirror>
    <interval>30</interval>
 </device>
