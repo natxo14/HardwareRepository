@@ -443,7 +443,7 @@ class MultiplePositions(Equipment):
         """
         move to position with name = name
         """
-        #print(f"$$$$$$$$$$$$$$$ move_to_position {name} ")
+        print(f"$$$$$$$$$$$$$$$ MULTIPLE POS move_to_position {name} ")
         
         position_props = self.positions_dict.get(name, None)
         
@@ -463,7 +463,7 @@ class MultiplePositions(Equipment):
             motor.set_value(role_position)
             
         if wait:
-            [mot.wait_end_of_move(4) for mot in self.motor_hwobj_dict if mot is not None]
+            [mot.wait_end_of_move(4) for mot in self.motor_hwobj_dict.values() if mot is not None]
         
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - move_to_position - {name} - self {id(self)}")
         self.emit("predefinedPositionChanged", name)
