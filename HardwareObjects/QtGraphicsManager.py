@@ -102,7 +102,6 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_calibration_state = None
         self.in_centring_state = None
         self.in_grid_drawing_state = None
-        self.in_square_drawing_state = None
         self.in_measure_distance_state = None
         self.in_measure_angle_state = None
         self.in_measure_area_state = None
@@ -113,7 +112,6 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = None
         self.in_move_beam_to_clicked_point = None
         self.wait_grid_drawing_click = None
-        self.wait_square_drawing_click = None
         self.wait_measure_distance_click = None
         self.wait_measure_angle_click = None
         self.wait_measure_area_click = None
@@ -700,25 +698,7 @@ class QtGraphicsManager(AbstractSampleView):
             self.add_shape(point, emit)
             cpos.set_index(point.index)
             return point
-    
-    def create_square_roi(self):
-        """Creates a square ROI point as feedback to user.
-        Two points needed for calibrating the camera.
-        They disappear at the end of calibration process
-        :param point_position:
-        :type array x, y point position
-        """
-        if not self.wait_square_drawing_click:
-            
-            self.set_cursor_busy(True)
-            self.graphics_square_draw_item = GraphicsLib.GraphicsItemSquareROI(
-                None, 
-            )
-            
-            self.add_shape(self.graphics_square_draw_item)
-            self.graphics_square_draw_item.hide()
-            self.wait_square_drawing_click = True
-            
+                    
     def create_calibration_point(self, point_position, ):
         """Creates a calibration  point as feedback to user.
         Two points needed for calibrating the camera.
@@ -863,16 +843,6 @@ class QtGraphicsManager(AbstractSampleView):
             self.graphics_grid_draw_item.set_draw_mode(True)
             self.graphics_grid_draw_item.set_start_position(pos_x, pos_y)
             self.graphics_grid_draw_item.show()
-        # elif self.wait_square_drawing_click:
-        #     print(f"""@@@@@@@@@@@@@@@@ QtGraphicsMananger wait_square_drawing_click
-        #     - {self.in_one_click_centering}
-        #     - pos_x, pos_y {pos_x} - {pos_y} """)
-
-        #     self.in_square_drawing_state = True
-        #     self.graphics_square_draw_item.setPos(pos_x, pos_y)
-        #     self.graphics_square_draw_item.set_start_position(pos_x, pos_y)
-        #     self.graphics_square_draw_item.set_end_position(pos_x, pos_y)
-        #     self.graphics_square_draw_item.show()
         elif self.wait_measure_distance_click:
             self.start_graphics_item(self.graphics_measure_distance_item)
             self.in_measure_distance_state = True
@@ -984,80 +954,6 @@ class QtGraphicsManager(AbstractSampleView):
             self.shape_dict[
                 self.graphics_grid_draw_item.get_display_name()
             ] = self.graphics_grid_draw_item
-        # elif self.in_square_drawing_state:
-        #     self.set_cursor_busy(False)
-        #     self.wait_square_drawing_click = False
-        #     self.in_square_drawing_state = False
-        #     self.de_select_all()
-        #     # set square distance and size
-        #     start_pos = self.graphics_square_draw_item.get_start_position()
-        #     end_pos = (pos_x, pos_y) #self.graphics_square_draw_item.get_end_position()
-        #     top_left_corner = (min(start_pos[0], end_pos[0]),
-        #                 min(start_pos[1], end_pos[1]))
-        #     delta_x_to_beam = self.beam_position[0] - top_left_corner[0]
-        #     delta_y_to_beam = self.beam_position[1] - top_left_corner[1]
-            
-        #     size_pix = (abs(start_pos[0] - end_pos[0]),
-        #                 abs(start_pos[1] - end_pos[1]))
-        #     size_mm = (size_pix[0] / self.pixels_per_mm[0],
-        #                size_pix[1] / self.pixels_per_mm[1])
-
-        #     self.graphics_square_draw_item.set_start_position(*top_left_corner)
-        #     self.graphics_square_draw_item.set_end_position(
-        #         top_left_corner[0] + size_pix[0] + 1,
-        #         top_left_corner[1] + size_pix[1]
-        #     )
-        #     self.graphics_square_draw_item.prepareGeometryChange()
-        #     self.graphics_square_draw_item.setPos(*top_left_corner)
-
-        #     self.graphics_square_draw_item.set_distance_to_beam_mm(
-        #         (delta_x_to_beam, delta_y_to_beam),
-        #     )
-            
-        #     self.graphics_square_draw_item.set_item_size_mm(
-        #         size_mm
-        #     )
-        #     self.emit("shapeCreated", self.graphics_square_draw_item, "Square")
-        #     self.graphics_square_draw_item.setSelected(True)
-        #     #self.graphics_square_draw_item.setPos(*top_left_corner)
-
-        #     # self.graphics_square_draw_item.update_item()
-
-        #     #  self.graphics_square_draw_item.hide()
-
-        #     # tmp = GraphicsLib.GraphicsItemSquareROI(
-        #     #     parent=None,
-        #     # )
-
-        #     # self.add_shape(tmp)
-
-        #     # tmp.set_start_position(*top_left_corner)
-        #     # tmp.set_end_position(
-        #     #     top_left_corner[0] + size_pix[0] + 1,
-        #     #     top_left_corner[1] + size_pix[1]
-        #     # )
-        #     # tmp.setPos(*top_left_corner)
-            
-        #     print(f"""
-        #     mouse_released : pos_x, pos_y {pos_x}, {pos_y}
-        #     top left corner : {top_left_corner}
-        #     in_square_drawing_state 
-        #     pos Returns the position of the item in parent coordinates {self.graphics_square_draw_item.pos()}
-        #     scene pos {self.graphics_square_draw_item.scenePos()}
-        #     rect {self.graphics_square_draw_item.boundingRect()}
-        #     start_position {self.graphics_square_draw_item.get_start_position()}
-        #     end_position {self.graphics_square_draw_item.get_end_position()}
-        #     """)
-
-        #     for shape in self.get_shapes():
-        #         print(f"""
-        #         type(shape) {type(shape)}
-        #         scene {shape.scene()} - type parent {type(shape.scene())}
-        #         point : pos() {shape.pos()}
-        #         scene pos {shape.scenePos()}
-        #         rect {shape.boundingRect()}
-        #         get_start_position {shape.get_start_position()}
-        #         """)
             
         elif self.in_beam_define_state:
             self.stop_beam_define()
@@ -1103,16 +999,7 @@ class QtGraphicsManager(AbstractSampleView):
                 self.graphics_grid_draw_item.set_end_position(
                     scene_point.x(), scene_point.y()
                 )
-        # elif self.in_square_drawing_state:
-        #     # start_pos = self.graphics_square_draw_item.get_start_position()
-        #     # self.graphics_square_draw_item.set_size(
-        #     #     abs(start_pos[0] - scene_point.x()),
-        #     #     abs(start_pos[1] - scene_point.y()),
-        #     # )
-        #     self.graphics_square_draw_item.set_end_position(
-        #             scene_point.x(), scene_point.y()
-        #     )
-
+        
         elif self.in_measure_distance_state:
             self.graphics_measure_distance_item.set_coord(self.mouse_position)
         elif self.in_measure_angle_state:
@@ -2577,3 +2464,25 @@ class QtGraphicsManager(AbstractSampleView):
             self.graphics_view.setVerticalScrollBarPolicy(
                 QtImport.Qt.ScrollBarAlwaysOff
             )
+
+    def stop_current_state(self):
+        """
+        stop any active current state
+        ex: set beam position manually
+        Useful to change 'state'
+        when selecting new action to perform
+        """
+        self.in_calibration_state = False
+        self.in_centring_state = False
+        self.in_measure_distance_state = False
+        self.in_measure_angle_state = False
+        self.in_measure_area_state = False
+        self.in_move_beam_mark_state = False
+        self.in_beam_define_state = False
+        self.in_magnification_mode = False
+        self.in_one_click_centering = False
+        self.in_move_beam_to_clicked_point = False
+        self.wait_measure_distance_click = False
+        self.wait_measure_angle_click = False
+        self.wait_measure_area_click = False
+    
