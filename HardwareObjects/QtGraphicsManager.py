@@ -590,10 +590,11 @@ class QtGraphicsManager(AbstractSampleView):
            Updates point screen coordinates and grid coorner coordinates.
            If diffractometer not ready then hides all shapes.
         """
-        logging.getLogger().debug(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: args (usually state) {args}")
+        logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: args (usually state) {args} - self.in_centring_state {self.in_centring_state} - self.in_move_beam_to_clicked_point {self.in_move_beam_to_clicked_point}")
         if not (self.in_centring_state or self.in_move_beam_to_clicked_point):
             logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: BEFORE CHECKING DIFF STATE")
             if self.diffractometer_hwobj.is_ready():
+                logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: self.diffractometer_hwobj.is_ready()")
                 for shape in self.get_shapes():
                     if isinstance(shape, GraphicsLib.GraphicsItemPoint):
                         cpos = shape.get_centred_position()
@@ -635,12 +636,14 @@ class QtGraphicsManager(AbstractSampleView):
                                     shape.set_projection_mode(False)
                                 else:
                                     shape.set_projection_mode(True)
-
+                logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: if self.diffractometer_hwobj.is_ready(): BEFORE show_all_items")
                 self.show_all_items()
+                logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: if self.diffractometer_hwobj.is_ready(): AFTER show_all_items")
                 self.graphics_view.graphics_scene.update()
                 # self.update_histogram()
                 self.emit("diffractometerReady", True)
         else:
+            logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: self.in_centring_state or self.in_move_beam_to_clicked_point: TRUE!!")
             self.hide_all_items()
             self.emit("diffractometerReady", False)
 
@@ -1436,6 +1439,7 @@ class QtGraphicsManager(AbstractSampleView):
         """Shows all items
         """
         for shape in self.get_shapes():
+            print(f"show all items iterations ; shape {type(shape)}")
             if shape != self.auto_grid:
                 shape.show()
 
