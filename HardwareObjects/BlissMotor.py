@@ -98,7 +98,7 @@ class BlissMotor(AbstractMotor):
         # init state to match motor's one
         self.update_state(self.get_state())
 
-        print(f"######## BLISS MOTOR init - type {type(self)} - name {self.motor_obj.name}")
+        # print(f"######## BLISS MOTOR init - type {type(self)} - name {self.motor_obj.name}")
         
     def _state2enum(self, state):
         """Translate the state to HardwareObjectState and BlissMotorStates
@@ -117,10 +117,17 @@ class BlissMotor(AbstractMotor):
 
     def _check_state(self, state):
         """
-        if state is a list, returns the first found HardwareObjectState
+        if state is a list:
+            if HardwareObjectState.OFF on the list (most restrictive):
+                return it
+            else:
+                returns the first found HardwareObjectState
+
         if state 'single', translates to a HardwareObjectState
         """
         if isinstance(state, list):
+            if ("OFF" or "DISABLED") in state:
+                return HardwareObjectState.OFF
             for stat in state:
                 if stat in self.SPECIFIC_TO_HWR_STATE:
                     return self.SPECIFIC_TO_HWR_STATE[stat]
@@ -134,10 +141,8 @@ class BlissMotor(AbstractMotor):
         Returns:
             (enum 'HardwareObjectState'): Motor state.
         """
-        #print(f"######## BLISS MOTOR get_state - type {type(self)} - name {self.motor_obj.name}")
         state = self.motor_obj.state.current_states_names
         state = self._check_state(state)
-        #print(f"######## BLISS MOTOR get_state - state - {state} - states {self.motor_obj.state.current_states_names}")
         return state
 
     def get_specific_state(self):
