@@ -317,8 +317,12 @@ class ID1013Diffractometer(GenericDiffractometer):
         delta_x = (coord_x - beam_pos_x) / self.pixelsPerMmY
         delta_y = (coord_y - beam_pos_y) / self.pixelsPerMmZ
 
-        phi_angle_motor = self.centring_phi.get_value()
+        phi_angle_motor = self.centring_phi.direction * self.centring_phi.get_value()
         phi_angle = math.radians(phi_angle_motor)
+        # sampx = self.centring_sampx.direction * self.centring_sampx.get_value()
+        # sampy = self.centring_sampy.direction * self.centring_sampy.get_value()
+        # phiy = self.centring_phiy.direction * self.centring_phiy.get_value()
+        # phiz = self.centring_phiz.direction * self.centring_phiz.get_value()
         sampx = self.centring_sampx.get_value()
         sampy = self.centring_sampy.get_value()
         phiy = self.centring_phiy.get_value()
@@ -326,7 +330,10 @@ class ID1013Diffractometer(GenericDiffractometer):
 
         print(f"""################ ID1013 DIFF START get_centred_point_from_coord
         point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE
-        sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz} 
+        sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz} \n
+        | delta_x {delta_x} | delta_y {delta_y} \n
+        | self.centring_phiy.direction : {self.centring_phiy.direction} \n
+        | self.centring_phiz.direction : {self.centring_phiz.direction} 
         """)
 
         rot_matrix = numpy.matrix(
@@ -347,8 +354,8 @@ class ID1013Diffractometer(GenericDiffractometer):
         sampx = sampx + dsampx
         sampy = sampy + dsampy
 
-        x_axis_motor_pos = phiy + delta_x
-        y_axis_motor_pos = phiz + delta_y
+        x_axis_motor_pos = phiy + ( self.centring_phiy.direction * delta_x )
+        y_axis_motor_pos = phiz + ( self.centring_phiz.direction * delta_y )
 
         motors_positions = {
             "phi": phi_angle_motor,
