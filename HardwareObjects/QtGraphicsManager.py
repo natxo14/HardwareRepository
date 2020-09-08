@@ -148,6 +148,9 @@ class QtGraphicsManager(AbstractSampleView):
         self.graphics_move_down_item = None
         self.graphics_move_left_item = None
         self.graphics_magnification_item = None
+
+        # if ctrl pressed when creating point: keep it selected
+        self.last_created_point = None
         
 
     def init(self):
@@ -1265,6 +1268,11 @@ class QtGraphicsManager(AbstractSampleView):
         :emits: shapeSelected
         """
         self.de_select_all()
+        if (
+                self.last_created_point and
+                QtImport.Qt.ControlModifier == QtImport.QGuiApplication.queryKeyboardModifiers()
+            ):
+            self.last_created_point.setSelected(True)
         if isinstance(shape, GraphicsLib.GraphicsItemPoint):
             self.point_count += 1
             shape.index = self.point_count
@@ -1287,6 +1295,7 @@ class QtGraphicsManager(AbstractSampleView):
                 self.emit("shapeCreated", shape, "Point")
             self.emit("pointSelected", shape)
             self.emit("infoMsg", "Centring %s created" % shape.get_full_name())
+            self.last_created_point = shape
         elif isinstance(shape, GraphicsLib.GraphicsItemLine):
             if emit:
                 self.emit("shapeCreated", shape, "Line")
