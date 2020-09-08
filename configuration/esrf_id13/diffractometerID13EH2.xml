@@ -6,12 +6,12 @@
   <!--object href="/beam-info" role="beam_info"/-->
 
   <!-- Next block added by rhfogh for better representation of move_motor behaviour -->
-  <object href="/usrotz" role="phi"/>
+  <object href="/mockupUsrotz" role="phi"/>
   <object href="/ustrz" role="phiz"/>
   <object href="/ustry" role="phiy"/>
   <object href="/ustrx" role="phix"/>
-  <object href="/umcenx" role="sampx"/>
-  <object href="/umceny" role="sampy"/>
+  <object href="/mockupUmcenx" role="sampx"/>
+  <object href="/mockupUmceny" role="sampy"/>
   <object href="/multiple-positionsID13EH2" role="zoom"/>
 
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>

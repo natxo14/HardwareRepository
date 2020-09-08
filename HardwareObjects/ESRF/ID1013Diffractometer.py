@@ -377,6 +377,9 @@ class ID1013Diffractometer(GenericDiffractometer):
         logging.getLogger("HWR").info(f"""################ ID1013 DIFF is_ready: BEFORE FOR MOTOR""")
         for motor in self.motor_hwobj_dict.values():
             tmp_state = motor.get_state()
+            if tmp_state == HardwareObjectState.OFF:
+                #if motor is OFF, then don't take it into account on diffractometer global status
+                continue
             all_ready = all_ready and (tmp_state == HardwareObjectState.READY)
             logging.getLogger("HWR").info(f"""################ ID1013 DIFF is_ready: Motor : {motor.name()} state {tmp_state} - is READY: {tmp_state == HardwareObjectState.READY}""")
         #all_ready = all(motor.get_state() == HardwareObjectState.READY for motor in self.motor_hwobj_dict.values())
