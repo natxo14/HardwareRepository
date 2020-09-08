@@ -82,15 +82,15 @@ class ID1013Diffractometer(GenericDiffractometer):
         }
 
         #set centring motors directions
-        try:
-            if self.use_sample_centring:
-                self.centring_phi.direction = -1
-                self.centring_phiz.direction = 1
-                self.centring_phiy.direction = 1
-                self.centring_sampx.direction = 1
-                self.centring_sampy.direction = 1
-        except BaseException:
-            pass  # used the default value
+        # try:
+        #     if self.use_sample_centring:
+        #         self.centring_phi.direction = -1
+        #         self.centring_phiz.direction = 1
+        #         self.centring_phiy.direction = 1
+        #         self.centring_sampx.direction = 1
+        #         self.centring_sampy.direction = 1
+        # except BaseException:
+        #     pass  # used the default value
 
         self.update_zoom_calibration()
 
@@ -331,7 +331,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         print(f"""################ ID1013 DIFF START get_centred_point_from_coord
         point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE
         sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz} \n
-        | delta_x {delta_x} | delta_y {delta_y} \n
+        | delta_x {delta_x} | delta_y {delta_y} Millimeters \n
         | self.centring_phiy.direction : {self.centring_phiy.direction} \n
         | self.centring_phiz.direction : {self.centring_phiz.direction} 
         """)
@@ -356,6 +356,12 @@ class ID1013Diffractometer(GenericDiffractometer):
 
         x_axis_motor_pos = phiy + ( self.centring_phiy.direction * delta_x )
         y_axis_motor_pos = phiz + ( self.centring_phiz.direction * delta_y )
+
+        print(f"""################ ID1013 DIFF START get_centred_point_from_coord \n
+        phiy + ( self.centring_phiy.direction * delta_x ) : {phiy} + ( {self.centring_phiy.direction} * {delta_x} ) |n
+        phiz + ( self.centring_phiz.direction * delta_y ) : {phiz} + ( {self.centring_phiz.direction} * {delta_y} ) \n
+        x_axis_motor_pos {x_axis_motor_pos} \n
+        y_axis_motor_pos {y_axis_motor_pos}""")
 
         motors_positions = {
             "phi": phi_angle_motor,
