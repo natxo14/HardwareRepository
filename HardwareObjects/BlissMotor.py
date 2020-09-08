@@ -95,11 +95,9 @@ class BlissMotor(AbstractMotor):
         self.connect(self.motor_obj, "state", self._update_state)
         self.connect(self.motor_obj, "move_done", self._update_state_move_done)
 
-        # init state to match motor's one
+        # init state - HardwareObjectState - to match motor's one
         self.update_state(self.get_state())
 
-        # print(f"######## BLISS MOTOR init - type {type(self)} - name {self.motor_obj.name}")
-        
     def _state2enum(self, state):
         """Translate the state to HardwareObjectState and BlissMotorStates
         Args:
@@ -114,41 +112,36 @@ class BlissMotor(AbstractMotor):
 
         _state = self.SPECIFIC_TO_HWR_STATE.get(state, HardwareObjectState.UNKNOWN)
         return _state, _specific_state
-
-    def _check_state(self, state):
-        """
-        if state is a list:
-            if HardwareObjectState.OFF on the list (most restrictive):
-                return it
-            else:
-                returns the first found HardwareObjectState
-
-        if state 'single', translates to a HardwareObjectState
-        """
-        if isinstance(state, list):
-            if ("OFF" or "DISABLED") in state:
-                return HardwareObjectState.OFF
-            for stat in state:
-                if stat in self.SPECIFIC_TO_HWR_STATE:
-                    return self.SPECIFIC_TO_HWR_STATE[stat]
-        else:
-            if state in self.SPECIFIC_TO_HWR_STATE:
-                return self.SPECIFIC_TO_HWR_STATE[state]
-        return HardwareObjectState.UNKNOWN
         
     def get_state(self):
-        """Get the motor state.
+        """Get the motor HardwareObjectState state.
         Returns:
             (enum 'HardwareObjectState'): Motor state.
         """
-        state = self.motor_obj.state.current_states_names
-        state = self._check_state(state)
+        state = HardwareObjectState.UNKNOWN
+        for stat in self.motor_obj.state.current_states_names:
+            if stat in HardwareObjectState.__members__:
+                # if stat has direct translation on HardwareObjectState
+                # return it . HardwareObjectState are mutual exclusive
+                return HardwareObjectState[stat]
+            if stat == "DISABLED":
+                # we need to treat DISABLED before any other auxillary state
+                return HardwareObjectState.OFF
+            if stat == "MOVING":
+                return HardwareObjectState.BUSY
+            else:
+                # translate first state from the 'current_states_names' list
+                state = self._state2enum(stat)[0]
         return state
 
     def get_specific_state(self):
         """Get the motor state.
         Returns:
-            (list): Motor states as list of BlissMotorStates enum
+            TODO: make this clear
+            Before (list): Motor states as list of BlissMotorStates enum
+            get_specific_state used by HardwareObjectMixin: no list in that code
+
+            Now : only one state from list: preconize 'error' status to return
         """
         state = self.motor_obj.state.current_states_names
         state_list = []
@@ -156,45 +149,53 @@ class BlissMotor(AbstractMotor):
         if len(state) > 1:
             for _state in state[1:]:
                 state_list.append(self._state2enum(_state)[1])
+        
+        if BlissMotorStates.FAULT in state_list:
+            return BlissMotorStates.FAULT
+        elif BlissMotorStates.OFF in state_list:
+            return BlissMotorStates.OFF
+        elif BlissMotorStates.DISABLED in state_list:
+            return BlissMotorStates.DISABLED
+        else:
+            return state_list[0]
 
-        return state_list[0]
-
-    def _update_state(self, state=None):
-        logging.getLogger().info(f"BLISSMOTOR _update_state {self.actuator_name} - signal from bliss state {state} - READY if state else MOVING")
+    def _update_state(self, bliss_state=None):
+        logging.getLogger().info(f"BLISSMOTOR _update_state {self.actuator_name} - signal from bliss state {bliss_state} - READY if state else MOVING")
         """Check if the state has changed. Emits signal stateChanged.
         Args:
             state (enum AxisState): state from a BLISS motor
         """
-        if isinstance(state, bool):
+        if isinstance(bliss_state, bool):
             # It seems like the current version of BLISS gives us a boolean
             # at first and last event, True for ready and False for moving
-            state = "READY" if state else "MOVING"
+            state = HardwareObjectState.READY if state else HardwareObjectState.BUSY
         else:
             # state comming from bliss (with current_states_names attribute)
             try:
-                state = state.current_states_names[0]
+                state = self.get_state()
             except (AttributeError, KeyError):
-                state = "UNKNOWN"
-        _state, self._specific_state = self._state2enum(state)
-        self.update_state(_state)
-    def _update_state_move_done(self, state=None):
+                state = HardwareObjectState.UNKNOWN
+        self._specific_state = self.get_specific_state()
+        self.update_state(state)
+
+    def _update_state_move_done(self, bliss_state=None):
         # TODO : DELETE THIS (and connection with bliss motor signal)
         # THIS IS A COPY OF _update_state
         # this function created to tell from move_done and state bliss signals
         # debugging why takes so much time to update bliss motor status after the movement
-        logging.getLogger().info(f"BLISSMOTOR _update_state_move_done {self.actuator_name} - signal from bliss move_done {state}")
-        if isinstance(state, bool):
+        logging.getLogger().info(f"BLISSMOTOR _update_state_move_done {self.actuator_name} - signal from bliss move_done {bliss_state}")
+        if isinstance(bliss_state, bool):
             # It seems like the current version of BLISS gives us a boolean
             # at first and last event, True for ready and False for moving
-            state = "READY" if state else "MOVING"
+            state = HardwareObjectState.READY if bliss_state else HardwareObjectState.BUSY
         else:
             # state comming from bliss (with current_states_names attribute)
             try:
-                state = state.current_states_names[0]
+                state = self.get_state()
             except (AttributeError, KeyError):
-                state = "UNKNOWN"
-        _state, self._specific_state = self._state2enum(state)
-        self.update_state(_state)
+                state = HardwareObjectState.UNKNOWN
+        self._specific_state = self.get_specific_state()
+        self.update_state(state)
 
     def get_value(self):
         """Read the motor position.
