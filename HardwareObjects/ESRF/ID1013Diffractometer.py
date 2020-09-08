@@ -81,17 +81,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             GenericDiffractometer.CENTRING_METHOD_MOVE_TO_BEAM: self.start_move_to_beam,
         }
 
-        #set centring motors directions
-        # try:
-        #     if self.use_sample_centring:
-        #         self.centring_phi.direction = -1
-        #         self.centring_phiz.direction = 1
-        #         self.centring_phiy.direction = 1
-        #         self.centring_sampx.direction = 1
-        #         self.centring_sampy.direction = 1
-        # except BaseException:
-        #     pass  # used the default value
-
+        
         self.update_zoom_calibration()
 
     def get_pixels_per_mm(self):
