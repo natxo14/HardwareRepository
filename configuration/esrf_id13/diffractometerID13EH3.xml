@@ -16,7 +16,7 @@
   <object href="/multiple-positionsID13EH3" role="zoom"/>
 
   <centring_motors>("phi", "phiz", "phiy", "phix", "sampx", "sampy", "zoom")</centring_motors>
-  <centring_motors_directions>{"phi": 1, "phiz": 1, "phiy" : -1, "phyx" : 1, "sampx" : 1, "sampy" : 1, "zoom" : 1}</centring_motors_directions>
+  <centring_motors_directions>{"phi": 1, "phiz": -1, "phiy" : -1, "phyx" : 1, "sampx" : 1, "sampy" : 1, "zoom" : 1}</centring_motors_directions>
 
   <sample_centring>True</sample_centring>
 
