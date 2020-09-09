@@ -998,8 +998,8 @@ class GenericDiffractometer(HardwareObject):
     def motor_positions_to_screen(self, centred_positions_dict):
         """
         """
-        print(f"################ GENERIC DIFF motor_positions_to_screen {centred_positions_dict}")
-        print(f"""################ GENERIC DIFF  motor_positions_to_screen
+        print(f"################ GENERIC DIFF motor_positions_to_screen centred_positions_dict :{centred_positions_dict}")
+        print(f"""################ GENERIC DIFF  motor_positions_to_screen CURRENT MOTOR POSITIONS
          - motor centring_phi:{self.centring_phi.get_value()}
          - motor centring_sampx:{self.centring_sampx.get_value()} 
          - motor centring_sampy:{self.centring_sampy.get_value()} 
@@ -1044,8 +1044,8 @@ class GenericDiffractometer(HardwareObject):
             #y = dy + (phiz * self.pixels_per_mm_y) + self.beam_position[1]
             y = (phiz * self.pixels_per_mm_y) + self.beam_position[1]
 
-            print(f"################ GENERIC DIFF motor_positions_to_screen x,y {x},{y}")
-            return x, y
+            print(f"################ GENERIC DIFF motor_positions_to_screen x,y {x} -> {int(round(x))},{y} -> {int(round(y))}")
+            return int(round(x)), int(round(y))
         else:
             raise NotImplementedError
 
