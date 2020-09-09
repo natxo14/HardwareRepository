@@ -126,6 +126,9 @@ class QtVideoMockup(AbstractVideoDevice):
 
     def get_exposure_time(self):
         return 0.23
+    
+    def get_exposure_limits(self):
+        return [0.01, 1]
 
     def get_video_live(self):
         return True
