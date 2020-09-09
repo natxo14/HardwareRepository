@@ -291,7 +291,8 @@ class ID1013Diffractometer(GenericDiffractometer):
 
     def get_centred_point_from_coord(self, coord_x, coord_y, return_by_names=False,):
         """
-        Returns a dictionary with motors name and absolute positions centred.
+        Returns a dictionary with motors name and the absolute positions
+        they should have to move ( coord_x, coord_y ) to beam position.
         It is expected in start_move_to_beam and move_to_beam methods in
         GenericDIffractometer HwObj.
 
@@ -299,7 +300,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
         
-        self.update_zoom_calibration()
+        # self.update_zoom_calibration()
 
         if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
             return 0, 0
@@ -320,9 +321,9 @@ class ID1013Diffractometer(GenericDiffractometer):
 
         print(f"""################ ID1013 DIFF START get_centred_point_from_coord
         point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE
-        sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz} \n
-        | delta_x {delta_x} | delta_y {delta_y} Millimeters \n
-        | self.centring_phiy.direction : {self.centring_phiy.direction} \n
+        sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz}
+        | delta_x {delta_x} | delta_y {delta_y} Millimeters
+        | self.centring_phiy.direction : {self.centring_phiy.direction}
         | self.centring_phiz.direction : {self.centring_phiz.direction} 
         """)
 
@@ -344,13 +345,15 @@ class ID1013Diffractometer(GenericDiffractometer):
         sampx = sampx + dsampx
         sampy = sampy + dsampy
 
-        x_axis_motor_pos = phiy + ( self.centring_phiy.direction * delta_x )
-        y_axis_motor_pos = phiz + ( self.centring_phiz.direction * delta_y )
+        x_axis_motor_pos = phiy + (self.centring_phiy.direction * delta_x)
+        y_axis_motor_pos = phiz + (self.centring_phiz.direction * delta_y)
+        # x_axis_motor_pos = phiy + delta_x
+        # y_axis_motor_pos = phiz + self.centring_phiz.direction
 
         print(f"""################ ID1013 DIFF START get_centred_point_from_coord \n
-        phiy + ( self.centring_phiy.direction * delta_x ) : {phiy} + ( {self.centring_phiy.direction} * {delta_x} ) |n
-        phiz + ( self.centring_phiz.direction * delta_y ) : {phiz} + ( {self.centring_phiz.direction} * {delta_y} ) \n
-        x_axis_motor_pos {x_axis_motor_pos} \n
+        phiy + ( self.centring_phiy.direction * delta_x ) : {phiy} + ( {self.centring_phiy.direction} * {delta_x} ) 
+        phiz + ( self.centring_phiz.direction * delta_y ) : {phiz} + ( {self.centring_phiz.direction} * {delta_y} )
+        x_axis_motor_pos {x_axis_motor_pos}
         y_axis_motor_pos {y_axis_motor_pos}""")
 
         motors_positions = {
