@@ -4,11 +4,11 @@
     <mode>absolute</mode>
     <motors>
         <motor>
-            <name>zoom</name>
+          <name>blight</name>
         </motor>
     </motors>
 
-    <device role="blight" hwrid="/blight"></device>
+    <object role="blight" hwrid="/blight_mot"/>
 	
     <deltas>
         <blight>0.1</blight>

@@ -11,7 +11,7 @@
   <object href="/thy" role="phiy"/>
   <object href="/sx" role="sampx"/>
   <object href="/sy" role="sampy"/>
-  <object href="/multiple-positions" role="zoom"/>
+  <object href="/multiple-positions-zoom" role="zoom"/>
 
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>
 
