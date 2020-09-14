@@ -6,12 +6,6 @@
         <motor>
             <name>zoom</name>
         </motor>
-        <!--motor>
-            <name>gain</name>
-        </motor>
-        <motor>
-            <name>exposure</name>
-        </motor-->
     </motors>
 	
     <object href="/zoom" role="zoom"/>
@@ -20,8 +14,8 @@
     
     <deltas>
         <zoom>0.1</zoom>
-        <gain>20</gain>
-        <exposure>20</exposure>
+        <gain>1</gain>
+        <exposure>0.1</exposure>
     </deltas>
 	
     <positions>

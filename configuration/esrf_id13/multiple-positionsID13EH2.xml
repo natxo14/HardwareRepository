@@ -16,7 +16,7 @@
 
 	<deltas>
         <zoom>0.1</zoom>
-        <light>2000</light>
+        <light>10</light>
     </deltas>
     
     <positions>
