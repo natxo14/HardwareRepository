@@ -71,8 +71,12 @@ class ESRFBeam(AbstractBeam):
 
         beam_shape = self.getProperty("beam_shape")
         print(f"################################ESRBEAM {beam_shape}" )
-        if beam_shape:
+        if beam_shape == "rectangular":
             self._beam_shape = BeamShape.RECTANGULAR
+        elif beam_shape == "ellipse":
+            self._beam_shape = BeamShape.ELIPTICAL
+        else:
+            self._beam_shape = BeamShape.UNKNOWN
 
     def _emit_beam_info_change(self, *args, **kwargs):
         self.emit_beam_info_change()
