@@ -199,7 +199,10 @@ class MultiplePositions(Equipment):
 
         Data will be kept/updated in self.zoom_positions_dict structure
         If data saved, then written in xml file
-        if data cancelled, then data reloaded from last saved xml file
+        if data cancelled, then data reloaded from self.backup_zoom_positions_dict
+
+        the multiple position xml file MUST have a tag with 'role=zoom'
+        <object role="zoom" hwrid="/zoom_xml_file"/>
     """
 
     def __init__(self, *args):
@@ -220,6 +223,7 @@ class MultiplePositions(Equipment):
         
       
         self.zoom_positions_dict = {}
+        self.backup_zoom_positions_dict = {}
         # FOR PARTICULAR CASE WHEN MULTIPLE POSITIONS OF A ZOOM MOTOR
         # if "zoom" in self.roles_positions_dict:
         # { "position_name" : { "beam_pos_x" : val, int - pixels
@@ -234,9 +238,6 @@ class MultiplePositions(Equipment):
 
         self.roles = None
         self.deltas = None
-        
-
-        self.multipos_file_xml_path = None
 
     def init(self):
         try:
@@ -332,16 +333,22 @@ class MultiplePositions(Equipment):
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
 
-        if HWR.beamline.sample_view is not None:
-            print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS update_beam_position HWR.beamline.beam not none")
-            self.connect(HWR.beamline.sample_view,
-                        "beam_position_data_changed",
-                        self.beam_position_data_changed
-            )
-        else:
-            print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS HWR.beamline.sample_view NONE")
+        # if HWR.beamline.sample_view is not None:
+        #     print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS update_beam_position HWR.beamline.beam not none")
+        #     # check if 'zoom' role exists
+        #     if "zoom" in self.roles:
+        #         self.connect(HWR.beamline.sample_view,
+        #                 "beam_position_data_changed",
+        #                 self.beam_position_data_changed
+        #         )
+        #     else:
+        #         print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS HAS NO 'ZOOM' role")
+        # else:
+        #     print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS HWR.beamline.sample_view NONE")
             
 
+        # create zoom_positions_dict backup
+        self.backup_zoom_positions_dict = copy.deepcopy(self.zoom_positions_dict)
         # self.positions = self.read_positions()
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS self.positions {self.positions_dict}")
     
@@ -559,69 +566,70 @@ class MultiplePositions(Equipment):
         return position[key]
     
     def cancel_edited_data(self):
-        self.reload_data_from_xml_file()
+        # self.reload_data_from_backup_dict()
+        self.zoom_positions_dict = copy.deepcopy(self.backup_zoom_positions_dict)
         
-    def reload_data_from_xml_file(self):
-        """
-        usefull when, after changing data, cancel changes
-        """
-        """
-        Parse xml file and load dict :
+    # def reload_data_from_xml_file(self):
+    #     """
+    #     usefull when, after changing data, cancel changes
+    #     """
+    #     """
+    #     Parse xml file and load dict :
 
-        { "position_name" : { "beam_pos_x" : val,int - pixels  
-                             "beam_pos_y" : val,int - pixels
-                             "cal_x" : val,int - nm
-                             "cal_y" : val,int - nm
-                             "light" : val,
-                             "zoom" : val,
-                            },
-        }
-        """
-        output_dict = {}
-        xml_file_tree = cElementTree.parse(self.multipos_file_xml_path)
+    #     { "position_name" : { "beam_pos_x" : val,int - pixels  
+    #                          "beam_pos_y" : val,int - pixels
+    #                          "cal_x" : val,int - nm
+    #                          "cal_y" : val,int - nm
+    #                          "light" : val,
+    #                          "zoom" : val,
+    #                         },
+    #     }
+    #     """
+    #     output_dict = {}
+    #     xml_file_tree = cElementTree.parse(self.multipos_file_xml_path)
 
-        xml_tree = xml_file_tree.getroot()
-        positions = xml_tree.find("positions")
+    #     xml_tree = xml_file_tree.getroot()
+    #     positions = xml_tree.find("positions")
 
-        pos_list = positions.findall("position")
+    #     pos_list = positions.findall("position")
         
-        for pos in pos_list:
+    #     for pos in pos_list:
             
-            if pos.find("beamx") is not None:
-                pos_x = self.from_text_to_int(pos.find("beamx").text)
-            else:
-                pos_x = 0
-            if pos.find("beamy") is not None:
-                pos_y = self.from_text_to_int(pos.find("beamy").text)
-            else:
-                pos_y = 0
-            if pos.find("resox") is not None:
-                cal_x = self.from_text_to_float(pos.find("resox").text, 1e9)
-            else:
-                cal_x = 0
-            if pos.find("resoy") is not None:
-                cal_y = self.from_text_to_float(pos.find("resoy").text, 1e9)
-            else:
-                cal_y = 0
-            if pos.find("light") is not None:
-                light_val = self.from_text_to_int(pos.find("light").text)
-            else:
-                light_val = 0
-            if pos.find("zoom") is not None:
-                zoom_val = self.from_text_to_int(pos.find("zoom").text)
-            else:
-                zoom_val = -1
+    #         if pos.find("beamx") is not None:
+    #             pos_x = self.from_text_to_int(pos.find("beamx").text)
+    #         else:
+    #             pos_x = 0
+    #         if pos.find("beamy") is not None:
+    #             pos_y = self.from_text_to_int(pos.find("beamy").text)
+    #         else:
+    #             pos_y = 0
+    #         if pos.find("resox") is not None:
+    #             cal_x = self.from_text_to_float(pos.find("resox").text, 1e9)
+    #         else:
+    #             cal_x = 0
+    #         if pos.find("resoy") is not None:
+    #             cal_y = self.from_text_to_float(pos.find("resoy").text, 1e9)
+    #         else:
+    #             cal_y = 0
+    #         if pos.find("light") is not None:
+    #             light_val = self.from_text_to_int(pos.find("light").text)
+    #         else:
+    #             light_val = 0
+    #         if pos.find("zoom") is not None:
+    #             zoom_val = self.from_text_to_int(pos.find("zoom").text)
+    #         else:
+    #             zoom_val = -1
             
-            dict_elem = {"beam_pos_x" : pos_x,
-                        "beam_pos_y" : pos_y,
-                        "cal_x" : cal_x,
-                        "cal_y" : cal_y,
-                        "zoom" : zoom_val,
-                        "light" : light_val,
-            }
-            output_dict[pos.find('name').text] = dict_elem
+    #         dict_elem = {"beam_pos_x" : pos_x,
+    #                     "beam_pos_y" : pos_y,
+    #                     "cal_x" : cal_x,
+    #                     "cal_y" : cal_y,
+    #                     "zoom" : zoom_val,
+    #                     "light" : light_val,
+    #         }
+    #         output_dict[pos.find('name').text] = dict_elem
             
-        self.zoom_positions_dict = copy.deepcopy(output_dict)
+    #     self.zoom_positions_dict = copy.deepcopy(output_dict)
 
     def save_data_to_file(self, path):
         
@@ -654,6 +662,9 @@ class MultiplePositions(Equipment):
         xml_file_tree.write(path)
 
         self.emit("beam_pos_cal_data_saved", )
+
+        # create zoom_positions_dict backup
+        self.backup_zoom_positions_dict = copy.deepcopy(self.zoom_positions_dict)
 
     def set_position_key_value(self, name, key, value):
 
