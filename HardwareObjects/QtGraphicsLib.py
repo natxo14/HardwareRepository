@@ -54,6 +54,10 @@ from gui.utils import QtImport
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.ConvertUtils import string_types
 
+from HardwareRepository.HardwareObjects.abstract.AbstractBeam import (
+    BeamShape,
+)
+
 SELECTED_COLOR = QtImport.Qt.green
 NORMAL_COLOR = QtImport.Qt.yellow
 ROI_COLOR = QtImport.Qt.red
@@ -255,7 +259,9 @@ class GraphicsItem(QtImport.QGraphicsItem):
                           (size_x, size_y, shape)
         :type beam_info: dict
         """
-        self.beam_is_rectangle = beam_info.get("shape") == "rectangular"
+        print(f"""!!!!!!!!!!!!!!GraphicsItem set_beam_info beam_info.get(shape) {beam_info.get("shape")} """)
+        self.beam_is_rectangle = beam_info.get("shape") == BeamShape.RECTANGULAR
+        print(f"""!!!!!!!!!!!!!!GraphicsItem set_beam_info self.beam_is_rectangle {self.beam_is_rectangle} """)
         self.beam_size_mm[0] = beam_info.get("size_x", 0)
         self.beam_size_mm[1] = beam_info.get("size_y", 0)
         if not math.isnan(self.pixels_per_mm[0]):
@@ -355,7 +361,7 @@ class GraphicsItemBeam(GraphicsItem):
             self.beam_position[1] * self.scene().image_scale + 10,
         )
         if self.display_beam_size:
-            self.custom_pen.setColor(QtImport.Qt.darkGray)
+            self.custom_pen.setColor(QtImport.Qt.green)
             painter.setPen(self.custom_pen)
             painter.drawText(
                 self.beam_position[0] + self.beam_size_pix[0] / 2 + 2,
@@ -384,6 +390,7 @@ class GraphicsItemBeam(GraphicsItem):
         :type state: bool
         :return: None
         """
+        print(f"ENABLE BEAM SIZE state {state}")
         self.display_beam_size = state
 
     def set_detected_beam_position(self, pos_x, pos_y):
