@@ -996,7 +996,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.emit("mouseMoved", scene_point.x(), scene_point.y())
         self.mouse_position[0] = scene_point.x()
         self.mouse_position[1] = scene_point.y()
-        if self.in_centring_state or self.in_one_click_centering:
+        if self.in_centring_state or self.in_one_click_centering or self.in_calibration_state:
             self.graphics_centring_lines_item.set_start_position(
                 scene_point.x(), scene_point.y()
             )
@@ -1663,7 +1663,8 @@ class QtGraphicsManager(AbstractSampleView):
         """
         self.in_calibration_state = True
         print(f"@@@@@@@@@@@@@@@@ QtGraphicsMananger start_calibration - {self.in_calibration_state}")
-        self.set_cursor_icon(True,"calibration")
+        self.set_cursor_icon(True,"calibrate_cursor")
+        self.graphics_centring_lines_item.setVisible(True)
         self.emit("infoMsg", "Click on one point on the image to start calibration")
     
     def stop_calibration(self):
@@ -1672,6 +1673,7 @@ class QtGraphicsManager(AbstractSampleView):
         """
         self.in_calibration_state = False
         self.set_cursor_icon(False,"")
+        self.graphics_centring_lines_item.setVisible(False)
         self.delete_calibration_points()
         self.graphics_view.graphics_scene.update()
         self.emit("infoMsg", "")
