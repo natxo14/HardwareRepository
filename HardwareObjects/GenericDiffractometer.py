@@ -356,8 +356,8 @@ class GenericDiffractometer(HardwareObject):
                 )
 
         print(f"################ GENERICDIFF self.motor_hwobj_dict  - {self.motor_hwobj_dict.keys()}")
-        #for mot in self.motor_hwobj_dict:
-            #print(f"################ GENERICDIFF self.motor_hwobj_dict  - {type(mot)}")
+        # for mot in self.motor_hwobj_dict:
+        #     print(f"################ GENERICDIFF self.motor_hwobj_dict  name - {mot.name()}")
         # sample changer -----------------------------------------------------
         if HWR.beamline.sample_changer is None:
             logging.getLogger("HWR").warning(
@@ -399,6 +399,9 @@ class GenericDiffractometer(HardwareObject):
                 self.centring_sampy = sample_centring.CentringMotor(
                     self.motor_hwobj_dict["sampy"], direction=self.motors_directions["sampy"]
                 )
+            logging.getLogger("HWR").info(
+                f"Diffractometer if self.use_sample_centring:"
+            )
         except BaseException:
             pass  # used the default value
 
