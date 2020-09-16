@@ -294,6 +294,13 @@ class MultiplePositions(Equipment):
                         cal_y = abs(float(position.getProperty("resoy", 0)) * 1e9)
                         light_val = int(position.getProperty("light", 0))
                         zoom_val = int(position.getProperty("zoom", -1))
+                        exposure = position.getProperty("exposure", None)
+                        gain = position.getProperty("gain", None)
+
+                        if exposure is not None:
+                            exposure = float(exposure)
+                        if gain is not None:
+                            gain = float(gain)
                         
                         dict_elem = {"beam_pos_x" : pos_x,
                                     "beam_pos_y" : pos_y,
@@ -301,7 +308,9 @@ class MultiplePositions(Equipment):
                                     "cal_y" : cal_y,
                                     "light" : light_val,
                                     "zoom" : zoom_val,
-                                    "zoom_tag" : name
+                                    "zoom_tag" : name,
+                                    "exposure" : exposure,
+                                    "gain" : gain
                         }
                         self.zoom_positions_dict[name] = dict_elem
                     
