@@ -258,8 +258,8 @@ class GenericDiffractometer(HardwareObject):
                 "Diffractometer: " + "BeamInfo hwobj is not defined"
             )
 
-        self.front_light_swtich = self.getObjectByRole("frontlightswtich")
-        self.back_light_swtich = self.getObjectByRole("backlightswtich")
+        self.front_light_switch = self.getObjectByRole("frontlightswtich")
+        self.back_light_switch = self.getObjectByRole("backlightswtich")
 
         # Channels -----------------------------------------------------------
         ss0 = self.getProperty("used_channels")
@@ -318,11 +318,10 @@ class GenericDiffractometer(HardwareObject):
             if temp_motor_hwobj is not None:
                 logging.getLogger("HWR").debug(
                     "Diffractometer: Adding "
-                    + "%s motor to centring motors" % motor_name 
+                    + "role %s - name %s motor to centring motors" % (motor_name, temp_motor_hwobj.name())
                 )
-                print(f"################ GENERICDIFF temp_motor_hwobj name {temp_motor_hwobj.name()}  ")
+                # print(f"################ GENERICDIFF temp_motor_hwobj name {temp_motor_hwobj.name()}  ")
             
-
                 self.motor_hwobj_dict[motor_name] = temp_motor_hwobj
                 if motor_name != "zoom":
                     self.connect(temp_motor_hwobj, "stateChanged", self.motor_state_changed)
