@@ -540,7 +540,7 @@ class QtGraphicsManager(AbstractSampleView):
            Slot to signal 'imageReceived'
 
         :param pixmap_image: frame from camera
-        :type pixmap_image: QtGui.QPixmapImage
+        :type pixmap_image: QtGui.QPixmap
         """
         if pixmap_image:
             if self.image_scale:
