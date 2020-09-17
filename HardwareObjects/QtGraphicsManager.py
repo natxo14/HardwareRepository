@@ -993,7 +993,8 @@ class QtGraphicsManager(AbstractSampleView):
         # moved_mouse connected to graphics_view's mouseMovedSignal
         # I think we need Scene's coordinates here:
         scene_point = self.graphics_view.mapToScene(QtImport.QPoint(pos_x, pos_y))
-        self.emit("mouseMoved", scene_point.x(), scene_point.y())
+        scene_pixel_QRgb = self.graphics_camera_frame.pixmap().toImage().pixel(QtImport.QPoint(scene_point.x(), scene_point.y()))
+        self.emit("mouseMoved", scene_point.x(), scene_point.y(), scene_pixel_QRgb)
         self.mouse_position[0] = scene_point.x()
         self.mouse_position[1] = scene_point.y()
         if self.in_centring_state or self.in_one_click_centering or self.in_calibration_state:
