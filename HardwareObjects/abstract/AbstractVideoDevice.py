@@ -53,8 +53,10 @@ if any(mod in sys.modules for mod in modulenames):
     USEQT = True
     try:
         from PyQt5.QtGui import QImage, QPixmap
+        from PyQt5.QtCore import QSize
     except ImportError:
         from PyQt4.QtGui import QImage, QPixmap
+        from PyQt4.QtCore import QSize
 else:
     USEQT = False
     from PIL import Image
