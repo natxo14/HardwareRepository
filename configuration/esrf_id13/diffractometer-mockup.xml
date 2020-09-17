@@ -13,6 +13,7 @@
   <object href="/multiple-positions-mockup" role="zoom"/>
   <object href="/omega-mockup" role="phi"/>
   <centring_motors>("phi", "phiz", "phiy", "sampx", "sampy", "zoom")</centring_motors>
+  <centring_motors_directions>{"phi": 1, "phiz": -1, "phiy" : 1, "phyx" : 1, "sampx" : 1, "sampy" : 1, "zoom" : 1}</centring_motors_directions>
 
   <sample_centring>True</sample_centring>
 
