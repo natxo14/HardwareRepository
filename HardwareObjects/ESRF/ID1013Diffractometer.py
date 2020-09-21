@@ -153,7 +153,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             )
     
     def move_beam_to_clicked_point(
-        self, coord_x=None, coord_y=None
+        self, coord_x=None, coord_y=None, direction="free"
     ):
         """
         Descript. :
@@ -179,11 +179,17 @@ class ID1013Diffractometer(GenericDiffractometer):
             motors.pop('sampx', None)
             motors.pop('sampy', None)
 
+            #check orientation
+            if direction == "horizontal":
+                motors.pop('phiz')
+            elif direction == "vertical":
+                motors.pop('phiy')
+
             print(f"##################ID10Diffractometer move_beam_to_clicked_point - motors - {motors}")
             
             self.move_to_motors_positions(motors)
         except BaseException:
-            logging.exception("Diffractometer: Could not complete 2D centring")
+            logging.exception("Diffractometer: Could not complete move to beam action")
 
     def image_clicked(self, x, y, use_mode=None):
         """

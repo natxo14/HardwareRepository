@@ -152,6 +152,7 @@ class QtGraphicsManager(AbstractSampleView):
         # if ctrl pressed when creating point: keep it selected
         self.last_created_point = None
         
+        self.move_to_beam_direction = "free"
 
     def init(self):
         """Main init function. Initiates all graphics items, hwobjs and
@@ -879,7 +880,7 @@ class QtGraphicsManager(AbstractSampleView):
         elif self.in_one_click_centering:
             self.diffractometer_hwobj.start_move_to_beam(pos_x, pos_y)
         elif self.in_move_beam_to_clicked_point:
-            self.diffractometer_hwobj.move_beam_to_clicked_point(pos_x, pos_y)
+            self.diffractometer_hwobj.move_beam_to_clicked_point(pos_x, pos_y, self.move_to_beam_direction)
             # self.stop_move_beam_to_clicked_point()
         else:
             print(f"""############################### QtGraphicsManager
@@ -1903,14 +1904,23 @@ class QtGraphicsManager(AbstractSampleView):
         self.in_one_click_centering = False
         self.graphics_centring_lines_item.setVisible(False)
     
-    def move_beam_to_clicked_point_clicked(self, button_checked):
-
+    def move_beam_to_clicked_point_clicked(self, button_checked, direction="free"):
+        """
+        starts/stops 'move to beam' state
+        params:
+        button_checked : bool. If on start. if off, stop
+        direction : str :
+            "free" : move in both Y and Z axis
+            "horizontal" : move only in Y axis
+            "vertical" : move only in Z axis
+        """
         if button_checked:
-            self.start_move_beam_to_clicked_point()
+            self.start_move_beam_to_clicked_point(direction)
+            self.move_to_beam_direction = direction
         else:
             self.stop_move_beam_to_clicked_point()
     
-    def start_move_beam_to_clicked_point(self):
+    def start_move_beam_to_clicked_point(self, direction):
         # TODO : need to cancel rest of events ??
         self.emit("infoMsg", "Click on the screen to move camera center")
         self.in_move_beam_to_clicked_point = True
