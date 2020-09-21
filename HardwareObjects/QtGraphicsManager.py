@@ -1532,12 +1532,18 @@ class QtGraphicsManager(AbstractSampleView):
                 if shape.isVisible():
                     visible_shapes_list.append(shape)
                     shape.hide()
+        # hide scale and beamposition items
+        self.graphics_scale_item.hide()
+        self.graphics_beam_item.hide()
         # take snapshot
         self.save_scene_snapshot(filename)
-
+        
         # show graphic items 
         for shape in visible_shapes_list:
             shape.show()
+        self.graphics_scale_item.show()
+        self.graphics_beam_item.show()
+
 
     def save_scene_animation(self, filename, duration_sec=1):
         """Saves animated gif of a rotating sample"""
