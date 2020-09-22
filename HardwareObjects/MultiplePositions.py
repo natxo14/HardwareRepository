@@ -577,6 +577,7 @@ class MultiplePositions(Equipment):
     def cancel_edited_data(self):
         # self.reload_data_from_backup_dict()
         self.zoom_positions_dict = copy.deepcopy(self.backup_zoom_positions_dict)
+        self.emit("beam_pos_cal_data_cancelled")
         
     # def reload_data_from_xml_file(self):
     #     """
