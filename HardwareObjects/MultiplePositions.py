@@ -380,7 +380,7 @@ class MultiplePositions(Equipment):
    
     def beam_position_data_changed(self, new_beam_pos_data):
         """
-        Slot when beam position data is edited through camera brick / QtGraphicsManager
+        Slot when beam position data is edited through camera beam brick / QtGraphicsManager
         """
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for beam_position_data_changed {new_beam_pos_data}")
         
@@ -395,11 +395,12 @@ class MultiplePositions(Equipment):
         self.emit(
             "beam_pos_cal_data_changed",
             0,
+            None,
         )
     
     def calibration_data_changed(self, new_calibration_data):
         """
-        Slot when beam position data is edited through camera brick / QtGraphicsManager
+        Slot when calibration data is edited through camera calibration brick
         """
         current_pos_name = self.get_value()
         if current_pos_name is not None:
@@ -412,11 +413,12 @@ class MultiplePositions(Equipment):
         self.emit(
             "beam_pos_cal_data_changed",
             1,
+            None,
         )
 
     def edit_data(self, edited_data_elem, data_key=None, who_changed=0):
         """
-        Slot when beam position data is edited through camera brick / QtGraphicsManager
+        Slot when beam position data is edited through ESRFConfigurationBrick
         """
         #if no data_key given, use current position
         if data_key is None:
@@ -428,7 +430,8 @@ class MultiplePositions(Equipment):
 
         self.emit(
             "beam_pos_cal_data_changed",
-            who_changed
+            who_changed,
+            edited_data_elem
         )
 
     def get_positions_names_list(self):
@@ -577,6 +580,17 @@ class MultiplePositions(Equipment):
     def cancel_edited_data(self):
         # self.reload_data_from_backup_dict()
         self.zoom_positions_dict = copy.deepcopy(self.backup_zoom_positions_dict)
+        self.emit("beam_pos_cal_data_cancelled")
+        # call to paint beam position
+        current_pos_dict = self.get_current_position()
+        self.beam_position_data_changed(
+            (
+            current_pos_dict["beam_pos_x"],
+            current_pos_dict["beam_pos_y"],
+            )
+        )
+        
+        # call to clear tables background color
         self.emit("beam_pos_cal_data_cancelled")
         
     # def reload_data_from_xml_file(self):
