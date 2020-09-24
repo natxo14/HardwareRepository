@@ -1073,25 +1073,26 @@ class QtGraphicsManager(AbstractSampleView):
                 if item.isSelected():
                     self.delete_shape(item)
         elif key_event == "Escape":
-            self.stop_calibration()
-            self.stop_measure_distance()
-            self.stop_measure_angle()
-            self.stop_measure_area()
-            self.stop_one_click_centring()
-            self.stop_move_beam_to_clicked_point()
-            # self.stop_move_beam_mark()
-            # if want to cancel move beam mark: need to tell from 
-            # clicked event and cancel event: boolean as parameter to change or not beam position
-            if self.in_beam_define_state:
-                self.stop_beam_define()
-            if self.in_magnification_mode:
-                self.set_magnification_mode(False)
-            if self.in_centring_state:
-                self.self.diffractometer_hwobj.cancel_centring_method(
-                    reject=True
-                )
-            self.in_move_beam_mark_state = False
-            self.graphics_move_beam_mark_item.hide()
+            self.stop_current_state()
+            # self.stop_calibration()
+            # self.stop_measure_distance()
+            # self.stop_measure_angle()
+            # self.stop_measure_area()
+            # self.stop_one_click_centring()
+            # self.stop_move_beam_to_clicked_point()
+            # # self.stop_move_beam_mark()
+            # # if want to cancel move beam mark: need to tell from 
+            # # clicked event and cancel event: boolean as parameter to change or not beam position
+            # if self.in_beam_define_state:
+            #     self.stop_beam_define()
+            # if self.in_magnification_mode:
+            #     self.set_magnification_mode(False)
+            # if self.in_centring_state:
+            #     self.self.diffractometer_hwobj.cancel_centring_method(
+            #         reject=True
+            #     )
+            # self.in_move_beam_mark_state = False
+            # self.graphics_move_beam_mark_item.hide()
             self.emit("escape_pressed", ())
             # self.graphics_beam_item.set_detected_beam_position(None, None)
 
@@ -2504,17 +2505,38 @@ class QtGraphicsManager(AbstractSampleView):
         Useful to change 'state'
         when selecting new action to perform
         """
-        self.in_calibration_state = False
-        self.in_centring_state = False
-        self.in_measure_distance_state = False
-        self.in_measure_angle_state = False
-        self.in_measure_area_state = False
+        self.stop_calibration()
+        self.stop_measure_distance()
+        self.stop_measure_angle()
+        self.stop_measure_area()
+        self.stop_one_click_centring()
+        self.stop_move_beam_to_clicked_point()
+        # self.stop_move_beam_mark()
+        # if want to cancel move beam mark: need to tell from 
+        # clicked event and cancel event: boolean as parameter to change or not beam position
+        if self.in_beam_define_state:
+            self.stop_beam_define()
+        if self.in_magnification_mode:
+            self.set_magnification_mode(False)
+        if self.in_centring_state:
+            self.self.diffractometer_hwobj.cancel_centring_method(
+                reject=True
+            )
+            self.in_centring_state = False
         self.in_move_beam_mark_state = False
-        self.in_beam_define_state = False
-        self.in_magnification_mode = False
+        self.graphics_move_beam_mark_item.hide()
+
         self.in_one_click_centering = False
         self.in_move_beam_to_clicked_point = False
-        self.wait_measure_distance_click = False
-        self.wait_measure_angle_click = False
-        self.wait_measure_area_click = False
     
+    def set_beam_mark_position(self, x_coord, y_coord):
+        """set beam mark
+        To be used when setting beam position from configuration brick
+        """
+        self.stop_current_state()
+        self.in_move_beam_mark_state = False
+        
+        HWR.beamline.beam.set_beam_position_on_screen(
+            (x_coord,
+            y_coord)
+        )   

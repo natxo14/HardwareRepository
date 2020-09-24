@@ -397,7 +397,7 @@ class MultiplePositions(Equipment):
             0,
             None,
         )
-    
+            
     def calibration_data_changed(self, new_calibration_data):
         """
         Slot when calibration data is edited through camera calibration brick
@@ -420,6 +420,12 @@ class MultiplePositions(Equipment):
         """
         Slot when beam position data is edited through ESRFConfigurationBrick
         """
+        # if data_key == current position => move beam position
+        if data_key == self.get_value() and data_key is not None:
+            if HWR.beamline.sample_view is not None:
+                x_pos = edited_data_elem["beam_pos_x"]
+                y_pos = edited_data_elem["beam_pos_y"]
+                HWR.beamline.sample_view.set_beam_mark_position(x_pos, y_pos)
         #if no data_key given, use current position
         if data_key is None:
             data_key = self.get_value()
@@ -581,17 +587,12 @@ class MultiplePositions(Equipment):
         # self.reload_data_from_backup_dict()
         self.zoom_positions_dict = copy.deepcopy(self.backup_zoom_positions_dict)
         self.emit("beam_pos_cal_data_cancelled")
-        # call to paint beam position
+        # call to paint new beam position
         current_pos_dict = self.get_current_position()
-        self.beam_position_data_changed(
-            (
-            current_pos_dict["beam_pos_x"],
-            current_pos_dict["beam_pos_y"],
-            )
-        )
-        
-        # call to clear tables background color
-        self.emit("beam_pos_cal_data_cancelled")
+        if HWR.beamline.sample_view is not None:
+                x_pos = current_pos_dict["beam_pos_x"]
+                y_pos = current_pos_dict["beam_pos_y"]
+                HWR.beamline.sample_view.set_beam_mark_position(x_pos, y_pos)
         
     # def reload_data_from_xml_file(self):
     #     """
