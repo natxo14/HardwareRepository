@@ -166,7 +166,7 @@ class BlissMotor(AbstractMotor):
             return state_list[0]
 
     def _update_state(self, bliss_state=None):
-        logging.getLogger().info(f"BLISSMOTOR _update_state {self.actuator_name} - signal from bliss state {bliss_state} - READY if state else MOVING")
+        logging.getLogger().info(f"""BLISSMOTOR {self.actuator_name} _update_state  - signal from BLISS : "state" . Param: {bliss_state}""")
         """Check if the state has changed. Emits signal stateChanged.
         Args:
             state (enum AxisState): state from a BLISS motor
@@ -174,7 +174,7 @@ class BlissMotor(AbstractMotor):
         if isinstance(bliss_state, bool):
             # It seems like the current version of BLISS gives us a boolean
             # at first and last event, True for ready and False for moving
-            state = HardwareObjectState.READY if state else HardwareObjectState.BUSY
+            state = HardwareObjectState.READY if bliss_state else HardwareObjectState.BUSY
         else:
             # state comming from bliss (with current_states_names attribute)
             try:
@@ -189,19 +189,20 @@ class BlissMotor(AbstractMotor):
         # THIS IS A COPY OF _update_state
         # this function created to tell from move_done and state bliss signals
         # debugging why takes so much time to update bliss motor status after the movement
-        logging.getLogger().info(f"BLISSMOTOR _update_state_move_done {self.actuator_name} - signal from bliss move_done {bliss_state}")
-        if isinstance(bliss_state, bool):
-            # It seems like the current version of BLISS gives us a boolean
-            # at first and last event, True for ready and False for moving
-            state = HardwareObjectState.READY if bliss_state else HardwareObjectState.BUSY
-        else:
-            # state comming from bliss (with current_states_names attribute)
-            try:
-                state = self.get_state()
-            except (AttributeError, KeyError):
-                state = HardwareObjectState.UNKNOWN
-        self._specific_state = self.get_specific_state()
-        self.update_state(state)
+        logging.getLogger().info(f"""BLISSMOTOR {self.actuator_name} _update_state_move_done - signal from BLISS "move_done" . Param: {bliss_state} . Calling _update_state""")
+        self._update_state(bliss_state)
+        # if isinstance(bliss_state, bool):
+        #     # It seems like the current version of BLISS gives us a boolean
+        #     # at first and last event, True for ready and False for moving
+        #     state = HardwareObjectState.READY if bliss_state else HardwareObjectState.BUSY
+        # else:
+        #     # state comming from bliss (with current_states_names attribute)
+        #     try:
+        #         state = self.get_state()
+        #     except (AttributeError, KeyError):
+        #         state = HardwareObjectState.UNKNOWN
+        # self._specific_state = self.get_specific_state()
+        # self.update_state(state)
 
     def get_value(self):
         """Read the motor position.
