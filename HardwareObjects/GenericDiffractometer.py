@@ -1001,13 +1001,6 @@ class GenericDiffractometer(HardwareObject):
         """
         """
         print(f"################ GENERIC DIFF motor_positions_to_screen centred_positions_dict :{centred_positions_dict}")
-        print(f"""################ GENERIC DIFF  motor_positions_to_screen CURRENT MOTOR POSITIONS
-         - motor centring_phi:{self.centring_phi.get_value()}
-         - motor centring_sampx:{self.centring_sampx.get_value()} 
-         - motor centring_sampy:{self.centring_sampy.get_value()} 
-         - motor centring_phiy:{self.centring_phiy.get_value()} 
-         - motor centring_phiz:{self.centring_phiz.get_value()} 
-        """)
         if self.use_sample_centring:
             self.update_zoom_calibration()
             if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
@@ -1027,6 +1020,13 @@ class GenericDiffractometer(HardwareObject):
             phiz = self.centring_phiz.direction * (
                 centred_positions_dict["phiz"] - self.centring_phiz.get_value()
             )
+            print(f"""################ GENERIC DIFF  motor_positions_to_screen CURRENT MOTOR POSITIONS and DELTA
+            - motor centring_phi:{self.centring_phi.get_value()}  
+            - motor centring_sampx:{self.centring_sampx.get_value()} vs centred_positions_dict["sampx"] {centred_positions_dict["sampx"]} - delta : {sampx}
+            - motor centring_sampy:{self.centring_sampy.get_value()} vs centred_positions_dict["sampy"] {centred_positions_dict["sampy"]} - delta : {sampy}
+            - motor centring_phiy:{self.centring_phiy.get_value()} vs centred_positions_dict["phiy"] {centred_positions_dict["phiy"]} - delta : {phiy}
+            - motor centring_phiz:{self.centring_phiz.get_value()} vs centred_positions_dict["phiz"] {centred_positions_dict["phiz"]} - delta : {phiz}
+            """)
             rot_matrix = numpy.matrix(
                 [
                     math.cos(phi_angle),
@@ -1042,11 +1042,22 @@ class GenericDiffractometer(HardwareObject):
                 * self.pixels_per_mm_x
             )
 
-            x = dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0]
+            print(f"""################ GENERICDIFF motor_positions_to_screen \n
+            dsx : {dsx} pixelx
+            dsy : {dsy} pixelx
+            phiy : {phiy} mm
+            phiz : {phiz} mm
+            x = dsx + dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsx + dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
+            x2 = dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
+            x3 = dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
+            y = (phiz * self.pixels_per_mm_y) + self.beam_position[1] : {(phiz * self.pixels_per_mm_y) + self.beam_position[1]}
+            """)
+
+            x = dsx + dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]
             #y = dy + (phiz * self.pixels_per_mm_y) + self.beam_position[1]
             y = (phiz * self.pixels_per_mm_y) + self.beam_position[1]
 
-            print(f"################ GENERIC DIFF motor_positions_to_screen x,y {x} -> {int(round(x))},{y} -> {int(round(y))}")
+            print(f"################ GENERIC DIFF motor_positions_to_screen x,y {x} -> {int(round(x))} , {y} -> {int(round(y))}")
             return int(round(x)), int(round(y))
         else:
             raise NotImplementedError

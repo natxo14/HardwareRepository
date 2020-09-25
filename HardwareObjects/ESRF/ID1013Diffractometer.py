@@ -130,20 +130,31 @@ class ID1013Diffractometer(GenericDiffractometer):
             return
         print(f"##################ID10Diffractometer zoom_motor props {props} - keys {props.keys()}")
         
+        emit_signal = False
         if "cal_x" in props.keys() and "cal_y" in props.keys():
             # props["cal_x"] and props["cal_y"] are in nm / pixel
-            self.pixels_per_mm_x = abs(1.0/float(props["cal_x"])) * 1e6
-            self.pixels_per_mm_y = abs(1.0/float(props["cal_y"])) * 1e6
+            new_cal_x = abs(1.0/float(props["cal_x"])) * 1e6
+            new_cal_y = abs(1.0/float(props["cal_y"])) * 1e6
+            
+            if ( new_cal_x != self.pixels_per_mm_x or
+                new_cal_y != self.pixels_per_mm_y ):
+                emit_signal = True
+
+            self.pixels_per_mm_x = new_cal_x
+            self.pixels_per_mm_y = new_cal_y
+
         else:
             self.pixels_per_mm_x = 0
             self.pixels_per_mm_y = 0
+            emit_signal = True
 
         if "beam_pos_x" in props.keys() and "beam_pos_y" in props.keys():
             self.beam_position = [float(props["beam_pos_x"]), float(props["beam_pos_y"])]
         else:
             self.beam_position = [0, 0]
         
-        if 0 not in [self.pixels_per_mm_x, self.pixels_per_mm_y]:
+        # if 0 not in [self.pixels_per_mm_x, self.pixels_per_mm_y]:
+        if emit_signal:
             print(f"##################ID10Diffractometer emit( \
                 pixelsPerMmChanged {self.pixels_per_mm_x} - {self.pixels_per_mm_y} \
                 {self.beam_position}")
@@ -326,11 +337,16 @@ class ID1013Diffractometer(GenericDiffractometer):
         phiz = self.centring_phiz.get_value()
 
         print(f"""################ ID1013 DIFF START get_centred_point_from_coord
-        point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} - calib Not NONE
+        MOTOR POSITIONS:
         sampx {sampx} | sampy {sampy} | phiy {phiy} | phiz {phiz}
+        point {coord_x} , {coord_y} - beam_pos {beam_pos_x}, {beam_pos_y} -
+        | delta : {coord_x - beam_pos_x} , {coord_y - beam_pos_y} Pixelx
         | delta_x {delta_x} | delta_y {delta_y} Millimeters
         | self.centring_phiy.direction : {self.centring_phiy.direction}
         | self.centring_phiz.direction : {self.centring_phiz.direction} 
+        | self.centring_sampx.direction : {self.centring_sampx.direction}
+        | self.centring_sampy.direction : {self.centring_sampy.direction} 
+        | RESOLUTION:  self.pixelsPerMmY : {self.pixelsPerMmY} | self.pixelsPerMmZ : {self.pixelsPerMmZ}
         """)
 
         rot_matrix = numpy.matrix(
@@ -347,30 +363,32 @@ class ID1013Diffractometer(GenericDiffractometer):
         # TODO : assure formules:
         # in MiniDiff delta_y is used: I think wrong: changes in vertical axe do
         # not change projections in X plane
-        dsampx, dsampy = numpy.dot(numpy.array([0, delta_y]), inv_rot_matrix)
+        dsampx, dsampy = numpy.dot(numpy.array([0, delta_x]), inv_rot_matrix)
         sampx = sampx + dsampx
         sampy = sampy + dsampy
 
-        x_axis_motor_pos = phiy + (self.centring_phiy.direction * delta_x)
-        y_axis_motor_pos = phiz + (self.centring_phiz.direction * delta_y)
+        #y_axis_motor_pos = phiy + (self.centring_phiy.direction * delta_x)
+        z_axis_motor_pos = phiz + (self.centring_phiz.direction * delta_y)
         # x_axis_motor_pos = phiy + delta_x
         # y_axis_motor_pos = phiz + self.centring_phiz.direction
 
-        print(f"""################ ID1013 DIFF START get_centred_point_from_coord \n
-        phiy + ( self.centring_phiy.direction * delta_x ) : {phiy} + ( {self.centring_phiy.direction} * {delta_x} ) 
-        phiz + ( self.centring_phiz.direction * delta_y ) : {phiz} + ( {self.centring_phiz.direction} * {delta_y} )
-        x_axis_motor_pos {x_axis_motor_pos}
-        y_axis_motor_pos {y_axis_motor_pos}""")
+        print(f"""################ ID1013 DIFF START get_centred_point_from_coord  MILLIMETERS\n
+        phiy : from {phiy} to {phiy}
+        phiz : from {phiz} to {z_axis_motor_pos} : phiz + (self.centring_phiz.direction * delta_y) - delta : {(self.centring_phiz.direction * delta_y)}
+        sampx : from {sampx - dsampx} to {sampx} - delta : {dsampx}
+        sampy : from {sampy - dsampy} to {sampy} - delta : {dsampy}
+        phi: {self.centring_phi.get_value()}
+        """)
 
         motors_positions = {
-            "phi": phi_angle_motor,
-            "phiz": float(y_axis_motor_pos),
-            "phiy": float(x_axis_motor_pos),
+            "phi": self.centring_phi.get_value(),
+            "phiz": float(z_axis_motor_pos),
+            "phiy": phiy, #float(y_axis_motor_pos),
             "sampx": float(sampx),
             "sampy": float(sampy),
         }
         
-        print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_positions {motors_positions}")
+        # print(f"################ ID1013 DIFF get_centred_point_from_coord out motors_positions {motors_positions}")
         
         return motors_positions
 

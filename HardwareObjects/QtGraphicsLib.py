@@ -727,6 +727,36 @@ class GraphicsItemLine(GraphicsItem):
 
         self.setToolTip(self.get_full_name())
 
+        self.set_drawing_coords_from_points()
+        # (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
+        # (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
+
+        # self.top_left_corner[0] = min(start_cp_x, end_cp_x)
+        # self.top_left_corner[1] = min(start_cp_y, end_cp_y)
+
+        # self.bottom_right_corner[0] = self.top_left_corner[0] + abs(start_cp_x - end_cp_x)
+        # self.bottom_right_corner[1] = self.top_left_corner[1] + abs(start_cp_y - end_cp_y)
+
+        # self.mid_x = abs((start_cp_x - end_cp_x) / 2.0)
+        # self.mid_y = abs((start_cp_y - end_cp_y) / 2.0)
+
+        # self.setPos(self.top_left_corner[0], self.top_left_corner[1])
+
+        # self.start_drawing_coord[0] = self.top_left_corner[0]
+        # self.end_drawing_coord[0] = self.bottom_right_corner[0]
+
+        # if start_cp_x <= end_cp_x:
+        #     self.start_drawing_coord[1] = start_cp_y - self.top_left_corner[1]
+        #     self.end_drawing_coord[1] = end_cp_y - self.top_left_corner[1]
+        # else:
+        #     self.start_drawing_coord[1] = end_cp_y - self.top_left_corner[1]
+        #     self.end_drawing_coord[1] = start_cp_y - self.top_left_corner[1]
+
+    def set_drawing_coords_from_points(self):
+        """
+        Calculate drawing coords for line from 
+        start and end points
+        """
         (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
         (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
 
@@ -750,7 +780,6 @@ class GraphicsItemLine(GraphicsItem):
         else:
             self.start_drawing_coord[1] = end_cp_y - self.top_left_corner[1]
             self.end_drawing_coord[1] = start_cp_y - self.top_left_corner[1]
-
         
     def set_fill_alpha(self, value):
         """Sets the transparency level"""
@@ -822,10 +851,11 @@ class GraphicsItemLine(GraphicsItem):
                     self.beam_size_pix[1],
                 )
 
-        info_txt = "Line %d (%d->%d)" % (
+        info_txt = str("Line %d (%d->%d)" % (
             self.index,
             self.__cp_start.index,
             self.__cp_end.index,
+            )
         )
 
         if self.isSelected():
@@ -926,6 +956,21 @@ class GraphicsItemLine(GraphicsItem):
         output[self.__cp_end.get_display_name().replace(" ", "_")] = self.get_end_point_info()
 
         return(output)
+    
+    def set_position(self, start_position, end_position):
+        """Sets item position
+
+        :param start_position: 'first' point coordinate (pixels)
+        :type start_position: int, int
+        :param end_position: 'second' point coordinate (pixels)
+        :type end_position: int, int
+        :return: None
+        """
+        self.__cp_start.set_start_position(start_position[0], start_position[1])
+        self.__cp_end.set_start_position(end_position[0], end_position[1])
+
+        self.set_drawing_coords_from_points()
+
 
 class GraphicsItemGrid(GraphicsItem):
 
@@ -2144,8 +2189,31 @@ class GraphicsItemSquareROI(GraphicsItem):
 
         self.setToolTip(self.get_full_name())
 
+        self.set_drawing_coords_from_points()
+
         # calculate graphics positions
 
+        # (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
+        # (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
+        # # self.mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
+        # # self.mid_y = min(start_cp_y, end_cp_y) + abs((start_cp_y - end_cp_y) / 2.0)
+        # self.mid_x = abs((start_cp_x - end_cp_x) / 2.0)
+        # self.mid_y = abs((start_cp_y - end_cp_y) / 2.0)
+        
+        # self.start_coord[0] = min(start_cp_x, end_cp_x)
+        # self.start_coord[1] = min(start_cp_y, end_cp_y)
+
+        # self.end_coord[0] = self.start_coord[0] + abs(start_cp_x - end_cp_x)
+        # self.end_coord[1] = min(start_cp_y, end_cp_y) + abs(start_cp_y - end_cp_y)
+
+        # self.setPos(self.start_coord[0], self.start_coord[1])
+        # print(f"self.start_coord {self.start_coord}, self.end_coord {self.end_coord} ")
+
+    def set_drawing_coords_from_points(self):
+        """
+        Calculate drawing coords for line from 
+        start and end points
+        """
         (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
         (end_cp_x, end_cp_y) = self.__cp_end.get_start_position()
         # self.mid_x = min(start_cp_x, end_cp_x) + abs((start_cp_x - end_cp_x) / 2.0)
@@ -2161,6 +2229,7 @@ class GraphicsItemSquareROI(GraphicsItem):
 
         self.setPos(self.start_coord[0], self.start_coord[1])
         print(f"self.start_coord {self.start_coord}, self.end_coord {self.end_coord} ")
+
 
     def set_fill_alpha(self, value):
         """Sets the transparency level"""

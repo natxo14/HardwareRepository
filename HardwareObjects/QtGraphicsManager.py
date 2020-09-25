@@ -600,6 +600,7 @@ class QtGraphicsManager(AbstractSampleView):
             if self.diffractometer_hwobj.is_ready():
                 logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: self.diffractometer_hwobj.is_ready()")
                 for shape in self.get_shapes():
+                    # do this first for points.
                     if isinstance(shape, GraphicsLib.GraphicsItemPoint):
                         cpos = shape.get_centred_position()
                         new_x, new_y = self.diffractometer_hwobj.motor_positions_to_screen(
@@ -640,6 +641,22 @@ class QtGraphicsManager(AbstractSampleView):
                                     shape.set_projection_mode(False)
                                 else:
                                     shape.set_projection_mode(True)
+                
+                for shape in self.get_shapes():
+                    # do then for figures depending on points
+                    if isinstance(shape, GraphicsLib.GraphicsItemLine):
+                        # cpos = shape.get_centred_position()
+                        # new_x, new_y = self.diffractometer_hwobj.motor_positions_to_screen(
+                        #     cpos.as_dict()
+                        # )
+                        shape.set_drawing_coords_from_points()
+                    if isinstance(shape, GraphicsLib.GraphicsItemSquareROI):
+                        # cpos = shape.get_centred_position()
+                        # new_x, new_y = self.diffractometer_hwobj.motor_positions_to_screen(
+                        #     cpos.as_dict()
+                        # )
+                        shape.set_drawing_coords_from_points()
+
                 logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: if self.diffractometer_hwobj.is_ready(): BEFORE show_all_items")
                 self.show_all_items()
                 logging.getLogger().info(f"$$$$$$$$$$$$$$$QtGraphicsManager diffractometer_state_changed: if self.diffractometer_hwobj.is_ready(): AFTER show_all_items")
