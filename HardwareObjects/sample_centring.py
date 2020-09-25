@@ -523,14 +523,15 @@ def center(
         ]
     )
     Z = chiRotMatrix * numpy.matrix([X, Y])
-    z = Z[1]
-    avg_pos = Z[0].mean()
+    # TODO : GENERIC FUNCTION FOR vertical and horizontal phi axes
+    z = Z[0] #Z[1]
+    avg_pos = Z[1].mean() #Z[0].mean()
 
     r, a, offset = multiPointCentre(numpy.array(z).flatten(), phi_positions)
     dy = r * numpy.sin(a)
     dx = r * numpy.cos(a)
 
-    d = chiRotMatrix.transpose() * numpy.matrix([[avg_pos], [offset]])
+    d = chiRotMatrix.transpose() * numpy.matrix([[offset], [avg_pos]]) # ([[avg_pos], [offset]])
 
     d_horizontal = d[0] - (beam_xc / float(pixelsPerMm_Hor))
     d_vertical = d[1] - (beam_yc / float(pixelsPerMm_Ver))
