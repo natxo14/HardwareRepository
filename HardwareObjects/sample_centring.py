@@ -516,6 +516,7 @@ def center(
 
     # logging.info("X=%s,Y=%s", X, Y)
     chi_angle = math.radians(chi_angle)
+
     chiRotMatrix = numpy.matrix(
         [
             [math.cos(chi_angle), -math.sin(chi_angle)],
@@ -528,8 +529,10 @@ def center(
     avg_pos = Z[1].mean() #Z[0].mean()
 
     r, a, offset = multiPointCentre(numpy.array(z).flatten(), phi_positions)
-    dy = r * numpy.sin(a)
-    dx = r * numpy.cos(a)
+    dy = r * numpy.cos(a) #numpy.sin(a)
+    dx = r * numpy.sin(a) #numpy.cos(a)
+    dy2 = r * numpy.sin(a)
+    dx2 = r * numpy.cos(a)
 
     d = chiRotMatrix.transpose() * numpy.matrix([[offset], [avg_pos]]) # ([[avg_pos], [offset]])
 
@@ -542,6 +545,40 @@ def center(
             [math.cos(phi_pos), -math.sin(phi_pos)],
             [math.sin(phi_pos), math.cos(phi_pos)],
         ]
+    )
+
+    print(f"""-------------------->
+    Z mm:
+    {Z}
+    z mm: {z}
+    numpy.array(z).flatten() : {numpy.array(z).flatten()}
+    phi_positions : {phi_positions}
+    Z[1] : {Z[1]}
+    offset : {offset}
+    avg_pos : {avg_pos}
+    r : {r}
+    a : {a}
+    chi_angle : {chi_angle}
+    chiRotMatrix :
+    {chiRotMatrix}
+    chiRotMatrix.transpose() :
+    {chiRotMatrix.transpose()}
+    d : {d}
+    d_horizontal : {d_horizontal} mm
+    d_vertical : {d_vertical} mm
+    dy : {dy} 
+    dy2 : {dy2} 
+    dx : {dx}
+    dx2 : {dx2}
+    sampx : {float(sampx.get_value() + sampx.direction * dx)}
+    sampy : {float(sampy.get_value() + sampy.direction * dy)}
+    sampx2 : {float(sampx.get_value() + sampx.direction * dx2)}
+    sampy2 : {float(sampy.get_value() + sampy.direction * dy2)}
+    phiz.__dict__.get("reference_position") : {phiz.__dict__.get("reference_position")}
+    phiy.__dict__.get("reference_position") : {phiy.__dict__.get("reference_position")}
+    phiz : {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
+    phiy : {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
+    """
     )
 
     centred_pos = SAVED_INITIAL_POSITIONS.copy()
