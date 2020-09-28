@@ -325,7 +325,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         delta_x = (coord_x - beam_pos_x) / self.pixelsPerMmY
         delta_y = (coord_y - beam_pos_y) / self.pixelsPerMmZ
 
-        phi_angle_motor = self.centring_phi.direction * self.centring_phi.get_value()
+        phi_angle_motor = self.centring_phi.get_value()
         phi_angle = math.radians(phi_angle_motor)
         # sampx = self.centring_sampx.direction * self.centring_sampx.get_value()
         # sampy = self.centring_sampy.direction * self.centring_sampy.get_value()
@@ -368,13 +368,13 @@ class ID1013Diffractometer(GenericDiffractometer):
         sampy = sampy + dsampy
 
         #y_axis_motor_pos = phiy + (self.centring_phiy.direction * delta_x)
-        z_axis_motor_pos = phiz + (self.centring_phiz.direction * delta_y)
+        z_axis_motor_pos = phiz + delta_y
         # x_axis_motor_pos = phiy + delta_x
         # y_axis_motor_pos = phiz + self.centring_phiz.direction
 
         print(f"""################ ID1013 DIFF START get_centred_point_from_coord  MILLIMETERS\n
         phiy : from {phiy} to {phiy}
-        phiz : from {phiz} to {z_axis_motor_pos} : phiz + (self.centring_phiz.direction * delta_y) - delta : {(self.centring_phiz.direction * delta_y)}
+        phiz : from {phiz} to {z_axis_motor_pos} : phiz + (self.centring_phiz.direction * delta_y) - delta : {delta_y}
         sampx : from {sampx - dsampx} to {sampx} - delta : {dsampx}
         sampy : from {sampy - dsampy} to {sampy} - delta : {dsampy}
         phi: {self.centring_phi.get_value()}
