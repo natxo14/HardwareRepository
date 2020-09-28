@@ -561,9 +561,7 @@ def center(
     chi_angle : {chi_angle}
     chiRotMatrix :
     {chiRotMatrix}
-    chiRotMatrix.transpose() :
-    {chiRotMatrix.transpose()}
-    d : {d}
+    chiRotMatri"Exception while centring"
     d_horizontal : {d_horizontal} mm
     d_vertical : {d_vertical} mm
     dy : {dy} 
