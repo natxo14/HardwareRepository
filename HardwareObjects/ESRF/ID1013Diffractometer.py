@@ -169,27 +169,36 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         Descript. :
         Move center of the image to the clicked point
+        Use only phiy and phyz motors
+        Calculate motors displacement 'directly', without get_centred_point_from_coord
         """
         
         try:
-            print(f"##################ID10Diffractometer move_beam_to_clicked_point {coord_x} {coord_y}")
-            
-            self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
-            self.centring_time = time.time()
-            #curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            print(f"""##################ID10Diffractometer
+            move_beam_to_clicked_point {coord_x} , {coord_y}
+            beam pos {self.beam_position[0]} , {self.beam_position[1]} """)
             
             if coord_x is None and coord_y is None:
                 coord_x = self.beam_position[0]
                 coord_y = self.beam_position[1]
+            
+            self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
+            
+            delta_x = (coord_x - self.beam_position[0]) / self.pixelsPerMmY
+            delta_y = (coord_y - self.beam_position[1]) / self.pixelsPerMmZ
 
-            motors = self.get_centred_point_from_coord(
-                coord_x, coord_y
-            )
-            # get rid of centred points that are not moving:
-            motors.pop('phi', None)
-            motors.pop('sampx', None)
-            motors.pop('sampy', None)
+            print(f"""##################ID10Diffractometer
+            phiy {self.centring_phiy.get_value()} , delta_x {delta_x} self.centring_phiy.direction {self.centring_phiy.direction}
+            phiz {self.centring_phiz.get_value()} , delta_y {delta_y} self.centring_phiz.direction {self.centring_phiz.direction}
+            """)
 
+            motors = {}
+            phiy = self.centring_phiy.get_value() + (self.centring_phiy.direction * delta_x)
+            phiz = self.centring_phiz.get_value() + (self.centring_phiz.direction * delta_y)
+            
+            motors['phiz'] = phiz
+            motors['phiy'] = phiy
+            
             #check orientation
             if direction == "horizontal":
                 motors.pop('phiz')
