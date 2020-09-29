@@ -921,8 +921,12 @@ class GenericDiffractometer(HardwareObject):
         else:
             motor_pos_str = ""
             for key, value in motor_pos.items():
-                print(f"centring done : {key.name()} , {value}")
-                motor_pos_str += str(f"{key.name()} : {value} \n ")
+                if type(key) == str:
+                    pass
+                else:
+                    print(f"centring done : {key.name()} , {value}")
+                    motor_pos_str += str(f"{key.name()} : {value} \n ")
+            self.emit("centring_calculation_ended", motor_pos)
             if (
                     QtImport.QMessageBox.warning(
                         None,
