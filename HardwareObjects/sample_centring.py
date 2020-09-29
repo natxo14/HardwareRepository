@@ -529,10 +529,10 @@ def center(
     avg_pos = Z[1].mean() #Z[0].mean()
 
     r, a, offset = multiPointCentre(numpy.array(z).flatten(), phi_positions)
-    dy = r * numpy.cos(a) #numpy.sin(a)
-    dx = r * numpy.sin(a) #numpy.cos(a)
-    dy2 = r * numpy.sin(a)
-    dx2 = r * numpy.cos(a)
+    dy = r * numpy.sin(a) #numpy.sin(a)
+    dx = r * numpy.cos(a) #numpy.cos(a)
+    dy2 = r * numpy.cos(a)
+    dx2 = r * numpy.sin(a)
 
     d = chiRotMatrix.transpose() * numpy.matrix([[offset], [avg_pos]]) # ([[avg_pos], [offset]])
 
@@ -592,6 +592,13 @@ def center(
             else phiy.reference_position,
         }
     )
+    centred_pos['alpha'] = a
+    centred_pos['r'] = r
+    centred_pos['avg_pos'] = avg_pos
+    centred_pos['phi_positions'] = phi_positions
+    centred_pos['offset'] = offset
+    centred_pos['pixelsPerMm_Hor'] = pixelsPerMm_Hor
+    centred_pos['pixelsPerMm_Ver'] = pixelsPerMm_Ver
 
     print(f"--------------------> END CENTER WITH centred_pos {centred_pos}")
     return centred_pos
