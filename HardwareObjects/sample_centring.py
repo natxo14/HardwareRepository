@@ -574,8 +574,8 @@ def center(
     sampy2 : {float(sampy.get_value() + sampy.direction * dy2)}
     phiz.__dict__.get("reference_position") : {phiz.__dict__.get("reference_position")}
     phiy.__dict__.get("reference_position") : {phiy.__dict__.get("reference_position")}
-    phiz : {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
-    phiy : {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
+    phiz : FROM  {phiz.get_value()} == > {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
+    phiy : FROM {phiy.get_value()} ==> {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
     """
     )
 
@@ -599,6 +599,8 @@ def center(
     centred_pos['offset'] = offset
     centred_pos['pixelsPerMm_Hor'] = pixelsPerMm_Hor
     centred_pos['pixelsPerMm_Ver'] = pixelsPerMm_Ver
+    centred_pos['d_vertical'] = d_vertical
+    centred_pos['d_horizontal'] = d_horizontal
 
     print(f"--------------------> END CENTER WITH centred_pos {centred_pos}")
     return centred_pos
