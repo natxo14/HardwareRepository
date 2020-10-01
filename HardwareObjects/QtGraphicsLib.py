@@ -197,6 +197,51 @@ class GraphicsItem(QtImport.QGraphicsItem):
         if position_x is not None and position_y is not None:
             self.end_coord = [position_x, position_y]
         self.scene().update()
+    
+    def get_item_height_mm(self):
+        return float(
+            self.get_item_height_pix() / self.pixels_per_mm[1]
+        )
+
+    def get_item_width_mm(self):
+        return float(
+            self.get_item_height_pix() / self.pixels_per_mm[0]
+        )
+
+    def get_item_height_pix(self):
+        return(
+            abs(
+            self.start_coord[1] -
+            self.end_coord[1]
+            )
+        )
+
+    def get_item_width_pix(self):
+        return(
+            abs(
+            self.start_coord[0] -
+            self.end_coord[0]
+            )
+        )
+    
+    def get_item_diagonal_pix(self):
+        height = self.get_item_height_pix()
+        width = self.get_item_width_pix()
+
+        return float(
+            math.pow(
+                math.pow(height, 2) + math.pow(width, 2), 0.5
+            )
+        )
+
+    def get_item_diagonal_mm(self):
+        height_mm = float(self.get_item_height_pix() / self.self.pixels_per_mm[1])
+        width_mm = float(self.get_item_width_pix() / self.self.pixels_per_mm[0])
+        return (
+            math.pow(
+                math.pow(height_mm, 2) + math.pow(width_mm, 2), 0.5
+            )
+        )
 
     def get_display_name(self):
         """Returns items display name
@@ -2211,7 +2256,7 @@ class GraphicsItemSquareROI(GraphicsItem):
 
     def set_drawing_coords_from_points(self):
         """
-        Calculate drawing coords for line from 
+        Calculate drawing coords for line from
         start and end points
         """
         (start_cp_x, start_cp_y) = self.__cp_start.get_start_position()
