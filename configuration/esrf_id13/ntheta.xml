@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device class="BlissMotor">
-  <actuator_name>thetab</actuator_name>
+  <actuator_name>Theta</actuator_name>
 </device>
