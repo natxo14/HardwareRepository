@@ -174,30 +174,41 @@ class ID1013Diffractometer(GenericDiffractometer):
         """
         
         try:
-            print(f"""##################ID10Diffractometer
-            move_beam_to_clicked_point {coord_x} , {coord_y}
-            beam pos {self.beam_position[0]} , {self.beam_position[1]} """)
+            print(f"##################ID10Diffractometer move_beam_to_clicked_point {coord_x} {coord_y}")
             
-            if coord_x is None and coord_y is None:
+            beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
+        
+            # self.update_zoom_calibration()
+
+            if None in (self.pixels_per_mm_x, self.pixels_per_mm_y):
+                return 0, 0
+            
+            if coord_x is None or coord_y is None:
                 coord_x = self.beam_position[0]
                 coord_y = self.beam_position[1]
             
             self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
-            
-            delta_x = (coord_x - self.beam_position[0]) / self.pixelsPerMmY
-            delta_y = (coord_y - self.beam_position[1]) / self.pixelsPerMmZ
-
-            print(f"""##################ID10Diffractometer
-            phiy {self.centring_phiy.get_value()} , delta_x {delta_x} self.centring_phiy.direction {self.centring_phiy.direction}
-            phiz {self.centring_phiz.get_value()} , delta_y {delta_y} self.centring_phiz.direction {self.centring_phiz.direction}
-            """)
-
+                        
+            delta_x = float(coord_x - beam_pos_x) / self.pixelsPerMmY
+            delta_y = float(coord_y - beam_pos_y) / self.pixelsPerMmZ
             motors = {}
-            phiy = self.centring_phiy.get_value() + (self.centring_phiy.direction * delta_x)
-            phiz = self.centring_phiz.get_value() + (self.centring_phiz.direction * delta_y)
             
-            motors['phiz'] = phiz
-            motors['phiy'] = phiy
+            phiy = self.centring_phiy.get_value()
+            phiz = self.centring_phiz.get_value()
+
+            motors['phiz'] = phiz - self.centring_phiz.direction * delta_y
+            motors['phiy'] = phiy - self.centring_phiy.direction * delta_x
+            # self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
+            # self.centring_time = time.time()
+            # #curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            
+            # motors = self.get_centred_point_from_coord(
+            #     coord_x, coord_y
+            # )
+            # # get rid of centred points that are not moving:
+            # motors.pop('phi', None)
+            # motors.pop('sampx', None)
+            # motors.pop('sampy', None)
             
             #check orientation
             if direction == "horizontal":
