@@ -196,8 +196,16 @@ class ID1013Diffractometer(GenericDiffractometer):
             phiy = self.centring_phiy.get_value()
             phiz = self.centring_phiz.get_value()
 
-            motors['phiz'] = phiz - self.centring_phiz.direction * delta_y
+            motors['phiz'] = phiz + self.centring_phiz.direction * delta_y
             motors['phiy'] = phiy - self.centring_phiy.direction * delta_x
+
+            print(f"""
+            ##################ID10Diffractometer move_beam_to_clicked_point
+            delta_x : {delta_x}
+            delta_y : {delta_y}
+            FROM phiy : {phiy} => {motors['phiy']}
+            FROM phiz : {phiz} => {motors['phiz']}
+            """)
             # self.emit_progress_message(f"Move to clicked point {coord_x},{coord_y}...")
             # self.centring_time = time.time()
             # #curr_time = time.strftime("%Y-%m-%d %H:%M:%S")
