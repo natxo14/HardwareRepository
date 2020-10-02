@@ -235,8 +235,8 @@ class GraphicsItem(QtImport.QGraphicsItem):
         )
 
     def get_item_diagonal_mm(self):
-        height_mm = float(self.get_item_height_pix() / self.self.pixels_per_mm[1])
-        width_mm = float(self.get_item_width_pix() / self.self.pixels_per_mm[0])
+        height_mm = float(self.get_item_height_pix() / self.pixels_per_mm[1])
+        width_mm = float(self.get_item_width_pix() / self.pixels_per_mm[0])
         return (
             math.pow(
                 math.pow(height_mm, 2) + math.pow(width_mm, 2), 0.5
@@ -565,6 +565,7 @@ class GraphicsItemPoint(GraphicsItem):
             self.__centred_position = centred_position
 
         self.start_coord = [position_x, position_y]
+        self.end_coord = [position_x, position_y]
         self.setPos(position_x - 10, position_y - 10)
 
     def boundingRect(self):
@@ -665,6 +666,8 @@ class GraphicsItemPoint(GraphicsItem):
         if position_x is not None and position_y is not None:
             self.start_coord[0] = position_x
             self.start_coord[1] = position_y
+            self.end_coord[0] = self.start_coord[0]
+            self.end_coord[1] = self.start_coord[1]
             self.setPos(position_x - 10, position_y - 10)
             self.scene().update()
 
@@ -825,6 +828,21 @@ class GraphicsItemLine(GraphicsItem):
         else:
             self.start_drawing_coord[1] = end_cp_y - self.top_left_corner[1]
             self.end_drawing_coord[1] = start_cp_y - self.top_left_corner[1]
+        
+        self.start_coord[0] = start_cp_x
+        self.start_coord[1] = start_cp_y
+        
+        self.end_coord[0] = end_cp_x
+        self.end_coord[1] = end_cp_y
+
+        # print(f"""
+        # (start_cp_x, start_cp_y) = ({start_cp_x}, {start_cp_y})
+        # (end_cp_x, end_cp_y) = ({end_cp_x}, {end_cp_y})
+        # self.start_coord  = {self.start_coord}
+        # self.end_coord = {self.end_coord}
+        # self.start_drawing_coord = {self.start_drawing_coord}
+        # self.end_drawing_coord = {self.end_drawing_coord}
+        # """)
         
     def set_fill_alpha(self, value):
         """Sets the transparency level"""

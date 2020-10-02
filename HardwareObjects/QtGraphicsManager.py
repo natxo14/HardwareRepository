@@ -1105,7 +1105,7 @@ class QtGraphicsManager(AbstractSampleView):
             # if self.in_magnification_mode:
             #     self.set_magnification_mode(False)
             # if self.in_centring_state:
-            #     self.self.diffractometer_hwobj.cancel_centring_method(
+            #     self.diffractometer_hwobj.cancel_centring_method(
             #         reject=True
             #     )
             # self.in_move_beam_mark_state = False
@@ -1309,7 +1309,7 @@ class QtGraphicsManager(AbstractSampleView):
         self.shape_dict[shape.get_display_name()] = shape
         #self._shapes.add_shape(shape.get_display_name(), shape)
         self.graphics_view.graphics_scene.addItem(shape)
-
+        shape.set_pixels_per_mm(self.pixels_per_mm)
         if isinstance(shape, GraphicsLib.GraphicsItemPoint):
             if emit:
                 self.emit("shapeCreated", shape, "Point")
@@ -2536,7 +2536,7 @@ class QtGraphicsManager(AbstractSampleView):
         if self.in_magnification_mode:
             self.set_magnification_mode(False)
         if self.in_centring_state:
-            self.self.diffractometer_hwobj.cancel_centring_method(
+            self.diffractometer_hwobj.cancel_centring_method(
                 reject=True
             )
             self.in_centring_state = False
