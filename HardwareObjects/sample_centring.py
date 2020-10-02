@@ -576,6 +576,8 @@ def center(
     phiy.__dict__.get("reference_position") : {phiy.__dict__.get("reference_position")}
     phiz : FROM  {phiz.get_value()} == > {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
     phiy : FROM {phiy.get_value()} ==> {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
+    pixelsPerMm_Hor {pixelsPerMm_Hor}
+    pixelsPerMm_Ver {pixelsPerMm_Ver}
     """
     )
 
