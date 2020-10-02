@@ -95,4 +95,7 @@
             <beamy>241.0</beamy>
         </position>
     </positions>
+
+    <default_session>cdi</default_session>
+
 </object>

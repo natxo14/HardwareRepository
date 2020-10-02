@@ -74,5 +74,6 @@
         </position>
     </positions>
 <operational_modes>['signal', 'background', 'test']</operational_modes>
+<default_session>eh3</default_session>
 
 </object>
