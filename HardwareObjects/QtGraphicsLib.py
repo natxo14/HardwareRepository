@@ -427,7 +427,14 @@ class GraphicsItemBeam(GraphicsItem):
                 self.detected_beam_info_dict[0] - 10,
                 self.detected_beam_info_dict[1] + 10,
             )
+        
+    def boundingRect(self):
+        """Returns adjusted rect
 
+        :returns: QRect
+        """
+        return self.rect.adjusted(0, 0, 20, 20)
+        
     def enable_beam_size(self, state):
         """Enable or disable info about beam size
 
@@ -1968,6 +1975,19 @@ class GraphicsItemScale(GraphicsItem):
         self.custom_pen.setWidth(3)
         self.custom_pen.setColor(self.custom_pen_color)
 
+    def boundingRect(self):
+        """Returns adjusted rect
+
+        :returns: QRect
+        """
+
+        return self.rect.adjusted(
+            0,
+            0,
+            7 + self.__scale_len_pix,
+            15 + self.__scale_len_pix / 2
+        )
+
     def paint(self, painter, option, widget):
         """
         Main pain method
@@ -2062,6 +2082,7 @@ class GraphicsItemScale(GraphicsItem):
         :return:
         """
         print(f"GraphicsItemScale set_pixels_per_mm {pixels_per_mm}")
+        print(f"GraphicsItemScale self.start_coord {self.start_coord}")
         self.pixels_per_mm = pixels_per_mm
         for line_len in GraphicsItemScale.HOR_LINE_LEN_NANOS:
             print(f"GraphicsItemScale HOR_LINE_LEN_NANOS set_pixels_per_mm line_len - {line_len} - {self.pixels_per_mm[0] * line_len}")
