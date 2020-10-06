@@ -397,6 +397,9 @@ class MultiplePositions(Equipment):
             0,
             None,
         )
+
+        # simulate zoom change to update values in diffractometer
+        self.emit("predefinedPositionChanged", current_pos_name)
             
     def calibration_data_changed(self, new_calibration_data):
         """
@@ -415,10 +418,17 @@ class MultiplePositions(Equipment):
             1,
             None,
         )
+        
+        # simulate zoom change to update values in diffractometer
+        self.emit("predefinedPositionChanged", current_pos_name)
 
     def edit_data(self, edited_data_elem, data_key=None, who_changed=0):
         """
         Slot when beam position data is edited through ESRFConfigurationBrick
+        params:
+        edited_data_elem : dict with edited data : zoom_tag, beam_pos, calib ...
+        data_key = name of the zoom position for which data changed
+        who_changed : 0 if beam_pos, 1 if calibration, 2 else
         """
         # if data_key == current position => move beam position
         if data_key == self.get_value() and data_key is not None:
@@ -439,6 +449,9 @@ class MultiplePositions(Equipment):
             who_changed,
             edited_data_elem
         )
+
+        # simulate zoom change to update values in diffractometer
+        self.emit("predefinedPositionChanged", data_key)
 
     def get_positions_names_list(self):
         return list(self.positions_dict.keys())
