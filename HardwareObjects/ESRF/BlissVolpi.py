@@ -9,11 +9,15 @@ class BlissVolpi(HardwareObject):
         
     def init(self):
         self.username = self.volpi_name
+        self.default_value = self.default_value
+        if self.default_value is None:
+            self.default_value = 15
 
         cfg = static.get_config()
         self.volpi = cfg.get(self.volpi_name)
         self.connect(self.volpi, "intensity", self.intensity_changed)
     
+        self.set_value(self.default_value)
     def connectNotify(self, signal):
         if signal == "intensityChanged":
             self.emit("intensityChanged", (self.get_value(),))
