@@ -373,67 +373,73 @@ class GraphicsItemBeam(GraphicsItem):
         if self.beam_is_rectangle:
             #print(f" GraphicsItemBeam Paint rectangle")
             painter.drawRect(
-                self.beam_position[0] * self.scene().image_scale
-                - self.beam_size_pix[0] / 2 * self.scene().image_scale,
-                self.beam_position[1] * self.scene().image_scale
-                - self.beam_size_pix[1] / 2 * self.scene().image_scale,
-                self.beam_size_pix[0] * self.scene().image_scale,
-                self.beam_size_pix[1] * self.scene().image_scale,
+                - self.beam_size_pix[0] / 2,
+                - self.beam_size_pix[1] / 2,
+                self.beam_size_pix[0],
+                self.beam_size_pix[1],
             )
         else:
-            #print(f""" GraphicsItemBeam Paint ellipse""")
             painter.drawEllipse(
-                self.beam_position[0] * self.scene().image_scale
-                - self.beam_size_pix[0] / 2 * self.scene().image_scale,
-                self.beam_position[1] * self.scene().image_scale
-                - self.beam_size_pix[1] / 2 * self.scene().image_scale,
-                self.beam_size_pix[0] * self.scene().image_scale,
-                self.beam_size_pix[1] * self.scene().image_scale,
+                - self.beam_size_pix[0] / 2,
+                - self.beam_size_pix[1] / 2,
+                self.beam_size_pix[0],
+                self.beam_size_pix[1],
             )
 
         self.custom_pen.setColor(QtImport.Qt.red)
         painter.setPen(self.custom_pen)
         painter.drawLine(
-            self.beam_position[0] * self.scene().image_scale - 10,
-            self.beam_position[1] * self.scene().image_scale,
-            self.beam_position[0] * self.scene().image_scale + 10,
-            self.beam_position[1] * self.scene().image_scale,
+            -10,
+            0,
+            10,
+            0,
         )
         painter.drawLine(
-            self.beam_position[0] * self.scene().image_scale,
-            self.beam_position[1] * self.scene().image_scale - 10,
-            self.beam_position[0] * self.scene().image_scale,
-            self.beam_position[1] * self.scene().image_scale + 10,
+            0,
+            -10,
+            0,
+            10
         )
         if self.display_beam_size:
             self.custom_pen.setColor(QtImport.Qt.green)
             painter.setPen(self.custom_pen)
             painter.drawText(
-                self.beam_position[0] + self.beam_size_pix[0] / 2 + 2,
-                self.beam_position[1] + self.beam_size_pix[1] / 2 + 10,
+                self.beam_size_pix[0] / 2 + 2,
+                self.beam_size_pix[1] / 2 + 10,
                 "%d x %d %sm"
                 % (self.beam_size_mm[0] * 1000, self.beam_size_mm[1] * 1000, u"\u00B5"),
             )
-        if None not in self.detected_beam_info_dict:
-            painter.drawLine(
-                self.detected_beam_info_dict[0] - 10,
-                self.detected_beam_info_dict[1] - 10,
-                self.detected_beam_info_dict[0] + 10,
-                self.detected_beam_info_dict[1] + 10,
-            )
-            painter.drawLine(
-                self.detected_beam_info_dict[0] + 10,
-                self.detected_beam_info_dict[1] - 10,
-                self.detected_beam_info_dict[0] - 10,
-                self.detected_beam_info_dict[1] + 10,
-            )
-        
+        # if None not in self.detected_beam_info_dict:
+        #     painter.drawLine(
+        #         self.detected_beam_info_dict[0] - 10,
+        #         self.detected_beam_info_dict[1] - 10,
+        #         self.detected_beam_info_dict[0] + 10,
+        #         self.detected_beam_info_dict[1] + 10,
+        #     )
+        #     painter.drawLine(
+        #         self.detected_beam_info_dict[0] + 10,
+        #         self.detected_beam_info_dict[1] - 10,
+        #         self.detected_beam_info_dict[0] - 10,
+        #         self.detected_beam_info_dict[1] + 10,
+        #     )
+
+    def set_beam_position(self, beam_position):
+        """Sets beam position
+        """
+        self.beam_position = beam_position
+        self.setPos(beam_position[0], beam_position[1])
+
     def boundingRect(self):
         """Returns adjusted rect
 
         :returns: QRect
         """
-        return self.rect.adjusted(0, 0, 20, 20)
+        return self.rect.adjusted(
+            - self.beam_size_pix[0] / 2,
+            - self.beam_size_pix[1] / 2,
+            self.beam_size_pix[0],
+            self.beam_size_pix[1],
+        )
         
     def enable_beam_size(self, state):
         """Enable or disable info about beam size
@@ -1984,8 +1990,8 @@ class GraphicsItemScale(GraphicsItem):
         return self.rect.adjusted(
             0,
             0,
-            7 + self.__scale_len_pix,
-            15 + self.__scale_len_pix / 2
+            self.__scale_len_pix,
+            - ( self.__scale_len_pix / 2 )
         )
 
     def paint(self, painter, option, widget):
@@ -2004,25 +2010,25 @@ class GraphicsItemScale(GraphicsItem):
         painter.setPen(self.custom_pen)
 
         painter.drawLine(
-            7,
-            self.start_coord[1] - 15,
-            7 + self.__scale_len_pix,
-            self.start_coord[1] - 15,
+            0,
+            0,
+            self.__scale_len_pix,
+            0
         )
         painter.drawText(
-            self.__scale_len_pix - 18,
-            self.start_coord[1] - 20,
+            self.__scale_len_pix - 30,
+            - 10,
             "%d %s" % (self.__scale_len, self.__scale_unit),
         )
         painter.drawLine(
-            7,
-            self.start_coord[1] - 15,
-            7,
-            self.start_coord[1] - 15 - self.__scale_len_pix / 2,
+            0,
+            0,
+            0,
+            - self.__scale_len_pix / 2,
         )
         painter.drawText(
-            12,
-            self.start_coord[1] - 7 - self.__scale_len_pix / 2,
+            7,
+            10 - self.__scale_len_pix / 2,
             "%d %s" % (self.__scale_len / 2, self.__scale_unit),
         )
 
@@ -2128,7 +2134,9 @@ class GraphicsItemScale(GraphicsItem):
         if position_x is not None and position_y is not None:
             self.start_coord[0] = int(position_x)
             self.start_coord[1] = int(position_y)
-
+        
+        self.setPos(7, position_y - 15)
+        
     def set_display_grid(self, display_grid):
         """
         Display grid
