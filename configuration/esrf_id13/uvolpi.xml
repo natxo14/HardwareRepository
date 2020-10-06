@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device class="ESRF.BlissVolpi">
   <volpi_name>uvolpi</volpi_name>
+  <default_value>15</default_value>
 </device>
