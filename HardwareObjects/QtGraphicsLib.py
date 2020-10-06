@@ -403,12 +403,21 @@ class GraphicsItemBeam(GraphicsItem):
         if self.display_beam_size:
             self.custom_pen.setColor(QtImport.Qt.green)
             painter.setPen(self.custom_pen)
-            painter.drawText(
-                self.beam_size_pix[0] / 2 + 2,
-                self.beam_size_pix[1] / 2 + 10,
-                "%d x %d %sm"
-                % (self.beam_size_mm[0] * 1000, self.beam_size_mm[1] * 1000, u"\u00B5"),
-            )
+
+            if (self.beam_size_mm[0] * 1000 > 1) and (self.beam_size_mm[1] * 1000 > 1):
+                painter.drawText(
+                    self.beam_size_pix[0] / 2 + 2,
+                    self.beam_size_pix[1] / 2 + 10,
+                    "%d x %d %sm"
+                    % (self.beam_size_mm[0] * 1000, self.beam_size_mm[1] * 1000, u"\u00B5"),
+                )
+            else:
+                painter.drawText(
+                    self.beam_size_pix[0] / 2 + 2,
+                    self.beam_size_pix[1] / 2 + 10,
+                    "%d x %d %sm"
+                    % (self.beam_size_mm[0] * 1000000, self.beam_size_mm[1] * 1000000, "n"),
+                )
         # if None not in self.detected_beam_info_dict:
         #     painter.drawLine(
         #         self.detected_beam_info_dict[0] - 10,
