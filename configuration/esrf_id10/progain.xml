@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<device class="BlissMotor">
-  <actuator_name>progain</actuator_name>
-  <GUIstep>0.05</GUIstep>
-</device>

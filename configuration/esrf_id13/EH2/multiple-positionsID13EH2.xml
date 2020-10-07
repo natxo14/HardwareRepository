@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<object class="MultiplePositions">
+    <username>Optic Zoom</username>
+    <amplitude>60</amplitude>
+    
+    <motors>
+        <motor>
+            <name>zoom</name>
+        </motor>
+        <!--motor>
+            <name>light</name>
+        </motor-->
+    </motors>
+	
+    <object href="/uturret" role="zoom"/>
+
+	<deltas>
+        <zoom>0.1</zoom>
+        <light>10</light>
+    </deltas>
+    
+    <positions>
+        <position>
+            <name>5x</name>
+            <zoom>5</zoom>
+            <light>700</light>
+            <resox>2.59067357513e-06</resox>
+            <resoy>2.53164556962e-06</resoy>
+            <beamx>394</beamx>
+            <beamy>202</beamy>
+        </position>
+        <position>
+            <name>20x</name>
+            <zoom>4</zoom>
+            <light>500</light>
+            <resox>8.40336134454e-07</resox>
+            <resoy>8.40336134454e-07</resoy>
+            <beamx>426</beamx>
+            <beamy>182</beamy>
+        </position>
+        <position>
+            <name>50x</name>
+            <zoom>1</zoom>
+            <light>300</light>
+            <resox>2.67379679144e-07</resox>
+            <resoy>2.52525252525e-07</resoy>
+            <beamx>372.0</beamx>
+            <beamy>228.0</beamy>
+        </position>
+        <position>
+            <name>100x</name>
+            <zoom>3</zoom>
+            <light>1000</light>
+            <resox>5.31914893617e-09</resox>
+            <resoy>6.41025641026e-09</resoy>
+            <beamx>375</beamx>
+            <beamy>293</beamy>
+        </position>
+        <position>
+            <name>diode</name>
+            <zoom>2</zoom>
+            <light>1000</light>
+            <resox>3.22580645161e-06</resox>
+            <resoy>3.25581395349e-06</resoy>
+            <beamx>431</beamx>
+            <beamy>202</beamy>
+        </position>
+        <position>
+        <name>dummy</name>
+            <zoom>-1</zoom>
+            <light>1000</light>
+            <resox>5.22580645161e-06</resox>
+            <resoy>5.25581395349e-06</resoy>
+        </position>
+    </positions>
+<operational_modes>['signal', 'background', 'test']</operational_modes>
+<default_session>eh2</default_session>
+</object>
