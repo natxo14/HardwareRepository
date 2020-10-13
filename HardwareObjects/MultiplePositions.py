@@ -211,8 +211,6 @@ class MultiplePositions(Equipment):
         """
         Equipment.__init__(self, *args)
 
-        self.motor_obj = None
-
         self.motor_hwobj_dict = {}
         #{ "motor_name" : motor_hwr_obj }
 
