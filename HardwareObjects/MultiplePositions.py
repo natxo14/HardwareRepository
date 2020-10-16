@@ -339,20 +339,14 @@ class MultiplePositions(Equipment):
             print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for mot in self.motor_hwobj_dict - name - {mot.name()} mot {id(mot)}")
             self.connect(mot, "valueChanged", self.checkPosition)
             self.connect(mot, "stateChanged", self.stateChanged)
-
-        # if HWR.beamline.sample_view is not None:
-        #     print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS update_beam_position HWR.beamline.beam not none")
-        #     # check if 'zoom' role exists
-        #     if "zoom" in self.roles:
-        #         self.connect(HWR.beamline.sample_view,
-        #                 "beam_position_data_changed",
-        #                 self.beam_position_data_changed
-        #         )
-        #     else:
-        #         print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS HAS NO 'ZOOM' role")
-        # else:
-        #     print(f"##################@@@@@@@@@@@@@@@@ MULTIPLE POS HWR.beamline.sample_view NONE")
             
+        if HWR.beamline.beam is not None:
+            self.connect(HWR.beamline.beam,
+                        "beamPosChanged",
+                        self.beam_position_data_changed
+            )
+        else:
+            logging.getLogger("HWR").warning("MultiplePositions init() : HWR.beamline.beam NONE")
 
         # create zoom_positions_dict backup
         self.backup_zoom_positions_dict = copy.deepcopy(self.zoom_positions_dict)
@@ -366,7 +360,7 @@ class MultiplePositions(Equipment):
         """
         returns
         tag_dict:
-        { 
+        {
             "pos_namei" : zoom_valuei,
         }
         """
@@ -397,7 +391,7 @@ class MultiplePositions(Equipment):
         )
 
         # simulate zoom change to update values in diffractometer
-        self.emit("predefinedPositionChanged", current_pos_name)
+        # self.emit("predefinedPositionChanged", current_pos_name)
             
     def calibration_data_changed(self, new_calibration_data):
         """
@@ -418,7 +412,7 @@ class MultiplePositions(Equipment):
         )
         
         # simulate zoom change to update values in diffractometer
-        self.emit("predefinedPositionChanged", current_pos_name)
+        # self.emit("predefinedPositionChanged", current_pos_name)
 
     def edit_data(self, edited_data_elem, data_key=None, who_changed=0):
         """
@@ -449,7 +443,7 @@ class MultiplePositions(Equipment):
         )
 
         # simulate zoom change to update values in diffractometer
-        self.emit("predefinedPositionChanged", data_key)
+        # self.emit("predefinedPositionChanged", data_key)
 
     def get_positions_names_list(self):
         return list(self.positions_dict.keys())
@@ -597,13 +591,13 @@ class MultiplePositions(Equipment):
     def cancel_edited_data(self):
         # self.reload_data_from_backup_dict()
         self.zoom_positions_dict = copy.deepcopy(self.backup_zoom_positions_dict)
-        self.emit("beam_pos_cal_data_cancelled")
         # call to paint new beam position
         current_pos_dict = self.get_current_position()
         if HWR.beamline.sample_view is not None:
                 x_pos = current_pos_dict["beam_pos_x"]
                 y_pos = current_pos_dict["beam_pos_y"]
                 HWR.beamline.sample_view.set_beam_mark_position(x_pos, y_pos)
+        self.emit("beam_pos_cal_data_cancelled")
         
     # def reload_data_from_xml_file(self):
     #     """
@@ -670,6 +664,8 @@ class MultiplePositions(Equipment):
     def save_data_to_file(self, path):
         
         #open xml file
+        path = self.getPath()
+        print(f"MULTIPLE POSITIONS : save_data_to_file : self.getPath() {self.getPath()}")
         xml_file_tree = cElementTree.parse(path)
 
         xml_tree = xml_file_tree.getroot()
