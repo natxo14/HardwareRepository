@@ -376,19 +376,24 @@ class MultiplePositions(Equipment):
         """
         print(f"@@@@@@@@@@@@@@@@ MULTIPLE POS - for beam_position_data_changed {new_beam_pos_data}")
         
+        emit = False
         current_pos_name = self.get_value()
         if current_pos_name is not None:
+            # check if data has been modified (new beam pos) or only zoom position changed
             dict_elem = self.zoom_positions_dict[current_pos_name]
-            dict_elem["beam_pos_x"] = new_beam_pos_data[0]
-            dict_elem["beam_pos_y"] = new_beam_pos_data[1]
-        
-        self.zoom_positions_dict[current_pos_name] = dict_elem
+            if (dict_elem["beam_pos_x"] != new_beam_pos_data[0] or
+                dict_elem["beam_pos_y"] != new_beam_pos_data[1]):
+                emit = True
+                dict_elem["beam_pos_x"] = new_beam_pos_data[0]
+                dict_elem["beam_pos_y"] = new_beam_pos_data[1]
+                self.zoom_positions_dict[current_pos_name] = dict_elem
 
-        self.emit(
-            "beam_pos_cal_data_changed",
-            0,
-            None,
-        )
+        if emit:
+            self.emit(
+                "beam_pos_cal_data_changed",
+                0,
+                None,
+            )
 
         # simulate zoom change to update values in diffractometer
         # self.emit("predefinedPositionChanged", current_pos_name)
