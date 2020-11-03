@@ -1046,18 +1046,40 @@ class GenericDiffractometer(HardwareObject):
                 * self.pixels_per_mm_x
             )
 
+
+            self.chiAngle = 90
+            chi_angle = math.radians(self.chiAngle)
+            chiRot = numpy.matrix(
+                [
+                    math.cos(chi_angle),
+                    -math.sin(chi_angle),
+                    math.sin(chi_angle),
+                    math.cos(chi_angle),
+                ]
+            )
+
+            dsx2, dsy2 = (
+                numpy.dot(numpy.array([sampx, sampy]), inv_rot_matrix)
+                * self.pixels_per_mm_y
+            )
+            chiRot.shape = (2, 2)
+            sx2, sy2 = numpy.dot(numpy.array([0, dsy2]), numpy.array(chiRot))  # .I))
+            beam_pos_x, beam_pos_y = HWR.beamline.beam.get_beam_position_on_screen()
+
+            x2 = sx2 + (phiy * self.pixelsPerMmY) + beam_pos_x
+            y2 = sy2 + (phiz * self.pixelsPerMmZ) + beam_pos_y
+
             print(f"""################ GENERICDIFF motor_positions_to_screen \n
             dsx : {dsx} pixelx
             dsy : {dsy} pixelx
             phiy : {phiy} mm
             phiz : {phiz} mm
             x = dsx + dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsx + dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
-            x2 = dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
-            x3 = dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
+            x = dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0] : {dsx + (phiy * self.pixels_per_mm_x) + self.beam_position[0]}
             y = (phiz * self.pixels_per_mm_y) + self.beam_position[1] : {(phiz * self.pixels_per_mm_y) + self.beam_position[1]}
             """)
 
-            x = dsx + dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]
+            x = dsy + (phiy * self.pixels_per_mm_x) + self.beam_position[0]
             #y = dy + (phiz * self.pixels_per_mm_y) + self.beam_position[1]
             y = (phiz * self.pixels_per_mm_y) + self.beam_position[1]
 
