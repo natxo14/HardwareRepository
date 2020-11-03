@@ -1839,11 +1839,11 @@ class QtGraphicsManager(AbstractSampleView):
             (self.graphics_move_beam_mark_item.end_coord[0],
             self.graphics_move_beam_mark_item.end_coord[1])
         )
-        print(f"QtGraphMng stop_move_beam_mark emit beam_position_data_changed")
-        self.emit(
-            "beam_position_data_changed",
-            self.graphics_move_beam_mark_item.end_coord
-        )
+        #print(f"QtGraphMng stop_move_beam_mark emit beam_position_data_changed")
+        # self.emit(
+        #     "beam_position_data_changed",
+        #     self.graphics_move_beam_mark_item.end_coord
+        # )
         self.emit("infoMsg", "")
 
     def stop_beam_define(self):

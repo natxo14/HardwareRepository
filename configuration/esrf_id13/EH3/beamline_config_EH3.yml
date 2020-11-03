@@ -27,9 +27,9 @@ _objects:
     #- machine_info: mach-info-mockup.xml
     #- transmission: transmission-mockup.xml
     #- energy: energy-mockup.xml
-    - beam: beam-infoID10.xml
-    - sample_view: graphicsID10.xml #graphicsWMockupCamera.xml #
-    - diffractometer: diffractometerID10.xml #-mockup.xml # id13-diffractometer.xml #
+    - beam: beam-infoEH3.xml
+    - sample_view: graphicsID13EH3.xml 
+    - diffractometer: diffractometerID13EH3.xml 
     #- microscope: graphics.xml
     #- flux: flux-mockup.xml
     #- detector: detector-mockup.xml

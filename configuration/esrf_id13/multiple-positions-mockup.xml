@@ -36,8 +36,8 @@
             <exposure>0.1</exposure>
             <resox>2.34741784038e-06</resox>
             <resoy>2.590673575130001e-06</resoy>
-            <beamx>94</beamx>
-            <beamy>45</beamy>
+            <beamx>325.0</beamx>
+            <beamy>244.0</beamy>
         </position>
         <position>
             <name>3X</name>
@@ -56,8 +56,8 @@
             <zoom>3</zoom>
             <gain>10</gain>
             <exposure>0.1</exposure>
-            <resox>7.462686567164181e-07</resox>
-            <resoy>2.631578947368422e-06</resoy>
+            <resox>7.462686567164182e-07</resox>
+            <resoy>2.6315789473684224e-06</resoy>
             <beamx>247</beamx>
             <beamy>440</beamy>
         </position>
@@ -66,7 +66,7 @@
             <zoom>2</zoom>
             <gain>13</gain>
             <exposure>0.1</exposure>
-            <resox>6.890000000000001e-07</resox>
+            <resox>6.890000000000002e-07</resox>
             <resoy>1.25e-05</resoy>
             <beamx>200</beamx>
             <beamy>340</beamy>
