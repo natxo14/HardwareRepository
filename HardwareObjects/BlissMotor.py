@@ -91,9 +91,9 @@ class BlissMotor(AbstractMotor):
         AbstractMotor.init(self)
         cfg = static.get_config()
         self.motor_obj = cfg.get(self.actuator_name)
-
+        
         self.update_state(self.get_state())
-
+        
         self.connect(self.motor_obj, "position", self.update_value)
         self.connect(self.motor_obj, "state", self._update_state)
         self.connect(self.motor_obj, "move_done", self._update_state_move_done)
