@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <object class="MultiplePositions">
     <username>Optic Zoom</username>
     <amplitude>60</amplitude>
@@ -7,9 +6,7 @@
         <motor>
             <name>zoom</name>
         </motor>
-        <!--motor>
-            <name>light</name>
-        </motor-->
+        
     </motors>
 	
     <object href="/turretID13EH3" role="zoom" />
@@ -23,57 +20,57 @@
         <position>
             <name>5x</name>
             <zoom>5</zoom>
-            <light>700</light>
-            <resox>2.59067357513e-06</resox>
-            <resoy>2.53164556962e-06</resoy>
-            <beamx>394</beamx>
-            <beamy>202</beamy>
+            <light>17</light>
+            <resox>2.463054187192118e-06</resox>
+            <resoy>2.5125628140703527e-06</resoy>
+            <beamx>347.0</beamx>
+            <beamy>216.0</beamy>
         </position>
         <position>
             <name>20x</name>
             <zoom>4</zoom>
-            <light>500</light>
-            <resox>8.40336134454e-07</resox>
-            <resoy>8.40336134454e-07</resoy>
+            <light>0</light>
+            <resox>1e-08</resox>
+            <resoy>1e-08</resoy>
             <beamx>426</beamx>
             <beamy>182</beamy>
         </position>
         <position>
             <name>50x</name>
             <zoom>1</zoom>
-            <light>300</light>
-            <resox>2.469135802469136e-06</resox>
-            <resoy>2.469135802469136e-06</resoy>
-            <beamx>372.0</beamx>
-            <beamy>228.0</beamy>
+            <light>25</light>
+            <resox>2.4630541871921185e-07</resox>
+            <resoy>2.525252525252525e-07</resoy>
+            <beamx>372</beamx>
+            <beamy>228</beamy>
         </position>
         <position>
             <name>100x</name>
             <zoom>3</zoom>
-            <light>1000</light>
-            <resox>5.31914893617e-09</resox>
-            <resoy>6.41025641026e-09</resoy>
+            <light>0</light>
+            <resox>1e-08</resox>
+            <resoy>1e-08</resoy>
             <beamx>375</beamx>
             <beamy>293</beamy>
         </position>
         <position>
             <name>diode</name>
             <zoom>2</zoom>
-            <light>1000</light>
-            <resox>3.22580645161e-06</resox>
-            <resoy>3.25581395349e-06</resoy>
+            <light>0</light>
+            <resox>1e-08</resox>
+            <resoy>1e-08</resoy>
             <beamx>431</beamx>
             <beamy>202</beamy>
         </position>
         <position>
         <name>dummy</name>
             <zoom>-1</zoom>
-            <light>1000</light>
-            <resox>5.22580645161e-06</resox>
-            <resoy>5.25581395349e-06</resoy>
+            <light>0</light>
+            <resox>1e-08</resox>
+            <resoy>1e-08</resoy>
         </position>
     </positions>
-<operational_modes>['signal', 'background', 'test']</operational_modes>
+<operational_modes>['signal', 'background', 'test', 'empty']</operational_modes>
 <default_session>eh3</default_session>
 
 </object>

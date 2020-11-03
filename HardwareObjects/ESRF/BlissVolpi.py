@@ -18,20 +18,22 @@ class BlissVolpi(HardwareObject):
         self.connect(self.volpi, "intensity", self.intensity_changed)
     
         self.set_value(self.default_value)
-    def connectNotify(self, signal):
-        if signal == "intensityChanged":
-            self.emit("intensityChanged", (self.get_value(),))
+    # def connectNotify(self, signal):
+    #     if signal == "intensityChanged":
+    #         self.emit("intensityChanged", (self.get_value(),))
 
     def set_value(self, intensity):
         """set volpi to new value."""
+        print(f" BLISS VOLPI set_value : {intensity}")
         self.volpi.intensity = intensity
 
     def get_value(self):
         """get volpi intensity value."""
         return self.volpi.intensity
     
-    def update_values(self):
-        self.emit("intensityChanged", (self.get_value(),))
+    # def update_values(self):
+    #     self.emit("intensityChanged", (self.get_value(),))
 
     def intensity_changed(self, new_intensity):
-        self.emit("intensityChanged", (new_intensity,))
+        if new_intensity != self.volpi.intensity:
+            self.emit("intensityChanged", (new_intensity,))
