@@ -1878,7 +1878,7 @@ class QtGraphicsManager(AbstractSampleView):
         print(f"QtGraphMng start_centring")
         if tree_click:
             self.hide_all_items()
-            self.set_cursor_busy(True)
+            #self.set_cursor_busy(True)
             self.set_centring_state(True)
             self.diffractometer_hwobj.start_centring_method(
                 self.diffractometer_hwobj.CENTRING_METHOD_MANUAL
