@@ -238,7 +238,7 @@ class ID1013Diffractometer(GenericDiffractometer):
         if self.use_sample_centring:
             sample_centring.user_click(x, y)
             if use_mode == "centring":
-                self.emit("centring_image_clicked", (x, y))
+                self.emit("centring_image_clicked", (x, y, self.centring_phi.get_value()))
         else:
             self.user_clicked_event.set((x, y))
     
