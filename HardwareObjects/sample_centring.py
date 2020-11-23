@@ -506,7 +506,7 @@ def center(
             print(phi.get_value())
             phi_positions.append(phi.direction * math.radians(phi.get_value()))
             if i != n_points - 1:
-                phi.set_value_relative(phi.direction * phi_angle)
+                phi.set_value_relative(phi.direction * phi_angle, timeout=10)
             READY_FOR_NEXT_POINT.set()
             i += 1
     except BaseException:
@@ -514,9 +514,8 @@ def center(
         move_motors(SAVED_INITIAL_POSITIONS)
         raise
 
-    # logging.info("X=%s,Y=%s", X, Y)
+    # AS IT IS IN MXCUBE : WITH CHI_ANGLE TO 90 DEGREES
     chi_angle = math.radians(chi_angle)
-
     chiRotMatrix = numpy.matrix(
         [
             [math.cos(chi_angle), -math.sin(chi_angle)],
@@ -524,32 +523,23 @@ def center(
         ]
     )
     Z = chiRotMatrix * numpy.matrix([X, Y])
-    # TODO : GENERIC FUNCTION FOR vertical and horizontal phi axes
-    z = Z[0] #Z[1]
-    avg_pos = Z[1].mean() #Z[0].mean()
+    z = Z[1]
+    avg_pos = Z[0].mean()
 
     r, a, offset = multiPointCentre(numpy.array(z).flatten(), phi_positions)
-    dy = r * numpy.sin(a) #numpy.sin(a)
-    dx = r * numpy.cos(a) #numpy.cos(a)
-    dy2 = r * numpy.cos(a)
-    dx2 = r * numpy.sin(a)
+    dy = r * numpy.sin(a)
+    dx = r * numpy.cos(a)
 
-    d = chiRotMatrix.transpose() * numpy.matrix([[offset], [avg_pos]]) # ([[avg_pos], [offset]])
+    d = chiRotMatrix.transpose() * numpy.matrix([[avg_pos], [offset]])
 
     d_horizontal = d[0] - (beam_xc / float(pixelsPerMm_Hor))
     d_vertical = d[1] - (beam_yc / float(pixelsPerMm_Ver))
-
-    phi_pos = math.radians(phi.direction * phi.get_value())
-    phiRotMatrix = numpy.matrix(
-        [
-            [math.cos(phi_pos), -math.sin(phi_pos)],
-            [math.sin(phi_pos), math.cos(phi_pos)],
-        ]
-    )
-
-    print(f"""-------------------->
-    Z mm:
-    {Z}
+    
+    print(f"""
+    # -------------------->
+    # AS IT IS IN MXCUBE : WITH CHI_ANGLE TO 90 DEGREES
+    # -------------------->
+    Z mm: {Z}
     z mm: {z}
     numpy.array(z).flatten() : {numpy.array(z).flatten()}
     phi_positions : {phi_positions}
@@ -559,23 +549,18 @@ def center(
     r : {r}
     a : {a}
     chi_angle : {chi_angle}
-    chiRotMatrix :
-    {chiRotMatrix}
-    chiRotMatri"Exception while centring"
+    chiRotMatrix : {chiRotMatrix}
     d_horizontal : {d_horizontal} mm
     d_vertical : {d_vertical} mm
     dy : {dy} 
-    dy2 : {dy2} 
     dx : {dx}
-    dx2 : {dx2}
-    sampx : {float(sampx.get_value() + sampx.direction * dx)}
-    sampy : {float(sampy.get_value() + sampy.direction * dy)}
-    sampx2 : {float(sampx.get_value() + sampx.direction * dx2)}
-    sampy2 : {float(sampy.get_value() + sampy.direction * dy2)}
+    sampx delta: ({sampx.direction}) * {dx} : from {sampx.get_value()} to {float(sampx.get_value() + sampx.direction * dx)}
+    sampy delta: ({sampy.direction}) * {dy} : from {sampy.get_value()} to {float(sampy.get_value() + sampy.direction * dy)}
+    
     phiz.__dict__.get("reference_position") : {phiz.__dict__.get("reference_position")}
     phiy.__dict__.get("reference_position") : {phiy.__dict__.get("reference_position")}
-    phiz : FROM  {phiz.get_value()} == > {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
-    phiy : FROM {phiy.get_value()} ==> {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
+    phiz : DELTA : ({phiz.direction}) * {d_vertical[0, 0]} : FROM  {phiz.get_value()} == > {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
+    phiy : DELTA : ({phiy.direction}) * {d_horizontal[0, 0]} : FROM {phiy.get_value()} ==> {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
     pixelsPerMm_Hor {pixelsPerMm_Hor}
     pixelsPerMm_Ver {pixelsPerMm_Ver}
     """
@@ -594,17 +579,109 @@ def center(
             else phiy.reference_position,
         }
     )
-    centred_pos['alpha'] = a
-    centred_pos['r'] = r
-    centred_pos['avg_pos'] = avg_pos
-    centred_pos['phi_positions'] = phi_positions
-    centred_pos['offset'] = offset
-    centred_pos['pixelsPerMm_Hor'] = pixelsPerMm_Hor
-    centred_pos['pixelsPerMm_Ver'] = pixelsPerMm_Ver
-    centred_pos['d_vertical'] = d_vertical
-    centred_pos['d_horizontal'] = d_horizontal
 
-    print(f"--------------------> END CENTER WITH centred_pos {centred_pos}")
+
+    # # FOR CDI : NO CHI ANGLE : BUT CHANGE HORIZONTAL FOR VERTICAL
+    # chi_angle = math.radians(0)
+
+    # chiRotMatrix = numpy.matrix(
+    #     [
+    #         [math.cos(chi_angle), -math.sin(chi_angle)],
+    #         [math.sin(chi_angle), math.cos(chi_angle)],
+    #     ]
+    # )
+    # Z = chiRotMatrix * numpy.matrix([X, Y])
+    # z = Z[0]
+    # avg_pos = Z[1].mean()
+
+    # r, a, offset = multiPointCentre(numpy.array(z).flatten(), phi_positions)
+    # dy = r * numpy.sin(a) #numpy.sin(a)
+    # dx = r * numpy.cos(a) #numpy.cos(a)
+    # dy2 = r * numpy.cos(a)
+    # dx2 = r * numpy.sin(a)
+
+    # d = chiRotMatrix.transpose() * numpy.matrix([[offset], [avg_pos]]) # ([[avg_pos], [offset]])
+
+    # d_horizontal = d[0] - (beam_xc / float(pixelsPerMm_Hor))
+    # d_vertical = d[1] - (beam_yc / float(pixelsPerMm_Ver))
+
+    # phi_pos = math.radians(phi.direction * phi.get_value())
+    # phiRotMatrix = numpy.matrix(
+    #     [
+    #         [math.cos(phi_pos), -math.sin(phi_pos)],
+    #         [math.sin(phi_pos), math.cos(phi_pos)],
+    #     ]
+    # )
+
+    # print(f"""# 
+    # -------------------->
+    # # TRANSFORMED WITH CHI ANGLE =0 
+    # # -------------------->
+    # Z mm: {Z}
+    # z mm: {z}
+    # numpy.array(z).flatten() : {numpy.array(z).flatten()}
+    # phi_positions : {phi_positions}
+    # Z[1] : {Z[1]}
+    # offset : {offset}
+    # avg_pos : {avg_pos}
+    # r : {r}
+    # a : {a}
+    # chi_angle : {chi_angle}
+    # chiRotMatrix : {chiRotMatrix}
+    # d_horizontal : {d_horizontal} mm
+    # d_vertical : {d_vertical} mm
+    # dy : {dy} 
+    # dx : {dx}
+    # dy2 : {dy2} 
+    # dx2 : {dx2}
+
+    # sampx delta: ({sampx.direction}) * {dx} : from {sampx.get_value()} to {float(sampx.get_value() + sampx.direction * dx)}
+    # sampy delta: ({sampy.direction}) * {dy} : from {sampy.get_value()} to {float(sampy.get_value() + sampy.direction * dy)}
+    
+    # sampx2 delta: ({sampx.direction}) * {dx2} : from {sampx.get_value()} to {float(sampx.get_value() + sampx.direction * dx2)}
+    # sampy2 delta: ({sampy.direction}) * {dy2} : from {sampy.get_value()} to {float(sampy.get_value() + sampy.direction * dy2)}
+    
+    # phiz.__dict__.get("reference_position") : {phiz.__dict__.get("reference_position")}
+    # phiy.__dict__.get("reference_position") : {phiy.__dict__.get("reference_position")}
+    # phiz : DELTA : ({phiz.direction}) * {d_vertical[0, 0]} : FROM  {phiz.get_value()} == > {float(phiz.get_value() + phiz.direction * d_vertical[0, 0])}
+    # phiy : DELTA : ({phiy.direction}) * {d_horizontal[0, 0]} : FROM {phiy.get_value()} ==> {float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])}
+    # pixelsPerMm_Hor {pixelsPerMm_Hor}
+    # pixelsPerMm_Ver {pixelsPerMm_Ver}
+    # """
+    # )
+
+    # # centred_pos = SAVED_INITIAL_POSITIONS.copy()
+    # # centred_pos.update(
+    # #     {
+    # #         sampx.motor: float(sampx.get_value() + sampx.direction * dx),
+    # #         sampy.motor: float(sampy.get_value() + sampy.direction * dy),
+    # #         phiz.motor: float(phiz.get_value() + phiz.direction * d_vertical[0, 0])
+    # #         if phiz.__dict__.get("reference_position") is None
+    # #         else phiz.reference_position,
+    # #         phiy.motor: float(phiy.get_value() + phiy.direction * d_horizontal[0, 0])
+    # #         if phiy.__dict__.get("reference_position") is None
+    # #         else phiy.reference_position,
+    # #     }
+    # # )
+    # centred_pos['alpha'] = a
+    # centred_pos['r'] = r
+    # centred_pos['avg_pos'] = avg_pos
+    # centred_pos['phi_positions'] = phi_positions
+    # centred_pos['offset'] = offset
+    # centred_pos['pixelsPerMm_Hor'] = pixelsPerMm_Hor
+    # centred_pos['pixelsPerMm_Ver'] = pixelsPerMm_Ver
+    # centred_pos['d_vertical'] = d_vertical
+    # centred_pos['d_horizontal'] = d_horizontal
+
+    # print(f"""--------------------> END CENTER WITH 
+    # centred_pos['sampx.motor'] = {centred_pos[sampx.motor]}
+    # centred_pos['sampy.motor'] = {centred_pos[sampy.motor]}
+    # centred_pos['phiz.motor'] = {centred_pos[phiz.motor]}
+    # centred_pos['phiy.motor'] = {centred_pos[phiy.motor]}
+    # centred_pos['phi.motor'] = {centred_pos[phi.motor]}
+
+    # """
+    # )
     return centred_pos
 
 

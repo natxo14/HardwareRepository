@@ -266,6 +266,7 @@ class ID1013Diffractometer(GenericDiffractometer):
             self.pixels_per_mm_y,
             self.beam_position[0],
             self.beam_position[1],
+            chi_angle=90,
             n_points=centring_points,
             phi_range=phi_range_val,
         )
